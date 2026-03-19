@@ -31,10 +31,10 @@ export function CommunitySection() {
 
             <div className="mt-6 space-y-4 text-slate-600 leading-relaxed">
               <p>
-                Cimaa Sites was born from the Minneapolis community. We watched
-                local businesses struggle to get online — either paying
-                thousands to agencies, or getting lost trying to figure out Wix
-                or Squarespace alone.
+                Cimaa Sites was born from the community. We watched local
+                businesses and community entrepreneurs struggle to get online —
+                either paying thousands to agencies, or getting lost trying to
+                figure out Wix or Squarespace alone.
               </p>
               <p>
                 So we built something better. Professional websites, done for
@@ -42,8 +42,9 @@ export function CommunitySection() {
                 that price never goes up. That&apos;s our community promise.
               </p>
               <p>
-                We serve businesses across Minneapolis — from Cedar-Riverside to
-                Northeast, from Burnsville to Brooklyn Park.
+                We serve local businesses across the country — from small towns
+                to big cities, wherever community entrepreneurs need a
+                professional online presence.
               </p>
             </div>
 
@@ -94,7 +95,7 @@ export function CommunitySection() {
 
             <div className="flex items-center gap-2 mt-6 text-sm text-gray-500">
               <MapPin size={14} className="text-blue-500" />
-              Proudly serving Minneapolis, MN and surrounding communities
+              Proudly serving local businesses and communities
             </div>
           </motion.div>
         </div>

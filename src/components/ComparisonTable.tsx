@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
 const rows = [
+  { feature: "Enterprise Stack", cimaa: "Next.js+Supabase", wix: false, squarespace: false, godaddy: false },
   { feature: "Price", cimaa: "$19/mo", wix: "$17-29/mo", squarespace: "$16-23/mo", godaddy: "$10-20/mo" },
   { feature: "Done for you", cimaa: true, wix: false, squarespace: false, godaddy: false },
   { feature: "You own your data", cimaa: true, wix: false, squarespace: false, godaddy: false },
@@ -83,6 +84,18 @@ export function ComparisonTable() {
             </tbody>
           </table>
         </motion.div>
+
+        <motion.p
+          className="mt-8 text-xs text-slate-500 text-center max-w-3xl mx-auto leading-relaxed"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+        >
+          * Cimaa Sites is built on Next.js and Supabase — the same technologies
+          used by Vercel ($3.25B), Linear ($400M), and Cal.com (millions of
+          users). Wix, Squarespace and GoDaddy use proprietary closed stacks you
+          don&apos;t own.
+        </motion.p>
       </Container>
     </section>
   );

@@ -54,7 +54,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900">Location</p>
-                    <p className="text-slate-600">Minneapolis, MN</p>
+                    <p className="text-slate-600">United States</p>
                   </div>
                 </div>
 

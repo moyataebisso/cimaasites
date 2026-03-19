@@ -33,7 +33,7 @@ const faqs = [
   },
   {
     q: "Do you work with non-English speaking businesses?",
-    a: "Yes — we work with businesses across Minneapolis including the Oromo, Somali, and East African communities. We speak your language.",
+    a: "Yes — we work with businesses across the country including the Oromo, Somali, and East African communities. We speak your language.",
   },
   {
     q: "What happens if my site goes down?",

@@ -29,7 +29,7 @@ export function Footer() {
               Powerful websites for powerful communities.
             </p>
             <p className="mt-2 text-sm text-slate-500">
-              Built in Minneapolis, MN &#127775;
+              Built for communities everywhere &#127775;
             </p>
           </div>
 
@@ -76,16 +76,16 @@ export function Footer() {
                   arsitechgroup@gmail.com
                 </a>
               </li>
-              <li>Minneapolis, MN</li>
+              <li>United States</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-800 text-center">
           <p className="text-xs text-slate-400 mb-4">
-            Serving the Oromo, Somali, Ethiopian, and East African communities
-            of Minneapolis — and all local businesses who deserve a professional
-            online presence.
+            Built for immigrant communities, local businesses, and
+            entrepreneurs everywhere who deserve a professional online
+            presence.
           </p>
           <p className="text-sm text-slate-500">
             &copy; 2026 Cimaa Sites by Arsi Technology Group

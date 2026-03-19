@@ -19,7 +19,7 @@ export function FinalCTA() {
             Ready to get your business online?
           </h2>
           <p className="mt-4 text-lg text-white/80 max-w-xl mx-auto">
-            Join Minneapolis businesses already powered by Cimaa Sites.
+            Join businesses everywhere already powered by Cimaa Sites.
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">

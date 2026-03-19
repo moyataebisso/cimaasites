@@ -15,15 +15,15 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cimaa Sites — Websites for Minneapolis Community Businesses | $19/mo",
+  title: "Cimaa Sites — Professional Websites for Local Businesses | $19/mo",
   description:
-    "Professional websites built for Minneapolis small businesses and the East African community. Done for you, $19/mo, 24/7 monitored. Serving Oromo, Somali, and Ethiopian businesses.",
+    "Professional websites built for local businesses and community entrepreneurs. Done for you, $19/mo, 24/7 monitored. Enterprise tech stack at small business prices.",
   keywords:
-    "website Minneapolis, Oromo business website, Somali business website, East African community website, small business website Minneapolis, affordable website Minnesota",
+    "affordable website, small business website, community business website, local business website, professional website $19, done for you website, website monitoring, Next.js website, Supabase website builder",
   openGraph: {
     title: "Cimaa Sites — Powerful Websites for $19/mo",
     description:
-      "We build and manage professional websites for local businesses in Minneapolis. Starting at $19/mo with 24/7 monitoring and direct support.",
+      "We build and manage professional websites for local businesses. Starting at $19/mo with 24/7 monitoring and direct support.",
     url: "https://cimaasites.ai",
     siteName: "Cimaa Sites",
     type: "website",
@@ -52,13 +52,11 @@ export default function RootLayout({
               "@type": "LocalBusiness",
               name: "Cimaa Sites",
               description:
-                "Professional website development and management for local businesses in Minneapolis.",
+                "Professional website development and management for local businesses and community entrepreneurs.",
               url: "https://cimaasites.ai",
               email: "arsitechgroup@gmail.com",
               address: {
                 "@type": "PostalAddress",
-                addressLocality: "Minneapolis",
-                addressRegion: "MN",
                 addressCountry: "US",
               },
               priceRange: "$19-$49.99",

@@ -9,7 +9,7 @@ export function CommunityPromise() {
       <p className="text-white text-sm sm:text-base">
         &#129309; <span className="font-semibold">Our Community Promise</span>{" "}
         — Your price never increases. Your data is always yours. We are always
-        reachable. Built for Minneapolis.
+        reachable. Built for your community.
       </p>
     </div>
   );
