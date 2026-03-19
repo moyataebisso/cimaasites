@@ -55,7 +55,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <Button href="/contact" size="sm">
+            <Button href="/get-started" size="sm">
               Get Started
             </Button>
           </div>
