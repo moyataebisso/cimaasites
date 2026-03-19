@@ -138,8 +138,12 @@ export default function BuildingPage({
                 {statusData?.submission?.error_message ||
                   "We hit a snag. Don't worry — we've been notified and will fix this."}
               </p>
-              <p className="mt-4 text-sm text-slate-400">
-                Contact us at arsitechgroup@gmail.com
+              <p className="mt-4 text-sm text-slate-600">
+                Something went wrong. Email us at{' '}
+                <a href="mailto:arsitechgroup@gmail.com" className="text-blue-600 font-medium hover:underline">
+                  arsitechgroup@gmail.com
+                </a>{' '}
+                and we will fix it within 1 hour.
               </p>
             </div>
           ) : (

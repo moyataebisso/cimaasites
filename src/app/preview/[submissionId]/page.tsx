@@ -111,34 +111,34 @@ export default function PreviewPage({
       {/* Top bar */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <Container>
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between h-14 gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
                 Cimaa Sites
               </span>
-              <Badge variant="blue">Preview Mode</Badge>
+              <Badge variant="blue" className="hidden sm:inline-flex">Preview Mode</Badge>
             </div>
-            <span className="hidden sm:block text-sm font-medium text-slate-700">
+            <span className="hidden lg:block text-sm font-medium text-slate-700 truncate">
               {businessName}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               <button
                 onClick={() => setShowThemePanel(!showThemePanel)}
-                className="px-3 py-1.5 text-sm font-medium border border-slate-300 rounded-lg hover:border-slate-400 transition-colors"
+                className="hidden sm:block px-3 py-1.5 text-sm font-medium border border-slate-300 rounded-lg hover:border-slate-400 transition-colors"
               >
-                Change Theme
+                Theme
               </button>
               <button
                 onClick={() => setShowChangesModal(true)}
-                className="px-3 py-1.5 text-sm font-medium border border-slate-300 rounded-lg hover:border-slate-400 transition-colors"
+                className="hidden sm:block px-3 py-1.5 text-sm font-medium border border-slate-300 rounded-lg hover:border-slate-400 transition-colors"
               >
-                Request Changes
+                Changes
               </button>
               <button
                 onClick={() => setShowApproveModal(true)}
-                className="px-4 py-1.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg hover:from-blue-700 hover:to-violet-700 transition-colors cursor-pointer"
+                className="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg hover:from-blue-700 hover:to-violet-700 transition-colors cursor-pointer"
               >
-                &#10003; Approve &amp; Go Live
+                &#10003; Go Live
               </button>
             </div>
           </div>

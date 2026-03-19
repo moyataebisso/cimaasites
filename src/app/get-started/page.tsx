@@ -690,7 +690,7 @@ function StepStyle({
                 type="button"
                 onClick={() => updateField('selectedTheme', theme.id)}
                 className={cn(
-                  'rounded-xl border-2 p-4 text-left transition-all',
+                  'relative rounded-xl border-2 p-4 text-left transition-all',
                   formData.selectedTheme === theme.id
                     ? 'border-blue-500 ring-2 ring-blue-500/20'
                     : 'border-slate-200 hover:border-slate-300'
@@ -851,15 +851,21 @@ const inputClass =
 export default function GetStartedPage() {
   const { formData, updateField, nextStep, prevStep, loaded } = useOnboardingForm()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
     setLoading(true)
+    setError(null)
     try {
       const saveRes = await fetch('/api/onboard/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
+      if (!saveRes.ok) {
+        const err = await saveRes.json()
+        throw new Error(err.error || 'Failed to save your information. Please try again.')
+      }
       const { submissionId } = await saveRes.json()
       updateField('submissionId', submissionId)
 
@@ -873,10 +879,15 @@ export default function GetStartedPage() {
           businessName: formData.businessName,
         }),
       })
+      if (!checkoutRes.ok) {
+        throw new Error('Failed to create checkout session. Please try again.')
+      }
       const { url } = await checkoutRes.json()
+      if (!url) throw new Error('No checkout URL returned. Please try again.')
       window.location.href = url
     } catch (err) {
       console.error('Checkout error:', err)
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again or email arsitechgroup@gmail.com')
       setLoading(false)
     }
   }
@@ -896,6 +907,11 @@ export default function GetStartedPage() {
     <main className="min-h-screen bg-white pt-24 pb-32">
       <Container className="max-w-4xl">
         <ProgressBar currentStep={formData.currentStep} />
+        {error && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
         <AnimatePresence mode="wait">
           <motion.div
             key={formData.currentStep}
