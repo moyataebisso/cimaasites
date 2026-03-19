@@ -1,16 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
-
-interface GeneratedContent {
-  heroHeadline: string
-  heroSubheading: string
-  aboutText: string
-  metaTitle: string
-  metaDescription: string
-  services: Array<{ name: string; description: string }>
+function getAnthropicClient() {
+  return new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  })
 }
 
 export async function generateContent(submission: {
@@ -21,39 +14,44 @@ export async function generateContent(submission: {
   services?: Array<{ name: string; description?: string }>
   city?: string
   state?: string
-}): Promise<GeneratedContent> {
-  const prompt = `You are writing website copy for a local business.
-Generate compelling, professional copy based on this business information:
+}) {
+  const anthropic = getAnthropicClient()
+
+  const prompt = `
+You are writing website copy for a local business.
+Generate compelling, professional copy based on
+this business information:
 
 Business Name: ${submission.business_name}
 Business Type: ${submission.business_type}
 Description: ${submission.business_description}
 Tagline: ${submission.tagline || 'none provided'}
 Services: ${JSON.stringify(submission.services || [])}
-Location: ${submission.city || ''}, ${submission.state || ''}
+City: ${submission.city || ''}
+State: ${submission.state || ''}
 
-Generate a JSON response with EXACTLY this structure, no other text, no markdown:
+Respond with ONLY valid JSON, no markdown, no extra text:
 {
   "heroHeadline": "compelling 6-10 word headline",
-  "heroSubheading": "one sentence describing the business value",
-  "aboutText": "2-3 sentences about the business, warm and professional",
+  "heroSubheading": "one sentence value proposition",
+  "aboutText": "2-3 warm professional sentences about the business",
   "metaTitle": "SEO title under 60 chars",
   "metaDescription": "SEO description under 160 chars",
   "services": [
     {
       "name": "service name",
-      "description": "one compelling sentence about this service"
+      "description": "one compelling sentence"
     }
   ]
 }
 
 Rules:
-- Use the business name naturally
+- Use the actual business name
 - Be specific to their industry
-- Sound human and warm, not corporate
-- metaTitle format: "[Business Name] - [What They Do]"
+- Sound human and warm not corporate
 - heroHeadline should be action-oriented
-- Do NOT mention location unless it's in their tagline`
+- Do NOT use placeholder text
+`
 
   try {
     const message = await anthropic.messages.create({
@@ -62,9 +60,20 @@ Rules:
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : '{}'
-    return JSON.parse(text)
-  } catch {
+    const text =
+      message.content[0].type === 'text'
+        ? message.content[0].text.trim()
+        : '{}'
+
+    // Strip markdown fencing if present
+    const cleaned = text
+      .replace(/^```json\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim()
+
+    return JSON.parse(cleaned)
+  } catch (error) {
+    console.error('Content generation failed:', error)
     return {
       heroHeadline: `Welcome to ${submission.business_name}`,
       heroSubheading:

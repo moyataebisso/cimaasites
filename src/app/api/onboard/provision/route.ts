@@ -1,3 +1,4 @@
+import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { logStep } from '@/lib/provision/logger'
 import { generateContent } from '@/lib/provision/generate-content'
@@ -5,19 +6,21 @@ import { createVercelProject } from '@/lib/provision/deploy-vercel'
 import { seedClientDatabase } from '@/lib/provision/seed-database'
 import { sendPreviewReadyEmail, sendYouNewClientEmail } from '@/lib/emails'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const { submissionId } = await request.json()
 
-  // Respond immediately, run provisioning async
+  // Respond immediately — webhook needs fast response
   provisionSite(submissionId).catch(async (error) => {
-    console.error('Provisioning failed:', error)
+    console.error('Provisioning error:', error)
+
     await logStep(
       submissionId,
       'provision_failed',
       'failed',
-      'Provisioning encountered an error',
+      'An error occurred during provisioning',
       error.message
     )
+
     await supabaseAdmin
       .schema('cimaasites')
       .from('onboarding_submissions')
@@ -28,25 +31,30 @@ export async function POST(request: Request) {
       .eq('id', submissionId)
 
     await sendYouNewClientEmail({
-      businessName: 'FAILED PROVISION',
+      businessName: 'PROVISIONING FAILED',
       email: submissionId,
-      plan: 'error',
+      plan: 'ERROR',
       revenue: error.message,
-    })
+    }).catch(console.error)
   })
 
-  return new Response('Provisioning started', { status: 200 })
+  return new Response(
+    JSON.stringify({ message: 'Provisioning started' }),
+    { status: 200, headers: { 'Content-Type': 'application/json' } }
+  )
 }
 
 async function provisionSite(submissionId: string) {
-  const { data: submission } = await supabaseAdmin
+  const { data: submission, error } = await supabaseAdmin
     .schema('cimaasites')
     .from('onboarding_submissions')
     .select('*')
     .eq('id', submissionId)
     .single()
 
-  if (!submission) throw new Error('Submission not found')
+  if (error || !submission) {
+    throw new Error(`Submission not found: ${submissionId}`)
+  }
 
   await supabaseAdmin
     .schema('cimaasites')
@@ -57,8 +65,14 @@ async function provisionSite(submissionId: string) {
     })
     .eq('id', submissionId)
 
-  // STEP A: Generate content with Claude AI
-  await logStep(submissionId, 'generating_content', 'running', 'Generating your website content...')
+  // ─── A: Generate content with Claude AI ───
+  await logStep(
+    submissionId,
+    'generating_content',
+    'running',
+    'Writing your website copy...'
+  )
+
   const content = await generateContent(submission)
 
   await supabaseAdmin
@@ -74,10 +88,21 @@ async function provisionSite(submissionId: string) {
     })
     .eq('id', submissionId)
 
-  await logStep(submissionId, 'generating_content', 'done', 'Content generated successfully')
+  await logStep(
+    submissionId,
+    'generating_content',
+    'done',
+    'Website copy generated'
+  )
 
-  // STEP B: Create Vercel project + deploy
-  await logStep(submissionId, 'creating_vercel_project', 'running', 'Setting up your website...')
+  // ─── B: Deploy to Vercel ───
+  await logStep(
+    submissionId,
+    'creating_vercel_project',
+    'running',
+    'Setting up your website on our servers...'
+  )
+
   const vercelResult = await createVercelProject(submission)
 
   await supabaseAdmin
@@ -86,14 +111,29 @@ async function provisionSite(submissionId: string) {
     .update({
       client_vercel_project_id: vercelResult.projectId,
       client_preview_url: vercelResult.previewUrl,
+      assigned_subdomain: `${vercelResult.projectName}.vercel.app`,
     })
     .eq('id', submissionId)
 
-  await logStep(submissionId, 'creating_vercel_project', 'done', 'Website deployed successfully')
+  await logStep(
+    submissionId,
+    'creating_vercel_project',
+    'done',
+    'Website deployed successfully'
+  )
 
-  // STEP C: Seed database with their info
-  await logStep(submissionId, 'setting_up_domain', 'running', 'Setting up your business data...')
-  const { adminEmail, adminPassword } = await seedClientDatabase(submission, content)
+  // ─── C: Seed database ───
+  await logStep(
+    submissionId,
+    'setting_up_domain',
+    'running',
+    'Configuring your business information...'
+  )
+
+  const { adminEmail, adminPassword } = await seedClientDatabase(
+    submission,
+    content
+  )
 
   await supabaseAdmin
     .schema('cimaasites')
@@ -101,14 +141,23 @@ async function provisionSite(submissionId: string) {
     .update({
       client_admin_email: adminEmail,
       client_admin_password: adminPassword,
-      assigned_subdomain: `${vercelResult.projectName}.vercel.app`,
     })
     .eq('id', submissionId)
 
-  await logStep(submissionId, 'setting_up_domain', 'done', 'Business data configured')
+  await logStep(
+    submissionId,
+    'setting_up_domain',
+    'done',
+    'Business information configured'
+  )
 
-  // STEP D: Send preview email
-  await logStep(submissionId, 'sending_preview', 'running', 'Sending you the preview link...')
+  // ─── D: Send preview email ───
+  await logStep(
+    submissionId,
+    'sending_preview',
+    'running',
+    'Sending your preview link...'
+  )
 
   await sendPreviewReadyEmail({
     email: submission.email,
@@ -122,12 +171,23 @@ async function provisionSite(submissionId: string) {
   await sendYouNewClientEmail({
     businessName: submission.business_name,
     email: submission.email,
-    plan: submission.plan,
+    plan: submission.plan || 'basic',
     revenue:
-      submission.plan === 'basic' ? '$19/mo' : submission.plan === 'pro' ? '$35/mo' : '$49.99 one-time',
+      submission.plan === 'pro'
+        ? '$35/mo'
+        : submission.plan === 'developer'
+          ? '$49.99 one-time'
+          : '$19/mo',
   })
 
-  // STEP E: Mark as complete
+  await logStep(
+    submissionId,
+    'sending_preview',
+    'done',
+    'Preview email sent!'
+  )
+
+  // ─── E: Mark complete ───
   await supabaseAdmin
     .schema('cimaasites')
     .from('onboarding_submissions')
@@ -135,8 +195,14 @@ async function provisionSite(submissionId: string) {
       status: 'preview',
       provisioned_at: new Date().toISOString(),
       progress: 100,
+      current_step: 'complete',
     })
     .eq('id', submissionId)
 
-  await logStep(submissionId, 'complete', 'done', 'Your website is ready to preview!')
+  await logStep(
+    submissionId,
+    'complete',
+    'done',
+    'Your website is ready to preview!'
+  )
 }

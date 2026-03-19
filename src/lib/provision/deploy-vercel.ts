@@ -1,36 +1,52 @@
 const VERCEL_API = 'https://api.vercel.com'
-const token = process.env.VERCEL_API_TOKEN
-const accountId = process.env.VERCEL_ACCOUNT_ID
+
+function getHeaders() {
+  return {
+    Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
+    'Content-Type': 'application/json',
+  }
+}
 
 async function vercelFetch(path: string, options: RequestInit = {}) {
-  const res = await fetch(`${VERCEL_API}${path}`, {
+  const teamId = process.env.VERCEL_ACCOUNT_ID
+  const separator = path.includes('?') ? '&' : '?'
+  const url = `${VERCEL_API}${path}${separator}teamId=${teamId}`
+
+  const res = await fetch(url, {
     ...options,
     headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
+      ...getHeaders(),
+      ...((options.headers as Record<string, string>) || {}),
     },
   })
+
   const data = await res.json()
-  if (!res.ok) throw new Error(data.error?.message || JSON.stringify(data))
+
+  if (!res.ok) {
+    throw new Error(
+      `Vercel API error: ${data.error?.message || JSON.stringify(data)}`
+    )
+  }
+
   return data
 }
 
-export async function createVercelProject(submission: {
-  business_name: string
-  email: string
-  selected_theme?: string
-}) {
-  const slug = submission.business_name
+function generateSlug(businessName: string): string {
+  return businessName
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '-')
     .replace(/-+/g, '-')
-    .slice(0, 30)
+    .replace(/^-|-$/g, '')
+    .slice(0, 25)
+}
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createVercelProject(submission: any) {
+  const slug = generateSlug(submission.business_name)
   const projectName = `cimaa-${slug}-${Date.now()}`
 
-  // 1. Create new project linked to GitHub repo
-  const project = await vercelFetch(`/v9/projects?teamId=${accountId}`, {
+  // 1. Create project from same GitHub repo
+  const project = await vercelFetch('/v9/projects', {
     method: 'POST',
     body: JSON.stringify({
       name: projectName,
@@ -40,11 +56,12 @@ export async function createVercelProject(submission: {
         repo: 'moyataebisso/arsi-platform',
       },
       rootDirectory: 'apps/starter-app',
-      buildCommand: 'cd ../.. && turbo run build --filter={apps/starter-app}...',
+      buildCommand:
+        'cd ../.. && turbo run build --filter={apps/starter-app}...',
     }),
   })
 
-  // 2. Set environment variables
+  // 2. Set all environment variables
   const envVars = [
     { key: 'NEXT_PUBLIC_SUPABASE_URL', value: process.env.NEXT_PUBLIC_SUPABASE_URL!, target: ['production', 'preview'], type: 'plain' },
     { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, target: ['production', 'preview'], type: 'plain' },
@@ -63,15 +80,16 @@ export async function createVercelProject(submission: {
     { key: 'CLIENT_SLUG', value: slug, target: ['production'], type: 'plain' },
     { key: 'CRON_SECRET', value: 'cimaa2026secret', target: ['production'], type: 'plain' },
     { key: 'DISCORD_WEBHOOK_DAILY_REPORTS', value: 'placeholder', target: ['production'], type: 'plain' },
+    { key: 'UNSPLASH_ACCESS_KEY', value: process.env.UNSPLASH_ACCESS_KEY || 'placeholder', target: ['production'], type: 'plain' },
   ]
 
-  await vercelFetch(`/v10/projects/${project.id}/env?teamId=${accountId}`, {
+  await vercelFetch(`/v10/projects/${project.id}/env`, {
     method: 'POST',
     body: JSON.stringify(envVars),
   })
 
   // 3. Trigger deployment
-  const deployment = await vercelFetch(`/v13/deployments?teamId=${accountId}`, {
+  const deployment = await vercelFetch('/v13/deployments', {
     method: 'POST',
     body: JSON.stringify({
       name: projectName,
@@ -84,7 +102,7 @@ export async function createVercelProject(submission: {
     }),
   })
 
-  // 4. Poll until deployment is ready
+  // 4. Poll until deployment ready (max 10 min)
   const deploymentUrl = await waitForDeployment(deployment.id)
 
   return {
@@ -97,20 +115,26 @@ export async function createVercelProject(submission: {
 
 async function waitForDeployment(
   deploymentId: string,
-  maxAttempts: number = 40
+  maxAttempts = 40
 ): Promise<string> {
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise((r) => setTimeout(r, 15000))
 
     const deployment = await vercelFetch(`/v13/deployments/${deploymentId}`)
 
-    if (deployment.status === 'READY') {
+    if (deployment.readyState === 'READY') {
       return deployment.url
     }
 
-    if (deployment.status === 'ERROR') {
-      throw new Error('Deployment failed on Vercel')
+    if (
+      deployment.readyState === 'ERROR' ||
+      deployment.readyState === 'CANCELED'
+    ) {
+      throw new Error(
+        `Deployment failed with state: ${deployment.readyState}`
+      )
     }
   }
+
   throw new Error('Deployment timed out after 10 minutes')
 }
