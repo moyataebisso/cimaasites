@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2, ExternalLink, Globe } from 'lucide-react'
+
+// ─── Types ──────────────────────────────────────────────
 
 interface Client {
   id: string
@@ -39,7 +41,113 @@ interface ChangeRequest {
   updated_at: string
 }
 
-type Tab = 'overview' | 'requests'
+type Tab = 'overview' | 'requests' | 'projects'
+
+// ─── Data ───────────────────────────────────────────────
+
+const EXISTING_PROJECTS = [
+  {
+    name: 'Arsi Tech Group',
+    url: 'https://arsitechgroup.com',
+    adminUrl: 'https://arsitechgroup.com/arsi-admin',
+    type: 'Company Website',
+    description: 'Main company marketing site for Arsi Technology Group LLC',
+    status: 'live',
+    businessName: 'Arsi Tech Group Website',
+    github: 'moyataebisso/arsitech',
+  },
+  {
+    name: 'SaveYours',
+    url: 'https://saveyours.net',
+    adminUrl: 'https://saveyours.net/admin/change-requests',
+    type: 'Training Platform',
+    description: 'CPR and first aid class registration, Stripe payments, automated emails',
+    status: 'live',
+    businessName: 'SaveYours',
+    github: 'moyataebisso/saveyours',
+  },
+  {
+    name: 'CareConnect Live',
+    url: 'https://careconnectlive.org',
+    adminUrl: 'https://careconnectlive.org/admin/change-requests',
+    type: 'Healthcare Platform',
+    description: 'Healthcare provider matching platform with booking, messaging, Stripe subscriptions',
+    status: 'live',
+    businessName: 'CareConnect Live',
+    github: 'moyataebisso/careconnect',
+  },
+  {
+    name: 'Oromo Platform',
+    url: 'https://oromo-platform.vercel.app',
+    adminUrl: 'https://oromo-platform.vercel.app/admin/change-requests',
+    type: 'Community Platform',
+    description: 'Oromo community platform with academy, businesses, careers, news, events',
+    status: 'live',
+    businessName: 'Oromo Platform',
+    github: 'moyataebisso/oromo-platform',
+  },
+  {
+    name: 'Arsi Command Center',
+    url: 'https://arsi-platform-dashboard.vercel.app',
+    adminUrl: 'https://arsi-platform-dashboard.vercel.app',
+    type: 'Monitoring Dashboard',
+    description: '24/7 uptime monitoring, SSL checks, performance tracking for all sites',
+    status: 'live',
+    businessName: 'Arsi Command Center',
+    github: 'moyataebisso/arsi-platform',
+  },
+  {
+    name: 'Entrusted Home Healthcare',
+    url: 'https://entrustedhomehealthcare.org',
+    adminUrl: null,
+    type: 'Healthcare Website',
+    description: 'Home healthcare company website with HIPAA compliance pages',
+    status: 'live',
+    businessName: 'Entrusted Home Healthcare',
+    github: null,
+  },
+  {
+    name: 'Rift Valley Transportation',
+    url: 'https://rvtusinc.com',
+    adminUrl: null,
+    type: 'Transportation Website',
+    description: 'Transportation company website hosted on GoDaddy',
+    status: 'live',
+    businessName: 'Rift Valley Transportation',
+    github: null,
+  },
+]
+
+const TYPE_COLORS: Record<string, string> = {
+  'Company Website': 'bg-slate-100 text-slate-600',
+  'Training Platform': 'bg-blue-100 text-blue-700',
+  'Healthcare Platform': 'bg-emerald-100 text-emerald-700',
+  'Community Platform': 'bg-violet-100 text-violet-700',
+  'Monitoring Dashboard': 'bg-orange-100 text-orange-700',
+  'Transportation Website': 'bg-amber-100 text-amber-700',
+  'Healthcare Website': 'bg-teal-100 text-teal-700',
+}
+
+const PROJECT_BADGE_COLORS: Record<string, string> = {
+  SaveYours: 'bg-blue-100 text-blue-700',
+  'CareConnect Live': 'bg-emerald-100 text-emerald-700',
+  'Oromo Platform': 'bg-violet-100 text-violet-700',
+  'Arsi Tech Group Website': 'bg-slate-100 text-slate-600',
+  'Arsi Command Center': 'bg-orange-100 text-orange-700',
+  'Entrusted Home Healthcare': 'bg-teal-100 text-teal-700',
+  'Rift Valley Transportation': 'bg-amber-100 text-amber-700',
+}
+
+const PROJECT_FILTER_OPTIONS = [
+  { value: 'all', label: 'All Projects' },
+  { value: 'Arsi Tech Group Website', label: 'Arsi Tech' },
+  { value: 'SaveYours', label: 'SaveYours' },
+  { value: 'CareConnect Live', label: 'CareConnect' },
+  { value: 'Oromo Platform', label: 'Oromo Platform' },
+  { value: 'cimaa', label: 'Cimaa Clients' },
+]
+
+// ─── Main Component ─────────────────────────────────────
 
 export default function AdminPage() {
   const [password, setPassword] = useState('')
@@ -54,6 +162,7 @@ export default function AdminPage() {
   const [requests, setRequests] = useState<ChangeRequest[]>([])
   const [requestsTotal, setRequestsTotal] = useState(0)
   const [requestsFilter, setRequestsFilter] = useState('all')
+  const [projectFilter, setProjectFilter] = useState('all')
   const [requestsLoading, setRequestsLoading] = useState(false)
   const [expandedRequest, setExpandedRequest] = useState<string | null>(null)
   const [editingRequest, setEditingRequest] = useState<string | null>(null)
@@ -83,13 +192,15 @@ export default function AdminPage() {
     setLoading(false)
   }
 
-  const loadRequests = async (pw?: string, filter?: string) => {
+  const loadRequests = async (pw?: string, statusF?: string, projectF?: string) => {
     setRequestsLoading(true)
     try {
-      const f = filter ?? requestsFilter
-      const res = await fetch(`/api/admin/change-requests?status=${f}`, {
-        headers: { 'x-admin-password': pw || storedPassword },
-      })
+      const s = statusF ?? requestsFilter
+      const p = projectF ?? projectFilter
+      const res = await fetch(
+        `/api/admin/change-requests?status=${s}&project=${p}`,
+        { headers: { 'x-admin-password': pw || storedPassword } }
+      )
       if (res.ok) {
         const data = await res.json()
         setRequests(data.requests || [])
@@ -128,6 +239,12 @@ export default function AdminPage() {
     setUpdating(false)
   }
 
+  const viewProjectRequests = (businessName: string) => {
+    setProjectFilter(businessName)
+    setTab('requests')
+    loadRequests(undefined, requestsFilter, businessName)
+  }
+
   const totalRevenue = clients.reduce((sum, c) => sum + (c.monthly_revenue_cents || 0), 0)
   const pendingCount = requests.filter((r) => r.status === 'pending').length
 
@@ -162,29 +279,16 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold text-slate-900 mb-6">Cimaa Admin Dashboard</h1>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 border-b border-slate-200">
-          <button
-            onClick={() => setTab('overview')}
-            className={cn(
-              'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px',
-              tab === 'overview'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            )}
-          >
+        <div className="flex gap-1 mb-8 border-b border-slate-200 overflow-x-auto">
+          <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>
             Overview
-          </button>
-          <button
+          </TabButton>
+          <TabButton
+            active={tab === 'requests'}
             onClick={() => {
               setTab('requests')
               if (requests.length === 0) loadRequests()
             }}
-            className={cn(
-              'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px flex items-center gap-2',
-              tab === 'requests'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            )}
           >
             Change Requests
             {pendingCount > 0 && (
@@ -192,13 +296,18 @@ export default function AdminPage() {
                 {pendingCount}
               </span>
             )}
-          </button>
+          </TabButton>
+          <TabButton active={tab === 'projects'} onClick={() => setTab('projects')}>
+            My Projects
+          </TabButton>
         </div>
 
+        {/* ─── Overview Tab ──────────────────────────────── */}
         {tab === 'overview' && (
           <>
-            <div className="grid sm:grid-cols-3 gap-6 mb-8">
-              <StatCard label="Total Clients" value={String(clients.length)} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard label="Total Projects" value="7" sub="All monitored 24/7" icon={<Globe size={16} className="text-blue-500" />} />
+              <StatCard label="Cimaa Clients" value={String(clients.length)} sub="New Cimaa Sites clients" />
               <StatCard label="Monthly Revenue" value={`$${(totalRevenue / 100).toFixed(2)}`} />
               <StatCard label="Recent Signups" value={String(submissions.length)} />
             </div>
@@ -250,10 +359,11 @@ export default function AdminPage() {
           </>
         )}
 
+        {/* ─── Change Requests Tab ───────────────────────── */}
         {tab === 'requests' && (
           <>
-            {/* Filter bar */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            {/* Status filter */}
+            <div className="flex flex-wrap gap-2 mb-4">
               {['all', 'pending', 'in_progress', 'done', 'cancelled'].map((f) => (
                 <button
                   key={f}
@@ -280,6 +390,28 @@ export default function AdminPage() {
               </span>
             </div>
 
+            {/* Project filter */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <span className="text-xs text-slate-400 self-center mr-1">Project:</span>
+              {PROJECT_FILTER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    setProjectFilter(opt.value)
+                    loadRequests(undefined, undefined, opt.value)
+                  }}
+                  className={cn(
+                    'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
+                    projectFilter === opt.value
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
             {requestsLoading ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="animate-spin text-slate-400" size={24} />
@@ -297,9 +429,7 @@ export default function AdminPage() {
                   >
                     <div className="px-6 py-4">
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-sm font-bold text-slate-900">
-                          {req.business_name || 'Unknown'}
-                        </span>
+                        <ProjectBadge name={req.business_name} />
                         <span className="text-xs text-slate-400">{req.client_email}</span>
                         <RequestStatusBadge status={req.status} />
                         {req.priority === 'urgent' && (
@@ -350,7 +480,6 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Admin notes (expanded) */}
                     {expandedRequest === req.id && req.admin_notes && (
                       <div className="px-6 py-3 bg-slate-50 border-t border-slate-100">
                         <p className="text-xs font-semibold text-slate-500 mb-1">Admin Notes</p>
@@ -358,13 +487,10 @@ export default function AdminPage() {
                       </div>
                     )}
 
-                    {/* Edit form */}
                     {editingRequest === req.id && (
                       <div className="px-6 py-4 bg-blue-50/50 border-t border-slate-100 space-y-3">
                         <div>
-                          <label className="block text-xs font-medium text-slate-600 mb-1">
-                            Status
-                          </label>
+                          <label className="block text-xs font-medium text-slate-600 mb-1">Status</label>
                           <select
                             value={editStatus}
                             onChange={(e) => setEditStatus(e.target.value)}
@@ -405,7 +531,8 @@ export default function AdminPage() {
                         </div>
                         {editStatus === 'done' && (
                           <p className="text-xs text-amber-600">
-                            Saving as &quot;Done&quot; will send a notification email to {req.client_email}
+                            Saving as &quot;Done&quot; will send a notification email to{' '}
+                            {req.client_email}
                           </p>
                         )}
                       </div>
@@ -416,16 +543,145 @@ export default function AdminPage() {
             )}
           </>
         )}
+
+        {/* ─── My Projects Tab ───────────────────────────── */}
+        {tab === 'projects' && (
+          <>
+            <p className="text-sm text-slate-500 mb-6">
+              {EXISTING_PROJECTS.length} projects &middot;{' '}
+              {EXISTING_PROJECTS.filter((p) => p.status === 'live').length} live &middot; All
+              monitored by Command Center
+            </p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {EXISTING_PROJECTS.map((project) => (
+                <div
+                  key={project.name}
+                  className="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-sm">{project.name}</h3>
+                      <span
+                        className={cn(
+                          'inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium',
+                          TYPE_COLORS[project.type] || 'bg-slate-100 text-slate-600'
+                        )}
+                      >
+                        {project.type}
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium whitespace-nowrap">
+                      Live
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-500 leading-relaxed mb-3">{project.description}</p>
+
+                  <div className="space-y-1 mb-4">
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline truncate"
+                    >
+                      <ExternalLink size={10} />
+                      {project.url.replace('https://', '')}
+                    </a>
+                    {project.github && (
+                      <a
+                        href={`https://github.com/${project.github}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs text-slate-500 hover:underline"
+                      >
+                        <span>&#128193;</span>
+                        {project.github}
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      Visit Site &#8599;
+                    </a>
+                    {project.adminUrl && (
+                      <a
+                        href={project.adminUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Admin Panel &#8599;
+                      </a>
+                    )}
+                    <button
+                      onClick={() => viewProjectRequests(project.businessName)}
+                      className="px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      View Requests &rarr;
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </Container>
     </main>
   )
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+// ─── Helper Components ──────────────────────────────────
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px flex items-center gap-2 whitespace-nowrap',
+        active
+          ? 'border-blue-600 text-blue-600'
+          : 'border-transparent text-slate-500 hover:text-slate-700'
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function StatCard({
+  label,
+  value,
+  sub,
+  icon,
+}: {
+  label: string
+  value: string
+  sub?: string
+  icon?: React.ReactNode
+}) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <p className="text-sm text-slate-500">{label}</p>
+      <div className="flex items-center gap-2">
+        {icon}
+        <p className="text-sm text-slate-500">{label}</p>
+      </div>
       <p className="text-3xl font-bold text-slate-900 mt-1">{value}</p>
+      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
     </div>
   )
 }
@@ -459,6 +715,15 @@ function RequestStatusBadge({ status }: { status: string }) {
       )}
     >
       {status === 'in_progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  )
+}
+
+function ProjectBadge({ name }: { name: string }) {
+  const color = PROJECT_BADGE_COLORS[name] || 'bg-blue-100 text-blue-700'
+  return (
+    <span className={cn('px-2 py-0.5 rounded-full text-xs font-bold', color)}>
+      {name || 'Unknown'}
     </span>
   )
 }
