@@ -276,7 +276,21 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-slate-50 pt-24 pb-16">
       <Container>
-        <h1 className="text-3xl font-bold text-slate-900 mb-6">Cimaa Admin Dashboard</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-slate-900">Cimaa Admin Dashboard</h1>
+          <a
+            href="https://arsi-platform-dashboard.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+            </svg>
+            Command Center
+          </a>
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8 border-b border-slate-200 overflow-x-auto">
