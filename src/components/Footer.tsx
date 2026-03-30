@@ -6,12 +6,15 @@ const productLinks = [
   { href: "/pricing", label: "Pricing" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Developer Plan" },
+  { href: "/features", label: "50 Themes" },
+  { href: "/features", label: "SEO Tools" },
   { href: "/contact", label: "Contact" },
 ];
 
 const companyLinks = [
   { href: "/about", label: "About" },
   { href: "https://arsitechgroup.com", label: "Arsi Technology Group" },
+  { href: "/#projects", label: "Our Projects" },
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/terms", label: "Terms" },
 ];

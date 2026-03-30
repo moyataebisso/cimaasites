@@ -35,7 +35,7 @@ export function Hero() {
             animate="show"
           >
             <motion.div variants={fadeUp}>
-              <Badge variant="blue">&#10022; Trusted by local businesses everywhere</Badge>
+              <Badge variant="blue">&#10022; Now with 50 themes + built-in SEO tools</Badge>
             </motion.div>
 
             <motion.h1
@@ -63,10 +63,14 @@ export function Hero() {
             >
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                Built on Next.js + Supabase + Vercel
+                50 themes
               </span>
-              <span className="text-gray-300">·</span>
-              <span>The same stack Netflix, Notion and Stripe trust</span>
+              <span className="text-gray-300">&middot;</span>
+              <span>6 products</span>
+              <span className="text-gray-300">&middot;</span>
+              <span>24/7 monitoring</span>
+              <span className="text-gray-300">&middot;</span>
+              <span>Built-in Google SEO tools</span>
             </motion.p>
 
             <motion.div variants={fadeUp} className="mt-4 flex flex-wrap gap-4">

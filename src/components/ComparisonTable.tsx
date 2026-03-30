@@ -16,6 +16,8 @@ const rows = [
   { feature: "Booking system", cimaa: "Pro", wix: "Add-on $", squarespace: "Add-on $", godaddy: "Add-on $" },
   { feature: "Online store", cimaa: "Pro", wix: "Add-on $", squarespace: "Add-on $", godaddy: "Add-on $" },
   { feature: "Custom code", cimaa: "Dev", wix: false, squarespace: false, godaddy: false },
+  { feature: "Built-in SEO tools", cimaa: true, wix: false, squarespace: false, godaddy: false },
+  { feature: "50+ themes by industry", cimaa: true, wix: true, squarespace: "Partial", godaddy: false },
 ];
 
 function CellValue({ value }: { value: boolean | string }) {

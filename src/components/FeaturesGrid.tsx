@@ -1,9 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { TrendingUp, Palette } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
-const features = [
+const iconComponents: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  TrendingUp,
+  Palette,
+};
+
+const features: { emoji?: string; icon?: string; title: string; description: string }[] = [
   {
     emoji: "\u{1F680}",
     title: "Edge Performance",
@@ -24,7 +30,7 @@ const features = [
   },
   {
     emoji: "\u{1F3A8}",
-    title: "20+ Themes",
+    title: "50 Themes",
     description:
       "Professional themes designed for real businesses. Switch anytime.",
   },
@@ -51,6 +57,18 @@ const features = [
     title: "Developer Option",
     description:
       "Want the code? Take it. $49.99 one-time for the full source.",
+  },
+  {
+    icon: "TrendingUp",
+    title: "Built-in SEO Tools",
+    description:
+      "Google Search Console setup, automatic sitemap, structured data, and a marketing dashboard \u2014 so your clients get found.",
+  },
+  {
+    icon: "Palette",
+    title: "50 Themes Across 8 Industries",
+    description:
+      "SaaS, healthcare, restaurant, retail, creative, community, real estate \u2014 a professional theme for every business type.",
   },
 ];
 
@@ -111,7 +129,9 @@ export function FeaturesGrid() {
                 }}
                 viewport={{ once: true }}
               >
-                <div className="text-2xl mb-3">{feature.emoji}</div>
+                <div className="text-2xl mb-3">
+                  {feature.emoji ? feature.emoji : feature.icon && iconComponents[feature.icon] ? (() => { const Icon = iconComponents[feature.icon!]; return <Icon size={24} className="text-blue-600" />; })() : null}
+                </div>
                 <h4 className="font-semibold text-slate-900 mb-1">
                   {feature.title}
                 </h4>
