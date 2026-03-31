@@ -48,28 +48,6 @@ export function CommunitySection() {
               </p>
             </div>
 
-            <div className="flex gap-2 flex-wrap mt-6">
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                &#127482;&#127480; English
-              </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                &#127466;&#127481; Afaan Oromoo
-              </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                &#127480;&#127476; Somali
-              </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                &#127466;&#127481; Amharic
-              </span>
-            </div>
-
-            <blockquote className="mt-6 pl-4 border-l-4 border-blue-500 italic text-gray-600">
-              &ldquo;We will never raise your price. $19 today is $19 in 5
-              years. That&apos;s our community promise.&rdquo;
-              <cite className="block mt-2 text-sm font-medium not-italic text-gray-900">
-                — The Cimaa Sites Team
-              </cite>
-            </blockquote>
           </motion.div>
 
           <motion.div

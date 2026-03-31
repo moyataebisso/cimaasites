@@ -10,7 +10,6 @@ import { Pricing } from "@/components/Pricing";
 import { Testimonials } from "@/components/Testimonials";
 import { Projects } from "@/components/Projects";
 import { FAQ } from "@/components/FAQ";
-import { CommunityPromise } from "@/components/CommunityPromise";
 import { FinalCTA } from "@/components/FinalCTA";
 
 export default function Home() {
@@ -28,7 +27,6 @@ export default function Home() {
       <Testimonials />
       <Projects />
       <FAQ />
-      <CommunityPromise />
       <FinalCTA />
     </main>
   );

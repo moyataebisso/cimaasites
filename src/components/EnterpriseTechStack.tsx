@@ -6,68 +6,8 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
-const techStack = ["Next.js", "Supabase", "Vercel", "Stripe", "Resend"];
-
-const companies = [
-  {
-    name: "Vercel",
-    description: "Frontend cloud platform",
-    stat: "$3.25 Billion valuation",
-    connection: "Powers our hosting infrastructure",
-  },
-  {
-    name: "Linear",
-    description: "Project management for software teams",
-    stat: "$400M+ valuation",
-    connection: "Built on Next.js — same as your site",
-  },
-  {
-    name: "Notion",
-    description: "All-in-one workspace",
-    stat: "10M+ users worldwide",
-    connection: "Uses the same React/Next.js foundation",
-  },
-  {
-    name: "Cal.com",
-    description: "Scheduling infrastructure",
-    stat: "Millions of bookings processed",
-    connection: "Built entirely on Next.js + PostgreSQL",
-  },
-  {
-    name: "GitHub",
-    description: "World's largest code platform",
-    stat: "$7.5 Billion acquisition",
-    connection: "Uses the same Postgres database layer",
-  },
-  {
-    name: "Twitch",
-    description: "Live streaming platform",
-    stat: "35M+ daily visitors",
-    connection: "Enterprise-grade infrastructure",
-  },
-  {
-    name: "Stripe",
-    description: "Global payments infrastructure",
-    stat: "$65 Billion valuation",
-    connection: "Powers our payment processing",
-  },
-  {
-    name: "Supabase",
-    description: "Open source Firebase alternative",
-    stat: "$200M+ raised, 1M+ developers",
-    connection: "Powers your database and storage",
-  },
-  {
-    name: "OpenAI",
-    description: "World's leading AI company",
-    stat: "$157 Billion valuation",
-    connection: "Built on the same cloud infrastructure",
-  },
-];
-
 const trustItems = [
   "No engineering team needed",
-  "No DevOps required",
   "No server maintenance",
   "Just $19/mo and it's all handled for you",
 ];
@@ -83,7 +23,7 @@ export function EnterpriseTechStack() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
-          <Badge variant="blue">&#9889; Enterprise-grade technology</Badge>
+          <Badge variant="blue">&#10022; Built for real businesses. No tech skills needed.</Badge>
         </motion.div>
 
         <motion.h2
@@ -93,9 +33,9 @@ export function EnterpriseTechStack() {
           transition={{ duration: 0.6, ease: "easeOut" as const, delay: 0.1 }}
           viewport={{ once: true }}
         >
-          The same tech stack powering{" "}
+          Your business, online —{" "}
           <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-            billion-dollar companies
+            built and managed for you
           </span>
         </motion.h2>
 
@@ -111,68 +51,41 @@ export function EnterpriseTechStack() {
           managed for you.
         </motion.p>
 
-        {/* Tech logos row */}
-        <motion.div
-          className="mt-10 flex flex-wrap justify-center gap-3"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+        {/* Trusted brands heading */}
+        <motion.p
+          className="mt-14 text-center text-sm font-medium text-slate-500"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           viewport={{ once: true }}
         >
-          {techStack.map((tech) => (
-            <span
-              key={tech}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white border border-slate-700"
-            >
-              <span className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-xs font-bold">
-                {tech[0]}
-              </span>
-              {tech}
-            </span>
-          ))}
-        </motion.div>
+          Trusted by businesses everywhere
+        </motion.p>
 
-        {/* Companies heading */}
-        <motion.p
-          className="mt-16 text-center text-sm font-medium text-slate-500"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+        {/* Brand tiles grid */}
+        <motion.div
+          className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Companies built on the same technology:
-        </motion.p>
-
-        {/* Company cards grid */}
-        <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {companies.map((company, i) => (
-            <motion.div
-              key={company.name}
-              className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                ease: "easeOut" as const,
-                delay: i * 0.08,
-              }}
-              viewport={{ once: true }}
+          {[
+            { emoji: "\uD83D\uDCB3", name: "Stripe", tagline: "Processes our payments" },
+            { emoji: "\uD83D\uDC19", name: "GitHub", tagline: "Hosts our code" },
+            { emoji: "\uD83D\uDD0D", name: "Google", tagline: "Found through Search" },
+            { emoji: "\uD83D\uDCDD", name: "Notion", tagline: "Teams run on it" },
+          ].map((brand) => (
+            <div
+              key={brand.name}
+              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center shadow-sm"
             >
-              <h3 className="text-lg font-bold text-slate-900">
-                {company.name}
-              </h3>
-              <p className="text-sm text-slate-500 mt-1">
-                {company.description}
-              </p>
-              <p className="mt-3 text-sm font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                {company.stat}
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                {company.connection}
-              </p>
-            </motion.div>
+              <span className="text-lg">{brand.emoji}</span>
+              <p className="text-sm font-semibold text-slate-900 mt-1">{brand.name}</p>
+              <p className="text-xs text-slate-500">{brand.tagline}</p>
+            </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Comparison callout box */}
         <motion.div
@@ -222,7 +135,7 @@ export function EnterpriseTechStack() {
 
         {/* Bottom trust line */}
         <motion.div
-          className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center"
+          className="mt-12 grid grid-cols-3 gap-4 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
