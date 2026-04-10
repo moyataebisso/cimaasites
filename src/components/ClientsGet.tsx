@@ -41,10 +41,10 @@ export function ClientsGet() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
+          <h2 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-4">
             Everything your clients need to get found online
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="text-xl font-semibold text-center text-violet-400 mb-12">
             Every Cimaa Site comes with a full marketing toolkit &mdash; built
             in, no add-ons needed.
           </p>

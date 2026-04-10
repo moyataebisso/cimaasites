@@ -1,8 +1,6 @@
 import { Hero } from "@/components/Hero";
-import { EnterpriseTechStack } from "@/components/EnterpriseTechStack";
 import { LogoBar } from "@/components/LogoBar";
 import { HowItWorks } from "@/components/HowItWorks";
-import { CommunitySection } from "@/components/CommunitySection";
 import { FeaturesGrid } from "@/components/FeaturesGrid";
 import { ClientsGet } from "@/components/ClientsGet";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -16,10 +14,11 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <EnterpriseTechStack />
-      <LogoBar />
+      <div className="h-2 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600" />
+      <div className="bg-gradient-to-b from-violet-50 to-white">
+        <LogoBar />
+      </div>
       <HowItWorks />
-      <CommunitySection />
       <FeaturesGrid />
       <ClientsGet />
       <ComparisonTable />

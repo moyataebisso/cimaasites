@@ -26,10 +26,53 @@ export function Hero() {
         <div className="absolute bottom-1/4 left-1/2 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl animate-blob animation-delay-4000" />
       </div>
 
+      {/* Browser mockup as full-width background */}
+      <motion.div
+        className="absolute inset-0 -z-20 opacity-10 overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.1 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      >
+        <div className="w-full h-full">
+          <div className="border-b border-slate-100 px-4 py-3 bg-slate-50 flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-red-400" />
+            <div className="h-3 w-3 rounded-full bg-amber-400" />
+            <div className="h-3 w-3 rounded-full bg-green-400" />
+            <div className="ml-2 text-xs text-slate-400">cimaasites.ai</div>
+          </div>
+          <div className="relative h-full">
+            <div className="absolute inset-0 animate-theme-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-8">
+              <div className="text-center">
+                <div className="h-8 w-32 mx-auto rounded bg-blue-600 mb-4" />
+                <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
+                <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
+                <div className="h-10 w-28 mx-auto rounded-full bg-blue-600" />
+              </div>
+            </div>
+            <div className="absolute inset-0 animate-theme-2 flex items-center justify-center bg-gradient-to-br from-violet-50 to-white p-8 opacity-0">
+              <div className="text-center">
+                <div className="h-8 w-32 mx-auto rounded bg-violet-600 mb-4" />
+                <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
+                <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
+                <div className="h-10 w-28 mx-auto rounded-full bg-violet-600" />
+              </div>
+            </div>
+            <div className="absolute inset-0 animate-theme-3 flex items-center justify-center bg-gradient-to-br from-amber-50 to-white p-8 opacity-0">
+              <div className="text-center">
+                <div className="h-8 w-32 mx-auto rounded bg-amber-600 mb-4" />
+                <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
+                <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
+                <div className="h-10 w-28 mx-auto rounded-full bg-amber-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       <Container>
-        <div className="grid lg:grid-cols-5 gap-12 items-center pt-20">
+        <div className="pt-20">
           <motion.div
-            className="lg:col-span-3"
+            className="max-w-3xl mx-auto text-center"
             variants={stagger}
             initial="hidden"
             animate="show"
@@ -50,7 +93,7 @@ export function Hero() {
 
             <motion.p
               variants={fadeUp}
-              className="mt-6 text-lg sm:text-xl text-slate-600 max-w-xl leading-relaxed"
+              className="mt-6 text-lg sm:text-xl text-slate-600 max-w-xl mx-auto leading-relaxed"
             >
               We build, monitor, and manage your website for $19/mo. Built
               by our community, for our community. No contracts. No DIY. Just
@@ -59,7 +102,7 @@ export function Hero() {
 
             <motion.p
               variants={fadeUp}
-              className="mt-6 text-sm text-gray-500 flex flex-wrap items-center gap-2"
+              className="mt-6 text-sm text-gray-500 flex flex-wrap items-center justify-center gap-2"
             >
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -73,7 +116,7 @@ export function Hero() {
               <span>Built-in Google SEO tools</span>
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-4 flex flex-wrap gap-4">
+            <motion.div variants={fadeUp} className="mt-4 flex flex-wrap justify-center gap-4">
               <Button href="/contact" size="lg">
                 Get Started &mdash; $19/mo
               </Button>
@@ -84,57 +127,13 @@ export function Hero() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500"
+              className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-500"
             >
               <span>&#128274; Setup in 3-5 days</span>
               <span>&#128202; 24/7 monitoring</span>
               <span>&#128172; Direct support</span>
               <span>&#127758; English · Afaan Oromoo · Somali · Amharic</span>
             </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="lg:col-span-2 hidden lg:block"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <div className="relative -rotate-2">
-              <div className="rounded-xl border border-slate-200 bg-white shadow-2xl shadow-blue-500/10 overflow-hidden">
-                <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3 bg-slate-50">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-amber-400" />
-                  <div className="h-3 w-3 rounded-full bg-green-400" />
-                  <div className="ml-2 text-xs text-slate-400">cimaasites.ai</div>
-                </div>
-                <div className="relative h-64 sm:h-80">
-                  <div className="absolute inset-0 animate-theme-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-8">
-                    <div className="text-center">
-                      <div className="h-8 w-32 mx-auto rounded bg-blue-600 mb-4" />
-                      <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
-                      <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
-                      <div className="h-10 w-28 mx-auto rounded-full bg-blue-600" />
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 animate-theme-2 flex items-center justify-center bg-gradient-to-br from-violet-50 to-white p-8 opacity-0">
-                    <div className="text-center">
-                      <div className="h-8 w-32 mx-auto rounded bg-violet-600 mb-4" />
-                      <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
-                      <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
-                      <div className="h-10 w-28 mx-auto rounded-full bg-violet-600" />
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 animate-theme-3 flex items-center justify-center bg-gradient-to-br from-amber-50 to-white p-8 opacity-0">
-                    <div className="text-center">
-                      <div className="h-8 w-32 mx-auto rounded bg-amber-600 mb-4" />
-                      <div className="h-3 w-48 mx-auto rounded bg-slate-200 mb-2" />
-                      <div className="h-3 w-40 mx-auto rounded bg-slate-200 mb-6" />
-                      <div className="h-10 w-28 mx-auto rounded-full bg-amber-600" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </Container>
