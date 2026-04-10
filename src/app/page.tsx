@@ -21,6 +21,7 @@ export default function Home() {
       <HowItWorks />
       <FeaturesGrid />
       <ClientsGet />
+      <div className="h-16 bg-gradient-to-b from-slate-900 to-white" />
       <ComparisonTable />
       <Pricing />
       <Testimonials />
