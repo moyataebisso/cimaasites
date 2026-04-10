@@ -99,11 +99,16 @@ export function Hero() {
 
             <motion.h1
               variants={fadeUp}
-              className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1]"
+              className="mt-6 leading-[1.05]"
             >
-              Powerful websites for{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+              <span className="block text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900">
+                Powerful websites for
+              </span>
+              <span className="block text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
                 powerful businesses
+              </span>
+              <span className="block text-lg sm:text-xl font-medium text-slate-500 mt-4 tracking-wide">
+                Full Google Search Engine Optimization &mdash; sitemap, structured data, meta tags, Search Console &mdash; built in and handled for you.
               </span>
             </motion.h1>
 
@@ -114,22 +119,6 @@ export function Hero() {
               We build, monitor, and manage your website for $19/mo. Built
               by our community, for our community. No contracts. No DIY. Just
               results.
-            </motion.p>
-
-            <motion.p
-              variants={fadeUp}
-              className="mt-4 text-sm text-gray-500 flex flex-wrap items-center justify-center gap-2"
-            >
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                50 themes
-              </span>
-              <span className="text-gray-300">&middot;</span>
-              <span>6 products</span>
-              <span className="text-gray-300">&middot;</span>
-              <span>24/7 monitoring</span>
-              <span className="text-gray-300">&middot;</span>
-              <span>Built-in Google SEO tools</span>
             </motion.p>
 
             <motion.div
@@ -146,12 +135,23 @@ export function Hero() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 justify-center"
+              className="mt-8 flex flex-wrap gap-x-8 gap-y-3 justify-center"
             >
-              <span>&#128274; Setup in 3-5 days</span>
-              <span>&#128202; 24/7 monitoring</span>
-              <span>&#128172; Direct support</span>
-              <span>&#127758; English · Afaan Oromoo · Somali · Amharic</span>
+              {[
+                { label: "Setup in 3-5 days", sub: "Fast launch" },
+                { label: "24/7 Monitoring", sub: "Always watching" },
+                { label: "Direct Support", sub: "Real humans" },
+                { label: "English \u00B7 Afaan Oromoo \u00B7 Somali \u00B7 Amharic", sub: "Your language" },
+              ].map((item, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-sm font-bold text-slate-800 tracking-wide">
+                    {item.label}
+                  </div>
+                  <div className="text-xs text-violet-500 font-medium mt-0.5">
+                    {item.sub}
+                  </div>
+                </div>
+              ))}
             </motion.div>
           </motion.div>
 

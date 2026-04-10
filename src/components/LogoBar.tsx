@@ -15,14 +15,26 @@ export function LogoBar() {
   return (
     <section className="py-16 border-y border-slate-100 bg-slate-50/50">
       <Container>
-        <motion.p
-          className="text-center text-sm font-medium text-slate-500 mb-8"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          Trusted by businesses across our community
-        </motion.p>
+        <div className="mt-16 text-center mb-8">
+          <p className="text-xs font-black tracking-[0.3em] uppercase text-violet-500 mb-2">
+            Trusted by businesses across our community
+          </p>
+          <h3 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
+            Minneapolis-built.{" "}
+            <span style={{
+              fontFamily: 'Georgia, serif',
+              fontStyle: 'italic',
+              background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              Community-owned.
+            </span>
+          </h3>
+          <p className="text-slate-500 text-lg mt-3 max-w-xl mx-auto">
+            Built in Minneapolis for local businesses &mdash; from Cedar-Riverside to Northeast, Brooklyn Park to Burnsville.
+          </p>
+        </div>
       </Container>
       <div className="relative overflow-hidden">
         <div className="flex animate-marquee whitespace-nowrap">
