@@ -33,11 +33,11 @@ const faqs = [
   },
   {
     q: "Do you work with non-English speaking businesses?",
-    a: "Yes — we work with businesses across the country including the Oromo, Somali, and East African communities. We speak your language.",
+    a: "Yes \u2014 we work with businesses across the country including the Oromo, Somali, and East African communities. We speak your language.",
   },
   {
     q: "What happens if my site goes down?",
-    a: "Our monitoring catches it within 5 minutes and we fix it immediately — usually before you even notice.",
+    a: "Our monitoring catches it within 5 minutes and we fix it immediately \u2014 usually before you even notice.",
   },
 ];
 
@@ -45,16 +45,16 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-slate-200">
+    <div className="border-b border-slate-700">
       <button
         className="flex w-full items-center justify-between py-5 text-left"
         onClick={() => setOpen(!open)}
       >
-        <span className="text-base font-semibold text-slate-900 pr-4">{q}</span>
+        <span className="text-base font-semibold text-slate-200 pr-4">{q}</span>
         <ChevronDown
           size={20}
           className={cn(
-            "flex-shrink-0 text-slate-400 transition-transform duration-200",
+            "flex-shrink-0 text-slate-500 transition-transform duration-200",
             open && "rotate-180"
           )}
         />
@@ -65,7 +65,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
           open ? "max-h-48 pb-5" : "max-h-0"
         )}
       >
-        <p className="text-slate-600 leading-relaxed">{a}</p>
+        <p className="text-slate-400 leading-relaxed">{a}</p>
       </div>
     </div>
   );
@@ -73,7 +73,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 export function FAQ() {
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-24 bg-slate-900">
       <Container>
         <motion.div
           className="text-center mb-16"
@@ -82,7 +82,7 @@ export function FAQ() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">
             Common questions
           </h2>
         </motion.div>

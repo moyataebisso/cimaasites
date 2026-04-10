@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/Container";
 const testimonials = [
   {
     quote:
-      "Cimaa Sites got our healthcare agency online in under a week. The admin dashboard is so easy — even our staff can update it. Best investment we've made.",
+      "Cimaa Sites got our healthcare agency online in under a week. The admin dashboard is so easy \u2014 even our staff can update it. Best investment we've made.",
     name: "Fatima A.",
     business: "Entrusted Home Healthcare",
   },
@@ -19,7 +19,7 @@ const testimonials = [
   },
   {
     quote:
-      "They understood exactly what we needed — a professional site that serves our community. Setup was painless and support has been amazing.",
+      "They understood exactly what we needed \u2014 a professional site that serves our community. Setup was painless and support has been amazing.",
     name: "Hana T.",
     business: "CareConnect Live",
   },
@@ -27,7 +27,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-slate-900">
       <Container>
         <motion.div
           className="text-center mb-16"
@@ -36,7 +36,7 @@ export function Testimonials() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">
             What our clients say
           </h2>
         </motion.div>
@@ -45,7 +45,7 @@ export function Testimonials() {
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
-              className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1"
+              className="rounded-2xl bg-slate-800 border border-slate-700 p-8 transition-all duration-200 hover:shadow-md hover:-translate-y-1"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.1 }}
@@ -60,12 +60,12 @@ export function Testimonials() {
                   />
                 ))}
               </div>
-              <p className="text-slate-600 leading-relaxed mb-6">
+              <p className="text-slate-300 leading-relaxed mb-6">
                 &ldquo;{t.quote}&rdquo;
               </p>
               <div>
-                <p className="font-semibold text-slate-900">{t.name}</p>
-                <p className="text-sm text-slate-500">{t.business}</p>
+                <p className="text-white font-bold">{t.name}</p>
+                <p className="text-sm text-violet-400">{t.business}</p>
               </div>
             </motion.div>
           ))}

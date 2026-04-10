@@ -9,18 +9,21 @@ const steps = [
     icon: MessageSquare,
     title: "Tell us about your business",
     description: "Fill out a quick form about your business. Takes 10 minutes.",
+    image: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=400&q=80",
   },
   {
     icon: Code2,
     title: "We build your site",
     description:
       "Our team builds your professional site in 3-5 days. You approve before it goes live.",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80",
   },
   {
     icon: Rocket,
     title: "Go live + we handle the rest",
     description:
       "Your site launches. We monitor it 24/7 and handle any issues so you never have to.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80",
   },
 ];
 
@@ -35,8 +38,24 @@ export function HowItWorks() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
-            Up and running in 3 steps
+          <h2>
+            <span className="block text-sm font-semibold tracking-widest text-violet-500 uppercase mb-3">
+              Simple process
+            </span>
+            <span className="block text-5xl sm:text-6xl font-black text-slate-900">
+              Up and running{" "}
+            </span>
+            <span
+              className="block text-5xl sm:text-6xl font-black italic"
+              style={{
+                fontFamily: 'Georgia, serif',
+                background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              in 3 steps.
+            </span>
           </h2>
         </motion.div>
 
@@ -57,13 +76,24 @@ export function HowItWorks() {
               }}
               viewport={{ once: true }}
             >
-              <div className="relative z-10 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-500/25">
-                <step.icon size={28} />
+              <div className="relative w-20 h-20 mx-auto rounded-2xl overflow-hidden shadow-xl mb-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={step.image}
+                  alt={step.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-violet-600/70 flex items-center justify-center">
+                  <step.icon size={28} className="text-white" />
+                </div>
               </div>
-              <div className="mb-2 text-sm font-semibold text-blue-600">
+              <div className="text-xs font-black tracking-widest uppercase text-violet-500 mb-2">
                 Step {i + 1}
               </div>
-              <h3 className="mb-2 text-xl font-bold text-slate-900">
+              <h3
+                className="text-2xl font-black text-slate-900 mb-2"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
                 {step.title}
               </h3>
               <p className="text-slate-600 leading-relaxed">

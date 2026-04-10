@@ -18,7 +18,18 @@ const fadeUp = {
 
 function MockupCard({ side }: { side: "left" | "right" }) {
   return (
-    <div className={`absolute top-1/2 -translate-y-1/2 ${side === "left" ? "-left-8 -rotate-6" : "-right-8 rotate-6"} w-64 hidden xl:block opacity-60`}>
+    <div
+      style={{
+        position: 'absolute',
+        top: '50%',
+        transform: `translateY(-50%) ${side === 'left' ? 'rotate(-6deg)' : 'rotate(6deg)'}`,
+        left: side === 'left' ? '0' : 'auto',
+        right: side === 'right' ? '0' : 'auto',
+        width: 'min(280px, 20vw)',
+        opacity: 0.55,
+        zIndex: 0,
+      }}
+    >
       <div className="rounded-xl border border-slate-200 bg-white shadow-2xl shadow-blue-500/10 overflow-hidden">
         <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3 bg-slate-50">
           <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
@@ -68,7 +79,7 @@ export function Hero() {
       </div>
 
       <Container>
-        <div className="relative flex items-center justify-center pt-20">
+        <div className="relative flex items-center justify-center pt-20 px-48">
 
           {/* Left mockup */}
           <MockupCard side="left" />

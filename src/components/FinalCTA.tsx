@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 
 export function FinalCTA() {
   return (
-    <section className="py-24 bg-gradient-to-br from-blue-600 to-violet-600">
+    <section className="py-24 bg-gradient-to-b from-slate-900 to-slate-800">
       <Container>
         <motion.div
           className="text-center"
@@ -18,7 +18,7 @@ export function FinalCTA() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white">
             Ready to get your business online?
           </h2>
-          <p className="mt-4 text-lg text-white/80 max-w-xl mx-auto">
+          <p className="mt-4 text-lg text-slate-300 max-w-xl mx-auto">
             Join businesses everywhere already powered by Cimaa Sites.
           </p>
 
@@ -31,7 +31,7 @@ export function FinalCTA() {
             </Button>
           </div>
 
-          <p className="mt-6 text-sm text-white/60">
+          <p className="mt-6 text-sm text-slate-400">
             Setup takes 10 minutes. Site live in 3-5 days.
           </p>
         </motion.div>
