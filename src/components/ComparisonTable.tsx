@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const rows = [
   { feature: "Enterprise Stack", cimaa: "Next.js+Supabase", wix: false, squarespace: false, godaddy: false },
-  { feature: "Price", cimaa: "$19/mo", wix: "$17-29/mo", squarespace: "$16-23/mo", godaddy: "$10-20/mo" },
+  { feature: "Price", cimaa: "$299/mo", wix: "$17-29/mo", squarespace: "$16-23/mo", godaddy: "$10-20/mo" },
   { feature: "Done for you", cimaa: true, wix: false, squarespace: false, godaddy: false },
   { feature: "You own your data", cimaa: true, wix: false, squarespace: false, godaddy: false },
   { feature: "24/7 monitoring", cimaa: true, wix: false, squarespace: false, godaddy: false },

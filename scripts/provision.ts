@@ -1,4 +1,23 @@
 #!/usr/bin/env tsx
+// ─────────────────────────────────────────
+// CIMAA SITES PRICING — April 2026
+// ─────────────────────────────────────────
+// Setup fee:      $599 one-time
+//                 Includes first month
+//                 Triggers full provisioning
+//
+// Basic monthly:  $299/mo from month 2
+// Pro monthly:    $399/mo from month 2
+//
+// Promo (first 3 months after setup):
+//   Basic promo:  $249/mo x3 then $299
+//   Pro promo:    $299/mo x3 then $399
+//
+// Grandfathered:  $100/mo (4 existing clients)
+//                 Never changes
+//
+// Developer:      $49.99 one-time, no monthly
+// ─────────────────────────────────────────
 import 'dotenv/config'
 import { input, select, confirm } from '@inquirer/prompts'
 import chalk from 'chalk'
@@ -101,8 +120,8 @@ async function main() {
   const plan = await select({
     message: 'Which plan?',
     choices: [
-      { value: 'basic', name: 'Basic — $19/mo' },
-      { value: 'pro', name: 'Pro — $35/mo' },
+      { value: 'basic', name: 'Basic — $599 setup + $299/mo' },
+      { value: 'pro', name: 'Pro — $599 setup + $399/mo' },
     ],
   })
 
@@ -269,7 +288,7 @@ async function main() {
       email,
       plan,
       status: 'active',
-      monthly_revenue_cents: plan === 'pro' ? 3500 : 1900,
+      monthly_revenue_cents: plan === 'pro' ? 39900 : 29900,
       live_url: previewUrl,
       admin_url: `${previewUrl}/admin`,
       domain: `${projectName}.vercel.app`,
@@ -296,7 +315,7 @@ async function main() {
       businessName,
       email,
       plan,
-      revenue: plan === 'pro' ? '$35/mo' : '$19/mo',
+      revenue: plan === 'pro' ? '$399/mo' : '$299/mo',
     })
     spinnerG.succeed(chalk.green('Welcome email sent'))
   } catch (e: unknown) {
@@ -317,7 +336,7 @@ async function main() {
   console.log(`Admin URL: ${chalk.cyan(previewUrl + '/admin')}`)
   console.log(`Email:     ${chalk.white(email)}`)
   console.log(`Password:  ${chalk.white(adminPassword)}`)
-  console.log(`Plan:      ${chalk.white(plan)} (${plan === 'pro' ? '$35' : '$19'}/mo)`)
+  console.log(`Plan:      ${chalk.white(plan)} (${plan === 'pro' ? '$399' : '$299'}/mo)`)
   console.log(chalk.gray('─────────────────────────'))
   console.log(chalk.gray('\nNext: Send Stripe invoice + add custom domain'))
   console.log()

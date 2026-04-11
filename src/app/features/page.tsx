@@ -138,7 +138,7 @@ export default function FeaturesPage() {
           <motion.div {...fadeUp}>
             <Badge variant="violet">Pro Plan</Badge>
             <h2 className="mt-4 text-2xl font-bold text-slate-900 mb-12">
-              Pro Features — $35/mo
+              Pro Features — $399/mo
             </h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">

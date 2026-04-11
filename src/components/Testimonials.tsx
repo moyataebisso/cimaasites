@@ -13,7 +13,7 @@ const testimonials = [
   },
   {
     quote:
-      "I was paying $30/mo on Wix and doing everything myself. Now I pay $19/mo and they handle everything. My site loads faster too.",
+      "I was paying thousands for a basic agency site. Cimaa built mine for $599, and now I pay $299/mo and they handle everything. My site loads faster too.",
     name: "Ahmed M.",
     business: "Rift Valley Transportation",
   },

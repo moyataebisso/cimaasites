@@ -120,8 +120,8 @@ export default function ContactPage() {
                     Which plan are you interested in?
                   </label>
                   <select className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all bg-white">
-                    <option>Basic — $19/mo</option>
-                    <option>Pro — $35/mo</option>
+                    <option>Basic — $599 setup + $299/mo</option>
+                    <option>Pro — $599 setup + $399/mo</option>
                     <option>Developer — $49.99 one-time</option>
                     <option>Not sure yet</option>
                   </select>

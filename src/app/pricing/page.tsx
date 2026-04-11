@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing — Cimaa Sites",
   description:
-    "Simple, honest pricing starting at $19/mo. No hidden fees, no contracts, cancel anytime.",
+    "Simple, honest pricing. $599 setup + $299/mo. No hidden fees, no contracts, cancel anytime.",
 };
 
 export default function PricingPage() {

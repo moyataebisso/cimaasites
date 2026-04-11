@@ -15,24 +15,24 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cimaa Sites — Professional Websites for Local Businesses | $19/mo",
+  title: "Cimaa Sites — Professional Websites for Local Businesses | $299/mo",
   description:
-    "Professional websites built for local businesses and community entrepreneurs. Done for you, $19/mo, 24/7 monitored. Enterprise tech stack at small business prices.",
+    "Professional websites built for local businesses and community entrepreneurs. Done for you, $599 setup + $299/mo, 24/7 monitored. Enterprise tech stack at small business prices.",
   keywords:
-    "affordable website, small business website, community business website, local business website, professional website $19, done for you website, website monitoring, Next.js website, Supabase website builder",
+    "affordable website, small business website, community business website, local business website, professional website, done for you website, website monitoring, Next.js website, Supabase website builder",
   openGraph: {
-    title: "Cimaa Sites — Powerful Websites for $19/mo",
+    title: "Cimaa Sites — Powerful Websites for Local Businesses",
     description:
-      "We build and manage professional websites for local businesses. Starting at $19/mo with 24/7 monitoring and direct support.",
+      "We build and manage professional websites for local businesses. $599 setup + $299/mo with 24/7 monitoring and direct support.",
     url: "https://cimaasites.ai",
     siteName: "Cimaa Sites",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cimaa Sites — Powerful Websites for $19/mo",
+    title: "Cimaa Sites — Powerful Websites for Local Businesses",
     description:
-      "Professional websites for local businesses. Starting at $19/mo.",
+      "Professional websites for local businesses. $599 setup + $299/mo.",
   },
 };
 
@@ -59,7 +59,7 @@ export default function RootLayout({
                 "@type": "PostalAddress",
                 addressCountry: "US",
               },
-              priceRange: "$19-$49.99",
+              priceRange: "$49.99-$599",
               parentOrganization: {
                 "@type": "Organization",
                 name: "Arsi Technology Group",

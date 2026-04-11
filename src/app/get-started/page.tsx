@@ -157,8 +157,8 @@ function StepPlan({
     {
       id: 'basic' as const,
       name: 'Basic',
-      price: '$19',
-      period: '/mo',
+      price: '$599',
+      period: ' setup',
       badge: 'Most Popular',
       features: [
         'Professional website (5 pages)',
@@ -174,8 +174,8 @@ function StepPlan({
     {
       id: 'pro' as const,
       name: 'Pro',
-      price: '$35',
-      period: '/mo',
+      price: '$599',
+      period: ' setup',
       badge: 'Best Value',
       featured: true,
       features: [
@@ -741,8 +741,8 @@ function StepReview({
   const [agreedTimeline, setAgreedTimeline] = useState(false)
 
   const planPrices: Record<string, string> = {
-    basic: '$19.00/mo (billed monthly)',
-    pro: '$35.00/mo (billed monthly)',
+    basic: '$599 setup + $299/mo',
+    pro: '$599 setup + $399/mo',
     developer: '$49.99 (one-time)',
   }
 

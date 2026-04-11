@@ -10,9 +10,12 @@ import { cn } from "@/lib/utils";
 const plans = [
   {
     name: "Basic",
-    price: "$19",
-    period: "/mo",
-    badge: "Most Popular",
+    tagline: "Everything you need to get online",
+    setupPrice: "$599",
+    setupSubtext: "one-time setup \u00B7 includes your first month",
+    monthlyPrice: "then $299/mo",
+    promo: "\uD83C\uDF89 First 3 months $249/mo \u00B7 then $299",
+    badge: "Starter",
     badgeVariant: "blue" as const,
     features: [
       "Professional website (5 pages)",
@@ -25,16 +28,19 @@ const plans = [
       "Mobile optimized",
       "Setup in 3-5 days",
     ],
-    cta: "Get Started",
+    cta: "Get Started \u2014 $599",
     ctaHref: "/contact",
     style: "border-blue-200 bg-white",
     ctaVariant: "primary" as const,
   },
   {
     name: "Pro",
-    price: "$35",
-    period: "/mo",
-    badge: "Best Value",
+    tagline: "The full toolkit for growing businesses",
+    setupPrice: "$599",
+    setupSubtext: "one-time setup \u00B7 includes your first month",
+    monthlyPrice: "then $399/mo",
+    promo: "\uD83C\uDF89 First 3 months $299/mo \u00B7 then $399",
+    badge: "Most Popular",
     badgeVariant: "violet" as const,
     featured: true,
     features: [
@@ -48,7 +54,7 @@ const plans = [
       "Photo gallery",
       "FAQ page builder",
     ],
-    cta: "Get Started",
+    cta: "Get Started \u2014 $599",
     ctaHref: "/contact",
     style:
       "bg-gradient-to-br from-blue-600 to-violet-600 border-transparent text-white",
@@ -56,8 +62,11 @@ const plans = [
   },
   {
     name: "Developer",
-    price: "$49.99",
-    period: " one-time",
+    tagline: "Full source code, your infrastructure",
+    setupPrice: "$49.99",
+    setupSubtext: "one-time \u00B7 no monthly fee",
+    monthlyPrice: null,
+    promo: null,
     badge: "For Developers",
     badgeVariant: "gold" as const,
     features: [
@@ -132,7 +141,17 @@ export function Pricing() {
                 >
                   {plan.name}
                 </h3>
-                <div className="mt-2 flex items-baseline gap-1">
+                <p
+                  className={cn(
+                    "text-sm mt-1",
+                    plan.featured || plan.name === "Developer"
+                      ? "text-white/70"
+                      : "text-slate-500"
+                  )}
+                >
+                  {plan.tagline}
+                </p>
+                <div className="mt-3 flex items-baseline gap-1">
                   <span
                     className={cn(
                       "text-4xl font-bold",
@@ -141,19 +160,41 @@ export function Pricing() {
                         : "text-slate-900"
                     )}
                   >
-                    {plan.price}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-sm",
-                      plan.featured || plan.name === "Developer"
-                        ? "text-white/70"
-                        : "text-slate-500"
-                    )}
-                  >
-                    {plan.period}
+                    {plan.setupPrice}
                   </span>
                 </div>
+                <p
+                  className={cn(
+                    "text-xs mt-1",
+                    plan.featured || plan.name === "Developer"
+                      ? "text-white/60"
+                      : "text-slate-500"
+                  )}
+                >
+                  {plan.setupSubtext}
+                </p>
+                {plan.monthlyPrice && (
+                  <p
+                    className={cn(
+                      "text-sm font-semibold mt-2",
+                      plan.featured ? "text-white/90" : "text-slate-700"
+                    )}
+                  >
+                    {plan.monthlyPrice}
+                  </p>
+                )}
+                {plan.promo && (
+                  <p
+                    className={cn(
+                      "text-xs mt-2 px-2 py-1 rounded-full inline-block",
+                      plan.featured
+                        ? "bg-white/15 text-white/90"
+                        : "bg-violet-100 text-violet-700"
+                    )}
+                  >
+                    {plan.promo}
+                  </p>
+                )}
               </div>
 
               <ul className="mt-8 space-y-3">
@@ -195,14 +236,19 @@ export function Pricing() {
           ))}
         </div>
 
-        <motion.p
-          className="mt-12 text-center text-sm text-slate-500"
+        <motion.div
+          className="mt-12 text-center space-y-2"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          All plans include free setup. No credit card required to start.
-        </motion.p>
+          <p className="text-sm text-slate-500">
+            Setup covers your first month. No contracts. Cancel anytime.
+          </p>
+          <p className="text-sm text-slate-500">
+            Local agencies charge $5,000&ndash;$25,000 just to build. We build it, host it, monitor it, and manage it &mdash; $599 to start.
+          </p>
+        </motion.div>
       </Container>
     </section>
   );

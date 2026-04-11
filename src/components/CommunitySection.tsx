@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 
 const stats = [
   { number: "3-5", label: "Days to go live", icon: Rocket },
-  { number: "$19", label: "Forever. No price hikes.", icon: Shield },
+  { number: "$299", label: "Per month. No price hikes.", icon: Shield },
   { number: "24/7", label: "Uptime monitoring", icon: Activity },
   { number: "5min", label: "Alert response time", icon: Bell },
 ];
@@ -38,7 +38,7 @@ export function CommunitySection() {
               </p>
               <p>
                 So we built something better. Professional websites, done for
-                you, at a price any business can actually afford. $19/mo — and
+                you, at a price any business can actually afford. $299/mo — and
                 that price never goes up. That&apos;s our community promise.
               </p>
               <p>

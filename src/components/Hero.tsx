@@ -106,9 +106,9 @@ export function Hero() {
               variants={fadeUp}
               className="mt-6 text-lg sm:text-xl text-slate-600 max-w-xl mx-auto leading-relaxed"
             >
-              We build, monitor, and manage your website for $19/mo. Built
-              by our community, for our community. No contracts. No DIY. Just
-              results.
+              We build, monitor, and manage your website. $599 to start &mdash;
+              includes your first month. Then $299/mo. No contracts. No DIY.
+              Just results.
             </motion.p>
 
             <motion.div
@@ -116,7 +116,7 @@ export function Hero() {
               className="mt-6 flex flex-wrap gap-4 justify-center"
             >
               <Button href="/contact" size="lg">
-                Get Started &mdash; $19/mo
+                Get Started &mdash; $599
               </Button>
               <Button href="/portfolio" variant="outline" size="lg">
                 See Our Work
