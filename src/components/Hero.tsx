@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
@@ -91,12 +90,6 @@ export function Hero() {
             initial="hidden"
             animate="show"
           >
-            <motion.div variants={fadeUp} className="flex justify-center">
-              <Badge variant="blue">
-                &#10022; Now with 50 themes + built-in SEO tools
-              </Badge>
-            </motion.div>
-
             <motion.h1
               variants={fadeUp}
               className="mt-6 leading-[1.05]"
@@ -106,9 +99,6 @@ export function Hero() {
               </span>
               <span className="block text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
                 powerful businesses
-              </span>
-              <span className="block text-lg sm:text-xl font-medium text-slate-500 mt-4 tracking-wide">
-                Full Google Search Engine Optimization &mdash; sitemap, structured data, meta tags, Search Console &mdash; built in and handled for you.
               </span>
             </motion.h1>
 
@@ -141,7 +131,6 @@ export function Hero() {
                 { label: "Setup in 3-5 days", sub: "Fast launch" },
                 { label: "24/7 Monitoring", sub: "Always watching" },
                 { label: "Direct Support", sub: "Real humans" },
-                { label: "English \u00B7 Afaan Oromoo \u00B7 Somali \u00B7 Amharic", sub: "Your language" },
               ].map((item, i) => (
                 <div key={i} className="text-center">
                   <div className="text-sm font-bold text-slate-800 tracking-wide">

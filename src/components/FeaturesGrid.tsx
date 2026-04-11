@@ -83,6 +83,12 @@ export function FeaturesGrid() {
   };
 
   useEffect(() => {
+    if (window.innerWidth < 768) {
+      setIsPaused(true);
+    }
+  }, []);
+
+  useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
 
@@ -125,7 +131,7 @@ export function FeaturesGrid() {
           viewport={{ once: true }}
         >
           <h2 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-4">
-            Everything included at $19/mo
+            Everything included
           </h2>
           <p className="text-2xl font-bold text-center text-violet-300 mb-16">
             No extras. No surprises.
@@ -135,7 +141,7 @@ export function FeaturesGrid() {
 
       <div
         ref={trackRef}
-        className="flex gap-6 overflow-x-auto cursor-grab active:cursor-grabbing select-none px-8"
+        className="flex gap-6 overflow-x-auto snap-x snap-mandatory cursor-grab active:cursor-grabbing select-none px-8"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -150,7 +156,7 @@ export function FeaturesGrid() {
         {[...features, ...features].map((f, i) => (
           <div
             key={i}
-            className="relative flex-shrink-0 w-80 h-56 rounded-2xl overflow-hidden group cursor-pointer"
+            className="relative flex-shrink-0 w-[85vw] sm:w-80 h-56 rounded-2xl overflow-hidden group cursor-pointer snap-start"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
