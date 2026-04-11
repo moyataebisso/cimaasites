@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 
@@ -49,47 +49,70 @@ const features = [
 
 export function FeaturesGrid() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeftRef = useRef(0);
   const [isPaused, setIsPaused] = useState(false);
+  const pauseTimer = useRef<NodeJS.Timeout>(null);
+
+  const pauseAndResume = () => {
+    setIsPaused(true);
+    if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 1500);
+  };
 
   const onMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setIsPaused(true);
-    setStartX(e.pageX - (trackRef.current?.offsetLeft || 0));
-    setScrollLeft(trackRef.current?.scrollLeft || 0);
+    isDragging.current = true;
+    startX.current = e.pageX - (trackRef.current?.offsetLeft || 0);
+    scrollLeftRef.current = trackRef.current?.scrollLeft || 0;
+    pauseAndResume();
   };
 
   const onMouseUp = () => {
-    setIsDragging(false);
-    setTimeout(() => setIsPaused(false), 1000);
+    isDragging.current = false;
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !trackRef.current) return;
+    if (!isDragging.current || !trackRef.current) return;
     e.preventDefault();
     const x = e.pageX - (trackRef.current.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    trackRef.current.scrollLeft = scrollLeft - walk;
+    const walk = (x - startX.current) * 2;
+    trackRef.current.scrollLeft = scrollLeftRef.current - walk;
   };
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    setIsPaused(true);
-    setStartX(e.touches[0].pageX - (trackRef.current?.offsetLeft || 0));
-    setScrollLeft(trackRef.current?.scrollLeft || 0);
-  };
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
 
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (!trackRef.current) return;
-    const x = e.touches[0].pageX - (trackRef.current.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    trackRef.current.scrollLeft = scrollLeft - walk;
-  };
+    const handleTouchStart = (e: TouchEvent) => {
+      startX.current = e.touches[0].pageX - el.offsetLeft;
+      scrollLeftRef.current = el.scrollLeft;
+      pauseAndResume();
+    };
 
-  const onTouchEnd = () => {
-    setTimeout(() => setIsPaused(false), 1000);
-  };
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const x = e.touches[0].pageX - el.offsetLeft;
+      const walk = (x - startX.current) * 2;
+      el.scrollLeft = scrollLeftRef.current - walk;
+    };
+
+    const handleTouchEnd = () => {
+      pauseAndResume();
+    };
+
+    el.addEventListener('touchstart', handleTouchStart, { passive: true });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    el.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
 
   return (
     <section className="bg-gradient-to-b from-slate-900 to-slate-800 py-24 overflow-hidden">
@@ -112,19 +135,17 @@ export function FeaturesGrid() {
 
       <div
         ref={trackRef}
-        className="flex gap-6 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none px-8"
+        className="flex gap-6 overflow-x-auto cursor-grab active:cursor-grabbing select-none px-8"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
           animation: isPaused ? 'none' : 'scroll-gallery 20s linear infinite',
         }}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
         onMouseMove={onMouseMove}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
         {[...features, ...features].map((f, i) => (
           <div

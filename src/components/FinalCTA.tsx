@@ -42,7 +42,7 @@ export function FinalCTA() {
             </Button>
           </div>
 
-          <p className="mt-6 text-sm text-slate-400">
+          <p className="text-slate-400 text-sm sm:text-base text-center mt-3 px-4">
             Setup takes 10 minutes. Site live in 3-5 days.
           </p>
         </motion.div>

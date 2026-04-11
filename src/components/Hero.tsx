@@ -25,7 +25,7 @@ function MockupCard({ side }: { side: "left" | "right" }) {
         transform: `translateY(-50%) ${side === 'left' ? 'rotate(-6deg)' : 'rotate(6deg)'}`,
         left: side === 'left' ? '0' : 'auto',
         right: side === 'right' ? '0' : 'auto',
-        width: 'min(280px, 20vw)',
+        width: 'min(240px, 15vw)',
         opacity: 0.55,
         zIndex: 0,
       }}
@@ -79,14 +79,14 @@ export function Hero() {
       </div>
 
       <Container>
-        <div className="relative flex items-center justify-center pt-20 px-48">
+        <div className="relative flex items-center justify-center pt-20 px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48">
 
           {/* Left mockup */}
           <MockupCard side="left" />
 
           {/* Center content */}
           <motion.div
-            className="relative z-10 text-center max-w-3xl mx-auto px-4"
+            className="relative z-10 text-center w-full max-w-2xl mx-auto px-4"
             variants={stagger}
             initial="hidden"
             animate="show"
