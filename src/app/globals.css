@@ -99,5 +99,10 @@ body {
 }
 
 .animate-scroll-gallery {
-  animation: scroll-gallery 30s linear infinite;
+  animation: scroll-gallery 20s linear infinite;
+}
+
+/* Hide scrollbar for drag-to-scroll galleries */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -15,12 +15,23 @@ export function FinalCTA() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Ready to get your business online?
-          </h2>
-          <p className="mt-4 text-lg text-slate-300 max-w-xl mx-auto">
-            Join businesses everywhere already powered by Cimaa Sites.
-          </p>
+          <div className="text-center">
+            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+              Powerful websites for{" "}
+              <span style={{
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                background: 'linear-gradient(135deg, #a78bfa, #60a5fa)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                powerful communities.
+              </span>
+            </h2>
+            <p className="text-slate-400 text-lg mt-2">
+              Built for communities everywhere 🌟
+            </p>
+          </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Button href="/contact" variant="white" size="lg">

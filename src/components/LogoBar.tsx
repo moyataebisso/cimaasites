@@ -15,12 +15,12 @@ export function LogoBar() {
   return (
     <section className="py-16 border-y border-slate-100 bg-slate-50/50">
       <Container>
-        <div className="mt-16 text-center mb-8">
+        <div className="mt-16 text-center px-4 mb-8">
           <p className="text-xs font-black tracking-[0.3em] uppercase text-violet-500 mb-2">
             Trusted by businesses across our community
           </p>
           <h3 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
-            Minneapolis-built.{" "}
+            Minnesota-started.{" "}
             <span style={{
               fontFamily: 'Georgia, serif',
               fontStyle: 'italic',
@@ -28,11 +28,11 @@ export function LogoBar() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              Community-owned.
+              Global reach.
             </span>
           </h3>
-          <p className="text-slate-500 text-lg mt-3 max-w-xl mx-auto">
-            Built in Minneapolis for local businesses &mdash; from Cedar-Riverside to Northeast, Brooklyn Park to Burnsville.
+          <p className="text-slate-500 text-base mt-2 max-w-sm mx-auto">
+            Born in Minneapolis. Built for communities everywhere.
           </p>
         </div>
       </Container>
