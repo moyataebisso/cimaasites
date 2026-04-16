@@ -8,42 +8,50 @@ const features = [
   {
     title: "Fast & Reliable",
     description: "Your site loads in under 1 second, worldwide.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&q=80",
+    gradient: "from-blue-600 to-blue-900",
   },
   {
     title: "We Watch It 24/7",
     description: "Get alerted the moment anything goes wrong.",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+    gradient: "from-violet-600 to-violet-900",
   },
   {
     title: "50 Professional Themes",
     description: "Pick your look. Switch anytime.",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&q=80",
+    gradient: "from-purple-600 to-purple-900",
   },
   {
     title: "Everything Built In",
     description: "Booking, store, blog, reviews \u2014 one click to turn on.",
-    image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80",
+    gradient: "from-indigo-600 to-indigo-900",
   },
   {
     title: "Real Human Support",
     description: "Text or email us directly. No bots, no tickets.",
-    image: "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
+    gradient: "from-teal-600 to-teal-900",
   },
   {
     title: "Secure by Default",
     description: "Enterprise-level security, handled for you.",
-    image: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=600&q=80",
+    gradient: "from-slate-600 to-slate-900",
   },
   {
     title: "Built-In SEO",
     description: "Show up on Google. We handle the technical setup.",
-    image: "https://images.unsplash.com/photo-1432888622747-4eb9a8f5f989?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80",
+    gradient: "from-green-600 to-green-900",
   },
   {
     title: "Developer Option",
     description: "Want the code? Take it for $49.99 one-time.",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=600&q=80",
+    gradient: "from-orange-600 to-orange-900",
   },
 ];
 
