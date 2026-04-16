@@ -121,16 +121,16 @@ export function FeaturesGrid() {
   }, []);
 
   return (
-    <section className="bg-gradient-to-b from-slate-900 to-slate-800 py-24 overflow-hidden">
+    <section className="bg-gradient-to-b from-slate-900 to-slate-800 py-24">
       <Container>
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-12 px-4 pb-4"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-4">
+          <h2 className="text-5xl sm:text-6xl font-black text-center bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent mb-4 leading-tight">
             Everything included
           </h2>
           <p className="text-2xl font-bold text-center text-violet-300 mb-16">
@@ -139,6 +139,7 @@ export function FeaturesGrid() {
         </motion.div>
       </Container>
 
+      <div className="overflow-hidden w-full">
       <div
         ref={trackRef}
         className="flex gap-6 overflow-x-auto snap-x snap-mandatory cursor-grab active:cursor-grabbing select-none px-8"
@@ -146,14 +147,14 @@ export function FeaturesGrid() {
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-          animation: isPaused ? 'none' : 'scroll-gallery 20s linear infinite',
+          animation: isPaused ? 'none' : 'scroll-gallery 25s linear infinite',
         }}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
         onMouseMove={onMouseMove}
       >
-        {[...features, ...features].map((f, i) => (
+        {[...features, ...features, ...features].map((f, i) => (
           <div
             key={i}
             className="relative flex-shrink-0 w-[85vw] sm:w-80 h-56 rounded-2xl overflow-hidden group cursor-pointer snap-start"
@@ -173,6 +174,7 @@ export function FeaturesGrid() {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </section>
   );

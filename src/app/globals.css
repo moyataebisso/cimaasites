@@ -94,12 +94,12 @@ body {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.333%);
   }
 }
 
 .animate-scroll-gallery {
-  animation: scroll-gallery 20s linear infinite;
+  animation: scroll-gallery 25s linear infinite;
 }
 
 /* Prevent horizontal overflow on mobile */

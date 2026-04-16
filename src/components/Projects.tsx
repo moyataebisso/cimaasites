@@ -3,48 +3,63 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 
-const projects = [
+type Project = {
+  name: string;
+  url: string | null;
+  description: string;
+  category: string;
+  image: string;
+  logo: string | null;
+};
+
+const projects: Project[] = [
   {
     name: "SaveYours",
-    url: "https://saveyours.net",
-    description: "CPR Training Platform",
     category: "Healthcare",
+    description: "CPR Training Platform",
+    url: "https://saveyours.net",
     image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80",
+    logo: null,
   },
   {
     name: "CareConnect Live",
-    url: "https://careconnectlive.org",
-    description: "Healthcare Platform",
     category: "Healthcare",
+    description: "Healthcare Platform",
+    url: "https://careconnectlive.org",
     image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80",
+    logo: null,
   },
   {
     name: "Oromo Platform",
-    url: "https://oromo-platform.vercel.app",
-    description: "Community Platform",
     category: "Community",
+    description: "Community Platform",
+    url: "https://oromo-platform.vercel.app",
     image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80",
+    logo: null,
   },
   {
     name: "Entrusted Home Healthcare",
-    url: null,
-    description: "Healthcare Agency Website",
     category: "Healthcare",
+    description: "Healthcare Agency Website",
+    url: "https://entrustedhomehealthcare.org",
     image: "https://images.unsplash.com/photo-1576765608622-067973a79f53?w=600&q=80",
+    logo: null,
   },
   {
     name: "Arsi Tech Group",
-    url: "https://arsitechgroup.com",
-    description: "Tech Company Website",
     category: "Technology",
+    description: "Tech Company Website",
+    url: "https://arsitechgroup.com",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80",
+    logo: null,
   },
   {
     name: "portal.saveyours.net",
-    url: null,
-    description: "B2B Compliance Portal",
     category: "SaaS \u00B7 Coming Soon",
+    description: "B2B Compliance Portal",
+    url: null,
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+    logo: null,
   },
 ];
 
@@ -84,6 +99,14 @@ export function Projects() {
                 alt={project.name}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              {project.logo && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={project.logo}
+                  alt={project.name + " logo"}
+                  className="absolute top-3 left-3 h-8 w-auto object-contain bg-white/90 rounded-md px-2 py-1 z-10"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5">
                 <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">

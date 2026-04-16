@@ -125,7 +125,7 @@ export function Hero() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-8 flex flex-wrap gap-x-8 gap-y-3 justify-center"
+              className="mt-8 pt-8 flex flex-wrap gap-x-16 gap-y-3 justify-center"
             >
               {[
                 { label: "Setup in 3-5 days", sub: "Fast launch" },

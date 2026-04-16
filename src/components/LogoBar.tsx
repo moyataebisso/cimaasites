@@ -16,7 +16,7 @@ export function LogoBar() {
     <section className="py-16 border-y border-slate-100 bg-slate-50/50">
       <Container>
         <div className="mt-16 text-center px-4 mb-8">
-          <p className="text-xs font-black tracking-[0.3em] uppercase text-violet-500 mb-2">
+          <p className="text-2xl sm:text-3xl font-black tracking-[0.2em] uppercase text-violet-500 mb-2 text-center">
             Trusted by businesses across our community
           </p>
           <h3 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
