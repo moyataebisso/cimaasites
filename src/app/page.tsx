@@ -14,10 +14,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <div className="h-2 w-full mt-12 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600" />
-      <div className="bg-gradient-to-b from-violet-50 to-white">
-        <LogoBar />
-      </div>
+      <LogoBar />
       <HowItWorks />
       <FeaturesGrid />
       <ComparisonTable />
