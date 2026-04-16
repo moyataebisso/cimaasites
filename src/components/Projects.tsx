@@ -12,6 +12,9 @@ type Project = {
   logo: string | null;
 };
 
+const SUPABASE_LOGOS =
+  "https://abhpzepanwhuswhiuutu.supabase.co/storage/v1/object/public/logos";
+
 const projects: Project[] = [
   {
     name: "SaveYours",
@@ -19,7 +22,7 @@ const projects: Project[] = [
     description: "CPR Training Platform",
     url: "https://saveyours.net",
     image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80",
-    logo: null,
+    logo: `${SUPABASE_LOGOS}/saveyours-logo.png`,
   },
   {
     name: "CareConnect Live",
@@ -27,7 +30,7 @@ const projects: Project[] = [
     description: "Healthcare Platform",
     url: "https://careconnectlive.org",
     image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80",
-    logo: null,
+    logo: `${SUPABASE_LOGOS}/careconnect-logo.png`,
   },
   {
     name: "Oromo Platform",
@@ -35,7 +38,7 @@ const projects: Project[] = [
     description: "Community Platform",
     url: "https://oromo-platform.vercel.app",
     image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80",
-    logo: null,
+    logo: `${SUPABASE_LOGOS}/odda-logo.png`,
   },
   {
     name: "Entrusted Home Healthcare",
@@ -43,15 +46,15 @@ const projects: Project[] = [
     description: "Healthcare Agency Website",
     url: "https://entrustedhomehealthcare.org",
     image: "https://images.unsplash.com/photo-1576765608622-067973a79f53?w=600&q=80",
-    logo: null,
+    logo: `${SUPABASE_LOGOS}/entrusted-logo.png`,
   },
   {
-    name: "Arsi Tech Group",
-    category: "Technology",
-    description: "Tech Company Website",
-    url: "https://arsitechgroup.com",
+    name: "Rift Valley Transportation",
+    category: "Transportation",
+    description: "Transportation Company",
+    url: "https://rvtusinc.com",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80",
-    logo: null,
+    logo: `${SUPABASE_LOGOS}/riftvalley-logo.png`,
   },
   {
     name: "portal.saveyours.net",
@@ -100,12 +103,17 @@ export function Projects() {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {project.logo && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={project.logo}
-                  alt={project.name + " logo"}
-                  className="absolute top-3 left-3 h-8 w-auto object-contain bg-white/90 rounded-md px-2 py-1 z-10"
-                />
+                <div className="absolute top-3 left-3 z-10 bg-white/95 rounded-lg px-2 py-1.5 shadow-md">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={project.logo}
+                    alt={project.name + " logo"}
+                    className="h-6 w-auto object-contain max-w-[80px]"
+                    onError={(e) => {
+                      e.currentTarget.parentElement?.style.setProperty('display', 'none');
+                    }}
+                  />
+                </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-5">
