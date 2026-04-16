@@ -1,7 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { LogoBar } from "@/components/LogoBar";
 import { HowItWorks } from "@/components/HowItWorks";
-import { CommunitySection } from "@/components/CommunitySection";
 import { FeaturesGrid } from "@/components/FeaturesGrid";
 import { ClientsGet } from "@/components/ClientsGet";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -20,7 +19,6 @@ export default function Home() {
         <LogoBar />
       </div>
       <HowItWorks />
-      <CommunitySection />
       <FeaturesGrid />
       <ComparisonTable />
       <ClientsGet />
