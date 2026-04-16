@@ -64,6 +64,14 @@ const projects: Project[] = [
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
     logo: null,
   },
+  {
+    name: "Indsve",
+    category: "Fashion \u00B7 Clothing",
+    description: "Minneapolis Clothing Brand",
+    url: "https://indsve.com",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    logo: `${SUPABASE_LOGOS}/indsve-logo.png`,
+  },
 ];
 
 export function Projects() {
@@ -86,7 +94,7 @@ export function Projects() {
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 [&>*:last-child:nth-child(3n-2)]:lg:col-span-3 [&>*:last-child:nth-child(3n-1)]:lg:col-span-2">
           {projects.map((project, i) => (
             <motion.div
               key={project.name}
