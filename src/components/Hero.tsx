@@ -148,6 +148,34 @@ export function Hero() {
           <MockupCard side="right" />
 
         </div>
+
+        {/* Purple gradient divider line */}
+        <div className="h-2 w-full mt-16 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600" />
+
+        {/* Minnesota section */}
+        <div className="mt-16 text-center px-4 w-full pb-16">
+          <p className="text-2xl sm:text-3xl font-black tracking-[0.2em] uppercase text-violet-500 mb-4 text-center">
+            Trusted by businesses across our community
+          </p>
+          <h3 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight">
+            Minnesota-started.{" "}
+            <span style={{
+              fontFamily: 'Georgia, serif',
+              fontStyle: 'italic',
+              background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              Global reach.
+            </span>
+          </h3>
+          <p className="text-slate-500 text-base mt-3 max-w-sm mx-auto">
+            Born in Minneapolis. Built for communities everywhere.
+          </p>
+
+          {/* Bold underline */}
+          <div className="h-1.5 w-32 mx-auto mt-6 rounded-full bg-gradient-to-r from-violet-600 via-blue-500 to-violet-600" />
+        </div>
       </Container>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
