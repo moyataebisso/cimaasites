@@ -34,6 +34,7 @@ export function LogoBar() {
           <p className="text-slate-500 text-base mt-2 max-w-sm mx-auto">
             Born in Minneapolis. Built for communities everywhere.
           </p>
+          <div className="h-1.5 w-32 mx-auto mt-6 rounded-full bg-gradient-to-r from-violet-600 via-blue-500 to-violet-600" />
         </div>
       </Container>
       <div className="relative overflow-hidden">
