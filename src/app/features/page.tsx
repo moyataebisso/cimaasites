@@ -82,18 +82,18 @@ const fadeUp = {
 
 export default function FeaturesPage() {
   return (
-    <main className="pt-24">
+    <main className="bg-slate-900 min-h-screen pt-24">
       <section className="py-24">
         <Container>
           <motion.div className="text-center max-w-3xl mx-auto" {...fadeUp}>
             <Badge variant="blue">Features</Badge>
-            <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-slate-900">
+            <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-white">
               Everything your business needs.{" "}
               <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
                 Nothing it doesn&apos;t.
               </span>
             </h1>
-            <p className="mt-6 text-lg text-slate-600">
+            <p className="mt-6 text-lg text-slate-400">
               Enterprise-grade technology made simple. Every Cimaa site runs on
               Next.js, Supabase, and Vercel — the same stack powering
               billion-dollar companies.
@@ -102,10 +102,10 @@ export default function FeaturesPage() {
         </Container>
       </section>
 
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-slate-800/50">
         <Container>
           <motion.h2
-            className="text-2xl font-bold text-slate-900 mb-12"
+            className="text-2xl font-bold text-white mb-12"
             {...fadeUp}
           >
             Core Features — Included in every plan
@@ -114,17 +114,17 @@ export default function FeaturesPage() {
             {coreFeatures.map((f, i) => (
               <motion.div
                 key={f.title}
-                className="rounded-2xl bg-white border border-slate-200 p-8 transition-all hover:shadow-md hover:scale-[1.02]"
+                className="rounded-2xl bg-slate-800 border border-slate-700 p-8 transition-all hover:shadow-md hover:scale-[1.02]"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
                 viewport={{ once: true }}
               >
                 <f.icon className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-bold text-slate-900 mb-2">
+                <h3 className="text-lg font-bold text-white mb-2">
                   {f.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-slate-400 leading-relaxed">
                   {f.description}
                 </p>
               </motion.div>
@@ -137,7 +137,7 @@ export default function FeaturesPage() {
         <Container>
           <motion.div {...fadeUp}>
             <Badge variant="violet">Pro Plan</Badge>
-            <h2 className="mt-4 text-2xl font-bold text-slate-900 mb-12">
+            <h2 className="mt-4 text-2xl font-bold text-white mb-12">
               Pro Features — $399/mo
             </h2>
           </motion.div>
@@ -152,24 +152,24 @@ export default function FeaturesPage() {
                 viewport={{ once: true }}
               >
                 <f.icon className="h-6 w-6 text-violet-600 mb-3" />
-                <h3 className="font-semibold text-slate-900 mb-1">
+                <h3 className="font-semibold text-white mb-1">
                   {f.title}
                 </h3>
-                <p className="text-sm text-slate-600">{f.description}</p>
+                <p className="text-sm text-slate-400">{f.description}</p>
               </motion.div>
             ))}
           </div>
         </Container>
       </section>
 
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-slate-800/50">
         <Container>
           <motion.div className="text-center max-w-2xl mx-auto" {...fadeUp}>
             <Badge variant="gold">For Developers</Badge>
-            <h2 className="mt-4 text-2xl font-bold text-slate-900 mb-4">
+            <h2 className="mt-4 text-2xl font-bold text-white mb-4">
               Developer Plan — $49.99 one-time
             </h2>
-            <p className="text-slate-600 mb-8">
+            <p className="text-slate-400 mb-8">
               Get the complete Next.js source code. All themes, all modules.
               Deploy to your own Supabase and Vercel. Perfect for agencies and
               developers who want full control.

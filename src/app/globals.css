@@ -116,3 +116,34 @@ html, body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Animated page border — travelling light effect */
+@keyframes travel-right {
+  0%   { left: -33%; }
+  100% { left: 100%; }
+}
+@keyframes travel-left {
+  0%   { right: -33%; }
+  100% { right: 100%; }
+}
+@keyframes travel-down {
+  0%   { top: -33%; }
+  100% { top: 100%; }
+}
+@keyframes travel-up {
+  0%   { bottom: -33%; }
+  100% { bottom: 100%; }
+}
+
+.border-travel-top {
+  animation: travel-right 4s linear infinite;
+}
+.border-travel-bottom {
+  animation: travel-left 4s linear infinite;
+}
+.border-travel-left {
+  animation: travel-down 4s linear infinite;
+}
+.border-travel-right {
+  animation: travel-up 4s linear infinite;
+}

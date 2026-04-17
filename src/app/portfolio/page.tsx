@@ -1,116 +1,140 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ExternalLink } from "lucide-react";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+const SUPABASE_LOGOS =
+  "https://abhpzepanwhuswhiuutu.supabase.co/storage/v1/object/public/logos";
 
 const projects = [
   {
     name: "CareConnect Live",
     category: "Healthcare",
     description:
-      "Professional healthcare platform connecting caregivers with families. Features appointment booking, service listings, and secure messaging.",
-    color: "from-blue-500 to-cyan-500",
+      "Professional healthcare platform connecting caregivers with families. Appointment booking, service listings, and secure messaging.",
+    url: "https://careconnectlive.org",
+    logo: `${SUPABASE_LOGOS}/careconnect-logo.png`,
   },
   {
     name: "SaveYours",
+    category: "Healthcare",
+    description:
+      "CPR and first aid training platform. Class registration, Stripe payments, and automated emails.",
+    url: "https://saveyours.net",
+    logo: `${SUPABASE_LOGOS}/saveyours-logo.png`,
+  },
+  {
+    name: "Oromo Platform",
     category: "Community",
     description:
-      "Community-focused platform helping local businesses save and grow. Includes member directory, events, and resource sharing.",
-    color: "from-violet-500 to-purple-500",
+      "Oromo community hub — Academy, Businesses, Careers, News, Events, and ODDA all in one platform.",
+    url: "https://oromo-platform.vercel.app",
+    logo: `${SUPABASE_LOGOS}/odda-logo.png`,
   },
   {
     name: "Entrusted Home Healthcare",
     category: "Healthcare",
     description:
-      "Home healthcare agency website with service pages, staff profiles, referral forms, and insurance information.",
-    color: "from-emerald-500 to-teal-500",
+      "Home healthcare agency website with HIPAA compliance pages and service listings.",
+    url: "https://entrustedhomehealthcare.org",
+    logo: `${SUPABASE_LOGOS}/entrusted-logo.png`,
   },
   {
     name: "Rift Valley Transportation",
     category: "Transportation",
     description:
-      "Transportation company website with online booking, fleet showcase, service areas, and real-time availability.",
-    color: "from-amber-500 to-orange-500",
+      "Transportation company website serving the Twin Cities metro area.",
+    url: "https://rvtusinc.com",
+    logo: `${SUPABASE_LOGOS}/riftvalley-logo.png`,
+  },
+  {
+    name: "Indsve",
+    category: "Fashion \u00B7 Clothing",
+    description:
+      "Minneapolis clothing brand with a modern Shopify-powered storefront.",
+    url: "https://indsve.com",
+    logo: `${SUPABASE_LOGOS}/indsve-logo.png`,
+  },
+  {
+    name: "portal.saveyours.net",
+    category: "SaaS \u00B7 Coming Soon",
+    description:
+      "B2B compliance portal for childcare facility directors to manage staff certifications.",
+    url: null,
+    logo: null,
   },
 ];
 
-const fadeUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut" as const },
-  viewport: { once: true },
-};
-
 export default function PortfolioPage() {
   return (
-    <main className="pt-24">
-      <section className="py-24">
-        <Container>
-          <motion.div className="text-center max-w-3xl mx-auto" {...fadeUp}>
-            <Badge variant="blue">Portfolio</Badge>
-            <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-slate-900">
-              Real sites for{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                real businesses
+    <main className="bg-slate-900 min-h-screen">
+      {/* Page header */}
+      <div className="text-center pt-32 pb-16 px-6">
+        <span className="text-xs font-black tracking-[0.3em] uppercase text-violet-400 mb-4 block">
+          Portfolio
+        </span>
+        <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-4">
+          Real sites for{" "}
+          <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+            real businesses
+          </span>
+        </h1>
+        <p className="text-slate-400 text-lg max-w-xl mx-auto">
+          Every site we build runs on the same enterprise stack. Here are some of
+          the businesses we have helped get online.
+        </p>
+      </div>
+
+      {/* Project grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 pb-24">
+        {projects.map((project, i) => (
+          <div
+            key={i}
+            className="relative rounded-2xl overflow-hidden group cursor-pointer bg-slate-800 border border-slate-700 hover:border-violet-500 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/20"
+          >
+            {/* Logo area */}
+            <div className="flex items-center justify-center h-40 px-8 bg-gradient-to-br from-slate-800 to-slate-900">
+              {project.logo ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={project.logo}
+                  alt={project.name}
+                  className="max-h-16 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <span className="text-4xl">&#128284;</span>
+              )}
+            </div>
+
+            {/* Text */}
+            <div className="p-6 border-t border-slate-700">
+              <span className="text-xs font-black tracking-widest uppercase text-violet-400">
+                {project.category}
               </span>
-            </h1>
-            <p className="mt-6 text-lg text-slate-600">
-              Every site we build runs on the same enterprise stack. Here are
-              some of the businesses we&apos;ve helped get online.
-            </p>
-          </motion.div>
-        </Container>
-      </section>
-
-      <section className="pb-24">
-        <Container>
-          <div className="grid sm:grid-cols-2 gap-8">
-            {projects.map((project, i) => (
-              <motion.div
-                key={project.name}
-                className="group rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div
-                  className={`h-48 bg-gradient-to-br ${project.color} flex items-center justify-center`}
+              <h3 className="text-white font-bold text-xl mt-1">
+                {project.name}
+              </h3>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed">
+                {project.description}
+              </p>
+              {project.url ? (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-violet-400 text-sm font-medium mt-4 hover:text-violet-300 transition-colors"
                 >
-                  <span className="text-3xl font-bold text-white/90">
-                    {project.name}
-                  </span>
-                </div>
-                <div className="p-8">
-                  <Badge>{project.category}</Badge>
-                  <h3 className="mt-3 text-xl font-bold text-slate-900">
-                    {project.name}
-                  </h3>
-                  <p className="mt-2 text-slate-600 leading-relaxed">
-                    {project.description}
-                  </p>
-                  <div className="mt-4 flex items-center gap-2 text-sm font-medium text-blue-600">
-                    <span>View project</span>
-                    <ExternalLink size={14} />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                  Visit site &rarr;
+                </a>
+              ) : (
+                <span className="inline-block text-slate-500 text-sm mt-4">
+                  Coming soon
+                </span>
+              )}
+            </div>
           </div>
-
-          <motion.div className="mt-16 text-center" {...fadeUp}>
-            <p className="text-lg text-slate-600 mb-6">
-              Want to see your business here?
-            </p>
-            <Button href="/contact" size="lg">
-              Get Started Today
-            </Button>
-          </motion.div>
-        </Container>
-      </section>
+        ))}
+      </div>
     </main>
   );
 }

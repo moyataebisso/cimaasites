@@ -71,6 +71,23 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} font-sans antialiased`}
       >
+        {/* Animated page border — top */}
+        <div className="fixed top-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
+          <div className="border-travel-top absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+        </div>
+        {/* Animated page border — bottom */}
+        <div className="fixed bottom-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
+          <div className="border-travel-bottom absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+        </div>
+        {/* Animated page border — left */}
+        <div className="fixed left-0 top-0 w-[3px] h-full z-[9999] pointer-events-none overflow-hidden">
+          <div className="border-travel-left absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-violet-500 to-transparent" />
+        </div>
+        {/* Animated page border — right */}
+        <div className="fixed right-0 top-0 w-[3px] h-full z-[9999] pointer-events-none overflow-hidden">
+          <div className="border-travel-right absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
+        </div>
+
         <Navbar />
         {children}
         <Footer />
