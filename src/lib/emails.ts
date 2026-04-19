@@ -84,3 +84,52 @@ export async function sendYouNewClientEmail(data: {
     `,
   })
 }
+
+export async function sendContactAutoReply(data: {
+  email: string
+  contactName: string
+  businessName: string
+}) {
+  await resend.emails.send({
+    from,
+    to: data.email,
+    subject: 'Thanks for reaching out — Cimaa Sites',
+    text: `Hi ${data.contactName}, thanks for telling us about ${data.businessName}. We'll review your info and get back to you within 24 hours with next steps.\n\n— The Cimaa Sites team`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
+        <h1 style="color:#2563EB">Thanks for reaching out!</h1>
+        <p>Hi ${data.contactName},</p>
+        <p>Thanks for telling us about <strong>${data.businessName}</strong>. We'll review your info and get back to you within 24 hours with next steps.</p>
+        <p>— The Cimaa Sites team</p>
+        <p style="color:#888;font-size:12px">
+          Cimaa Sites — Powerful websites for powerful businesses
+        </p>
+      </div>
+    `,
+  })
+}
+
+export async function sendNewContactLeadEmail(data: {
+  contactName: string
+  email: string
+  businessName: string
+  plan: string
+  message: string
+  submissionId: string
+}) {
+  const adminUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://cimaasites.ai'}/admin`
+  await resend.emails.send({
+    from,
+    to: 'arsitechgroup@gmail.com',
+    subject: `New Cimaa Sites lead: ${data.businessName}`,
+    html: `
+      <h2>New Cimaa Sites lead!</h2>
+      <p>Contact: ${data.contactName}</p>
+      <p>Email: ${data.email}</p>
+      <p>Business: ${data.businessName}</p>
+      <p>Plan: ${data.plan}</p>
+      <p>Message:<br>${data.message ? data.message.replace(/\n/g, '<br>') : '<em>(none)</em>'}</p>
+      <p>Review in <a href="${adminUrl}">admin</a> — submission ID: <code>${data.submissionId}</code></p>
+    `,
+  })
+}

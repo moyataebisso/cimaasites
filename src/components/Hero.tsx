@@ -116,7 +116,7 @@ export function Hero() {
               className="mt-6 flex flex-wrap gap-4 justify-center"
             >
               <Button href="/contact" size="lg">
-                Get Started &mdash; $599
+                Get Started
               </Button>
               <Button href="/portfolio" variant="outline" size="lg">
                 See Our Work

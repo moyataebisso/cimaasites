@@ -56,7 +56,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center">
-            <Button href="/get-started" size="sm">
+            <Button href="/contact" size="sm">
               Get Started
             </Button>
             <a
@@ -89,7 +89,7 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="px-4 pt-2">
-                <Button href="/get-started" size="sm" className="w-full">
+                <Button href="/contact" size="sm" className="w-full">
                   Get Started
                 </Button>
               </div>
