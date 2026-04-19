@@ -174,10 +174,10 @@ async function provisionSite(submissionId: string) {
     plan: submission.plan || 'basic',
     revenue:
       submission.plan === 'pro'
-        ? '$35/mo'
+        ? '$399/mo'
         : submission.plan === 'developer'
           ? '$49.99 one-time'
-          : '$19/mo',
+          : '$299/mo',
   })
 
   await logStep(

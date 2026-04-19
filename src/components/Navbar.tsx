@@ -89,7 +89,7 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="px-4 pt-2">
-                <Button href="/contact" size="sm" className="w-full">
+                <Button href="/get-started" size="sm" className="w-full">
                   Get Started
                 </Button>
               </div>

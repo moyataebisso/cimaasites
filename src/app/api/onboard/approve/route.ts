@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       email: submission.email,
       plan: submission.plan,
       revenue:
-        submission.plan === 'basic' ? '$19' : submission.plan === 'pro' ? '$35' : '$49.99',
+        submission.plan === 'basic' ? '$299' : submission.plan === 'pro' ? '$399' : '$49.99',
     })
   } catch (err) {
     console.error('Email send error:', err)
