@@ -1,5 +1,6 @@
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendPaymentReceivedEmail } from '@/lib/emails'
 
 export const runtime = 'nodejs'
 
@@ -51,6 +52,29 @@ export async function POST(request: Request) {
         completed_at: new Date().toISOString(),
       })
 
+    // Best-effort: notify customer that payment was received and build is starting.
+    // Do NOT block provisioning if the email fails.
+    try {
+      const { data: paidSubmission } = await supabaseAdmin
+        .schema('cimaasites')
+        .from('onboarding_submissions')
+        .select('contact_name, business_name, email, plan')
+        .eq('id', submissionId)
+        .single()
+
+      if (paidSubmission?.email) {
+        await sendPaymentReceivedEmail({
+          email: paidSubmission.email,
+          contactName:
+            paidSubmission.contact_name || paidSubmission.business_name,
+          businessName: paidSubmission.business_name,
+          plan: paidSubmission.plan,
+        })
+      }
+    } catch (err) {
+      console.error('sendPaymentReceivedEmail error:', err)
+    }
+
     // Only run full provisioning for setup payments (not recurring invoices)
     const isSetup = checkoutType === 'setup' || checkoutType === 'developer'
 
@@ -67,20 +91,33 @@ export async function POST(request: Request) {
   if (event.type === 'invoice.paid') {
     // Recurring monthly payment — log only
     const invoice = event.data.object
-    const customerId = invoice.customer as string
+    const customerId = invoice.customer as string | null
 
     if (customerId) {
-      await supabaseAdmin
+      const { data: ownerSubmission } = await supabaseAdmin
         .schema('cimaasites')
-        .from('provisioning_logs')
-        .insert({
-          submission_id: customerId,
-          step: 'recurring_payment',
-          status: 'done',
-          message: `Recurring payment received: ${invoice.amount_paid} cents`,
-          started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
-        })
+        .from('onboarding_submissions')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+        .single()
+
+      if (ownerSubmission?.id) {
+        await supabaseAdmin
+          .schema('cimaasites')
+          .from('provisioning_logs')
+          .insert({
+            submission_id: ownerSubmission.id,
+            step: 'recurring_payment',
+            status: 'done',
+            message: `Recurring payment received: ${invoice.amount_paid} cents`,
+            started_at: new Date().toISOString(),
+            completed_at: new Date().toISOString(),
+          })
+      } else {
+        console.warn(
+          `invoice.paid: no submission found for stripe_customer_id=${customerId}; skipping log`
+        )
+      }
     }
   }
 

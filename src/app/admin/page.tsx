@@ -3,7 +3,19 @@
 import { Fragment, useState } from 'react'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Loader2, ExternalLink, Globe, StickyNote } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  ExternalLink,
+  Globe,
+  StickyNote,
+  Copy,
+  Check,
+  Mail,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────
 
@@ -28,6 +40,13 @@ interface Submission {
   amount_cents: number
   selected_layout: string | null
   layout_notes: string | null
+  contact_name: string | null
+  phone: string | null
+  business_description: string | null
+  checkout_url: string | null
+  stripe_session_id: string | null
+  approved_at: string | null
+  client_live_url: string | null
 }
 
 interface ChangeRequest {
@@ -196,6 +215,21 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  const loadOverview = async (pw?: string) => {
+    try {
+      const res = await fetch('/api/admin/data', {
+        headers: { 'x-admin-password': pw || storedPassword },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setClients(data.clients || [])
+        setSubmissions(data.submissions || [])
+      }
+    } catch (err) {
+      console.error('Failed to refresh overview:', err)
+    }
+  }
+
   const loadRequests = async (pw?: string, statusF?: string, projectF?: string) => {
     setRequestsLoading(true)
     try {
@@ -353,18 +387,21 @@ export default function AdminPage() {
                       return (
                         <Fragment key={s.id}>
                           <tr
-                            className={cn(
-                              'border-b border-slate-50',
-                              hasNotes && 'cursor-pointer hover:bg-slate-50',
-                              !hasNotes && 'hover:bg-slate-50'
-                            )}
-                            onClick={() => {
-                              if (hasNotes) {
-                                setExpandedSubmission(isExpanded ? null : s.id)
-                              }
-                            }}
+                            className="border-b border-slate-50 cursor-pointer hover:bg-slate-50"
+                            onClick={() =>
+                              setExpandedSubmission(isExpanded ? null : s.id)
+                            }
                           >
-                            <td className="px-6 py-3 font-medium text-slate-900">{s.business_name}</td>
+                            <td className="px-6 py-3 font-medium text-slate-900">
+                              <div className="flex items-center gap-2">
+                                {isExpanded ? (
+                                  <ChevronUp size={14} className="text-slate-400" />
+                                ) : (
+                                  <ChevronDown size={14} className="text-slate-400" />
+                                )}
+                                {s.business_name}
+                              </div>
+                            </td>
                             <td className="px-6 py-3 text-slate-600">{s.email}</td>
                             <td className="px-6 py-3">
                               <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
@@ -393,15 +430,14 @@ export default function AdminPage() {
                               {new Date(s.created_at).toLocaleDateString()}
                             </td>
                           </tr>
-                          {isExpanded && hasNotes && (
-                            <tr className="bg-amber-50/60 border-b border-slate-100">
-                              <td colSpan={6} className="px-6 py-3">
-                                <p className="text-xs font-semibold text-amber-700 mb-1">
-                                  Layout notes
-                                </p>
-                                <p className="text-sm text-slate-700 whitespace-pre-wrap">
-                                  {s.layout_notes}
-                                </p>
+                          {isExpanded && (
+                            <tr className="bg-slate-50/70 border-b border-slate-100">
+                              <td colSpan={6} className="px-6 py-4">
+                                <SubmissionDetail
+                                  submission={s}
+                                  adminPassword={storedPassword}
+                                  onChanged={() => loadOverview(storedPassword)}
+                                />
                               </td>
                             </tr>
                           )}
@@ -758,11 +794,323 @@ function StatusBadge({ status }: { status: string }) {
         status === 'preview' && 'bg-blue-100 text-blue-700',
         status === 'paid' && 'bg-amber-100 text-amber-700',
         status === 'failed' && 'bg-red-100 text-red-700',
-        status === 'pending' && 'bg-slate-100 text-slate-600'
+        status === 'pending' && 'bg-slate-100 text-slate-600',
+        status === 'approved' && 'bg-violet-100 text-violet-700',
+        status === 'provisioning' && 'bg-blue-100 text-blue-700'
       )}
     >
       {status}
     </span>
+  )
+}
+
+function SubmissionDetail({
+  submission,
+  adminPassword,
+  onChanged,
+}: {
+  submission: Submission
+  adminPassword: string
+  onChanged: () => void
+}) {
+  const [busy, setBusy] = useState<null | 'approve' | 'approve_email' | 'resend'>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const status = submission.status
+  const hasNotes = Boolean(submission.layout_notes && submission.layout_notes.trim())
+
+  const approve = async (sendEmail: boolean) => {
+    setError(null)
+    setSuccess(null)
+    setBusy(sendEmail ? 'approve_email' : 'approve')
+    try {
+      const res = await fetch('/api/onboard/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword,
+        },
+        body: JSON.stringify({
+          submissionId: submission.id,
+          mode: 'approve_for_payment',
+          sendEmail,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Approve failed')
+      }
+      if (data.emailError) {
+        setSuccess(`Checkout link generated. ${data.emailError}`)
+      } else if (sendEmail) {
+        setSuccess('Approved — checkout link emailed to customer.')
+      } else {
+        setSuccess('Approved — checkout link generated. Use Resend Email when ready.')
+      }
+      onChanged()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Approve failed')
+    }
+    setBusy(null)
+  }
+
+  const resendEmail = async () => {
+    setError(null)
+    setSuccess(null)
+    setBusy('resend')
+    try {
+      const res = await fetch('/api/admin/send-checkout-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword,
+        },
+        body: JSON.stringify({ submissionId: submission.id }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not send email')
+      }
+      setSuccess(`Email sent to ${submission.email}.`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send email')
+    }
+    setBusy(null)
+  }
+
+  const copyCheckout = async () => {
+    if (!submission.checkout_url) return
+    try {
+      await navigator.clipboard.writeText(submission.checkout_url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Ignore — user can still use the open-in-tab link
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Detail */}
+      <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        <DetailRow label="Contact" value={submission.contact_name || '—'} />
+        <DetailRow label="Email" value={submission.email} />
+        <DetailRow label="Phone" value={submission.phone || '—'} />
+        <DetailRow
+          label="Plan"
+          value={
+            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+              {submission.plan}
+            </span>
+          }
+        />
+        <DetailRow
+          label="Layout"
+          value={
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 text-xs font-medium capitalize">
+                {submission.selected_layout || '—'}
+              </span>
+              {hasNotes && <StickyNote size={14} className="text-amber-600" />}
+            </div>
+          }
+        />
+        <DetailRow
+          label="Submitted"
+          value={new Date(submission.created_at).toLocaleString()}
+        />
+        {submission.approved_at && (
+          <DetailRow
+            label="Approved"
+            value={new Date(submission.approved_at).toLocaleString()}
+          />
+        )}
+      </div>
+
+      {hasNotes && (
+        <div className="rounded-lg bg-amber-50 border border-amber-100 px-4 py-3">
+          <p className="text-xs font-semibold text-amber-700 mb-1">Layout notes</p>
+          <p className="text-sm text-slate-700 whitespace-pre-wrap">
+            {submission.layout_notes}
+          </p>
+        </div>
+      )}
+
+      {submission.business_description && (
+        <div className="rounded-lg bg-slate-100 border border-slate-200 px-4 py-3">
+          <p className="text-xs font-semibold text-slate-600 mb-1">
+            Business description
+          </p>
+          <p className="text-sm text-slate-700 whitespace-pre-wrap">
+            {submission.business_description}
+          </p>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="pt-3 border-t border-slate-200">
+        {status === 'pending' && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => approve(true)}
+              disabled={busy !== null}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 cursor-pointer"
+            >
+              {busy === 'approve_email' ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Generating link...
+                </>
+              ) : (
+                <>
+                  <Mail size={14} />
+                  Approve & Email Customer
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => approve(false)}
+              disabled={busy !== null}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60 cursor-pointer"
+            >
+              {busy === 'approve' ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Generating link...
+                </>
+              ) : (
+                'Approve (Manual Send)'
+              )}
+            </button>
+          </div>
+        )}
+
+        {status === 'approved' && (
+          <div className="space-y-3">
+            {submission.checkout_url ? (
+              <div>
+                <p className="text-xs font-semibold text-slate-600 mb-1">
+                  Checkout URL
+                </p>
+                <div className="flex items-stretch gap-2">
+                  <code className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-slate-100 text-xs font-mono break-all">
+                    {submission.checkout_url}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={copyCheckout}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                  <a
+                    href={submission.checkout_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                  >
+                    <ExternalLink size={14} />
+                    Open
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500 italic">
+                Generating checkout URL...
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={resendEmail}
+                disabled={busy !== null || !submission.checkout_url}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 cursor-pointer"
+              >
+                {busy === 'resend' ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} />
+                    Resend Email to Customer
+                  </>
+                )}
+              </button>
+              {submission.approved_at && (
+                <p className="text-xs text-slate-500">
+                  Approved at {new Date(submission.approved_at).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {(status === 'paid' || status === 'provisioning') && (
+          <div className="text-sm text-slate-600">
+            <p>
+              Customer paid. Provisioning is in progress — webhook + provision
+              flow handles the rest.
+            </p>
+          </div>
+        )}
+
+        {status === 'live' && (
+          <div className="text-sm text-slate-600 flex flex-wrap items-center gap-3">
+            <span>Site is live.</span>
+            {submission.client_live_url && (
+              <a
+                href={submission.client_live_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+              >
+                <ExternalLink size={12} />
+                {submission.client_live_url.replace(/^https?:\/\//, '')}
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+
+      {(error || success) && (
+        <div
+          className={cn(
+            'flex items-start gap-2 rounded-lg px-3 py-2 text-sm',
+            error
+              ? 'bg-red-50 border border-red-100 text-red-700'
+              : 'bg-emerald-50 border border-emerald-100 text-emerald-700'
+          )}
+        >
+          {error ? <AlertCircle size={14} className="mt-0.5" /> : <CheckCircle2 size={14} className="mt-0.5" />}
+          <span>{error || success}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string
+  value: React.ReactNode
+}) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <span className="text-xs font-medium text-slate-500 w-20 shrink-0">
+        {label}
+      </span>
+      <span className="text-sm text-slate-800">{value}</span>
+    </div>
   )
 }
 

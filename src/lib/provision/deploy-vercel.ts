@@ -1,3 +1,5 @@
+import { generateSlug } from './slug'
+
 const VERCEL_API = 'https://api.vercel.com'
 
 function getHeaders() {
@@ -31,17 +33,12 @@ async function vercelFetch(path: string, options: RequestInit = {}) {
   return data
 }
 
-function generateSlug(businessName: string): string {
-  return businessName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 25)
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createVercelProject(submission: any) {
+export async function createVercelProject(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  submission: any,
+  schemaName: string
+) {
   const slug = generateSlug(submission.business_name)
   const projectName = `cimaa-${slug}-${Date.now()}`
 
@@ -78,6 +75,11 @@ export async function createVercelProject(submission: any) {
     { key: 'CLOUDFLARE_R2_ENDPOINT', value: 'placeholder', target: ['production'], type: 'plain' },
     { key: 'CLOUDFLARE_R2_BUCKET', value: 'placeholder', target: ['production'], type: 'plain' },
     { key: 'CLIENT_SLUG', value: slug, target: ['production'], type: 'plain' },
+    // SUPABASE_SCHEMA is read by the starter-app's getAdminClient() to scope
+    // all queries to this customer's isolated schema. Pre-multi-tenant
+    // deployments (no schemaName) silently fall back to 'public' on the
+    // starter side, so we keep them working by setting a sensible default.
+    { key: 'SUPABASE_SCHEMA', value: schemaName, target: ['production', 'preview'], type: 'plain' },
     { key: 'CRON_SECRET', value: 'cimaa2026secret', target: ['production'], type: 'plain' },
     { key: 'DISCORD_WEBHOOK_DAILY_REPORTS', value: 'placeholder', target: ['production'], type: 'plain' },
     { key: 'UNSPLASH_ACCESS_KEY', value: process.env.UNSPLASH_ACCESS_KEY || 'placeholder', target: ['production'], type: 'plain' },

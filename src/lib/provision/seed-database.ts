@@ -1,5 +1,14 @@
 import { supabaseAdmin } from '@/lib/supabase'
 
+const LAYOUT_DEFAULT_HERO: Record<string, string> = {
+  fleet: 'solid_color',
+  restaurant: 'image_overlay',
+  salon: 'image_overlay',
+  healthcare: 'solid_color',
+  community: 'image_overlay',
+  home_services: 'image_overlay',
+}
+
 function generatePassword(): string {
   const chars =
     'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
@@ -10,7 +19,17 @@ function generatePassword(): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function seedClientDatabase(submission: any, content: any) {
+export async function seedClientDatabase(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  submission: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content: any,
+  schemaName: string
+) {
+  const layoutId: string = submission.selected_layout || 'fleet'
+  const heroVariant: string =
+    LAYOUT_DEFAULT_HERO[layoutId] || LAYOUT_DEFAULT_HERO.fleet
+
   const settingsToSeed = [
     {
       key: 'business_name',
@@ -38,9 +57,19 @@ export async function seedClientDatabase(submission: any, content: any) {
       value_json: `${submission.address || ''} ${submission.city || ''} ${submission.state || ''}`.trim(),
     },
     {
+      key: 'active_layout',
+      value: layoutId,
+      value_json: layoutId,
+    },
+    {
       key: 'active_theme',
       value: submission.selected_theme || 'warm',
       value_json: submission.selected_theme || 'warm',
+    },
+    {
+      key: 'active_hero_variant',
+      value: heroVariant,
+      value_json: heroVariant,
     },
     {
       key: 'hero_headline',
@@ -96,6 +125,7 @@ export async function seedClientDatabase(submission: any, content: any) {
 
   for (const setting of settingsToSeed) {
     await supabaseAdmin
+      .schema(schemaName)
       .from('site_settings')
       .upsert(
         {
@@ -117,14 +147,17 @@ export async function seedClientDatabase(submission: any, content: any) {
         (s: any) => s.name.toLowerCase() === service.name.toLowerCase()
       )
 
-      await supabaseAdmin.from('booking_services').insert({
-        name: service.name,
-        description:
-          matchedContent?.description || service.description || '',
-        duration_minutes: parseInt(service.duration) || 60,
-        price: 0,
-        active: true,
-      })
+      await supabaseAdmin
+        .schema(schemaName)
+        .from('booking_services')
+        .insert({
+          name: service.name,
+          description:
+            matchedContent?.description || service.description || '',
+          duration_minutes: parseInt(service.duration) || 60,
+          price: 0,
+          active: true,
+        })
     }
   }
 

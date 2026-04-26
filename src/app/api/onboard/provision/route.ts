@@ -4,6 +4,8 @@ import { logStep } from '@/lib/provision/logger'
 import { generateContent } from '@/lib/provision/generate-content'
 import { createVercelProject } from '@/lib/provision/deploy-vercel'
 import { seedClientDatabase } from '@/lib/provision/seed-database'
+import { createClientSchema } from '@/lib/provision/create-client-schema'
+import { generateSlug } from '@/lib/provision/slug'
 import { sendPreviewReadyEmail, sendYouNewClientEmail } from '@/lib/emails'
 
 export async function POST(request: NextRequest) {
@@ -65,6 +67,35 @@ async function provisionSite(submissionId: string) {
     })
     .eq('id', submissionId)
 
+  // ─── 0: Provision per-customer Postgres schema ───
+  // Pre-existing customers (provisioned before multi-tenant rollout) live in
+  // public.* and don't go through this path — they have client_supabase_schema
+  // null and their starter-app deployments still set SUPABASE_SCHEMA='public'.
+  // A future migration will copy their settings into a dedicated client_<slug>
+  // schema and flip the env var.
+  await logStep(
+    submissionId,
+    'creating_client_schema',
+    'running',
+    'Provisioning your isolated database...'
+  )
+
+  const slug = generateSlug(submission.business_name)
+  const { schemaName } = await createClientSchema(slug)
+
+  await supabaseAdmin
+    .schema('cimaasites')
+    .from('onboarding_submissions')
+    .update({ client_supabase_schema: schemaName })
+    .eq('id', submissionId)
+
+  await logStep(
+    submissionId,
+    'creating_client_schema',
+    'done',
+    `Database ready (${schemaName})`
+  )
+
   // ─── A: Generate content with Claude AI ───
   await logStep(
     submissionId,
@@ -103,7 +134,7 @@ async function provisionSite(submissionId: string) {
     'Setting up your website on our servers...'
   )
 
-  const vercelResult = await createVercelProject(submission)
+  const vercelResult = await createVercelProject(submission, schemaName)
 
   await supabaseAdmin
     .schema('cimaasites')
@@ -132,7 +163,8 @@ async function provisionSite(submissionId: string) {
 
   const { adminEmail, adminPassword } = await seedClientDatabase(
     submission,
-    content
+    content,
+    schemaName
   )
 
   await supabaseAdmin
