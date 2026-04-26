@@ -7,6 +7,8 @@ import { Mail, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { LayoutPicker } from "@/components/LayoutPicker";
+import type { LayoutId } from "@/lib/layouts";
 
 const PLAN_LABELS: Record<"basic" | "pro" | "developer", string> = {
   basic: "Basic — $599 setup + $299/mo",
@@ -40,6 +42,8 @@ function ContactPageInner() {
   const [businessName, setBusinessName] = useState("");
   const [plan, setPlan] = useState<PlanKey>("basic");
   const [message, setMessage] = useState("");
+  const [selectedLayout, setSelectedLayout] = useState<LayoutId>("fleet");
+  const [layoutNotes, setLayoutNotes] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -56,6 +60,8 @@ function ContactPageInner() {
     setBusinessName("");
     setPlan("basic");
     setMessage("");
+    setSelectedLayout("fleet");
+    setLayoutNotes("");
     setStatus("idle");
     setErrorMessage("");
   };
@@ -74,6 +80,8 @@ function ContactPageInner() {
           business_name: businessName,
           plan,
           message,
+          selected_layout: selectedLayout,
+          layout_notes: layoutNotes,
         }),
       });
       const result = await res.json();
@@ -236,6 +244,38 @@ function ContactPageInner() {
                       className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
                       placeholder="What does your business do? What do you need from your website?"
                     />
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-700">
+                    <h3 className="text-base font-semibold text-white mt-4">
+                      Pick a starting layout (optional)
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-400">
+                      We&apos;ll use this as a starting point. You can change it
+                      anytime — and we may suggest a different fit based on
+                      your business.
+                    </p>
+
+                    <div className="mt-5">
+                      <LayoutPicker
+                        value={selectedLayout}
+                        onChange={setSelectedLayout}
+                      />
+                    </div>
+
+                    <div className="mt-5">
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Anything specific you&apos;d like to see? (optional)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={layoutNotes}
+                        onChange={(e) => setLayoutNotes(e.target.value)}
+                        maxLength={1000}
+                        className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
+                        placeholder="e.g., warm earthy colors, more photos than text, prefer no menu section..."
+                      />
+                    </div>
                   </div>
 
                   {status === "error" && errorMessage && (

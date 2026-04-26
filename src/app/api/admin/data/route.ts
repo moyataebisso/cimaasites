@@ -16,7 +16,9 @@ export async function GET(request: Request) {
   const { data: submissions } = await supabaseAdmin
     .schema('cimaasites')
     .from('onboarding_submissions')
-    .select('id, business_name, email, plan, status, created_at, amount_cents')
+    .select(
+      'id, business_name, email, plan, status, created_at, amount_cents, selected_layout, layout_notes'
+    )
     .order('created_at', { ascending: false })
     .limit(50)
 

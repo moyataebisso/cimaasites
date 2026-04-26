@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Container } from '@/components/ui/Container'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Loader2, ExternalLink, Globe } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader2, ExternalLink, Globe, StickyNote } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────
 
@@ -26,6 +26,8 @@ interface Submission {
   status: string
   created_at: string
   amount_cents: number
+  selected_layout: string | null
+  layout_notes: string | null
 }
 
 interface ChangeRequest {
@@ -157,6 +159,8 @@ export default function AdminPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState<Tab>('overview')
+
+  const [expandedSubmission, setExpandedSubmission] = useState<string | null>(null)
 
   // Change requests state
   const [requests, setRequests] = useState<ChangeRequest[]>([])
@@ -337,31 +341,76 @@ export default function AdminPage() {
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Business</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Email</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Plan</th>
+                      <th className="px-6 py-3 text-left font-medium text-slate-500">Layout</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Status</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Date</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {submissions.map((s) => (
-                      <tr key={s.id} className="border-b border-slate-50 hover:bg-slate-50">
-                        <td className="px-6 py-3 font-medium text-slate-900">{s.business_name}</td>
-                        <td className="px-6 py-3 text-slate-600">{s.email}</td>
-                        <td className="px-6 py-3">
-                          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
-                            {s.plan}
-                          </span>
-                        </td>
-                        <td className="px-6 py-3">
-                          <StatusBadge status={s.status} />
-                        </td>
-                        <td className="px-6 py-3 text-slate-500">
-                          {new Date(s.created_at).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))}
+                    {submissions.map((s) => {
+                      const hasNotes = Boolean(s.layout_notes && s.layout_notes.trim())
+                      const isExpanded = expandedSubmission === s.id
+                      return (
+                        <Fragment key={s.id}>
+                          <tr
+                            className={cn(
+                              'border-b border-slate-50',
+                              hasNotes && 'cursor-pointer hover:bg-slate-50',
+                              !hasNotes && 'hover:bg-slate-50'
+                            )}
+                            onClick={() => {
+                              if (hasNotes) {
+                                setExpandedSubmission(isExpanded ? null : s.id)
+                              }
+                            }}
+                          >
+                            <td className="px-6 py-3 font-medium text-slate-900">{s.business_name}</td>
+                            <td className="px-6 py-3 text-slate-600">{s.email}</td>
+                            <td className="px-6 py-3">
+                              <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                                {s.plan}
+                              </span>
+                            </td>
+                            <td className="px-6 py-3">
+                              <div className="flex items-center gap-1.5">
+                                <span className="px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 text-xs font-medium capitalize">
+                                  {s.selected_layout || '—'}
+                                </span>
+                                {hasNotes && (
+                                  <span
+                                    title={s.layout_notes || ''}
+                                    className="text-amber-600 inline-flex items-center"
+                                  >
+                                    <StickyNote size={14} />
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-3">
+                              <StatusBadge status={s.status} />
+                            </td>
+                            <td className="px-6 py-3 text-slate-500">
+                              {new Date(s.created_at).toLocaleDateString()}
+                            </td>
+                          </tr>
+                          {isExpanded && hasNotes && (
+                            <tr className="bg-amber-50/60 border-b border-slate-100">
+                              <td colSpan={6} className="px-6 py-3">
+                                <p className="text-xs font-semibold text-amber-700 mb-1">
+                                  Layout notes
+                                </p>
+                                <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                                  {s.layout_notes}
+                                </p>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      )
+                    })}
                     {submissions.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="px-6 py-8 text-center text-slate-400">
+                        <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
                           No submissions yet
                         </td>
                       </tr>

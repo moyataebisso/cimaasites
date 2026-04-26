@@ -1,8 +1,10 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendContactAutoReply, sendNewContactLeadEmail } from '@/lib/emails'
+import { isLayoutId, type LayoutId } from '@/lib/layouts'
 
 const VALID_PLANS = ['basic', 'pro', 'developer'] as const
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const LAYOUT_NOTES_MAX = 1000
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -12,6 +14,14 @@ export async function POST(request: Request) {
     typeof body.business_name === 'string' ? body.business_name.trim() : ''
   const plan = typeof body.plan === 'string' ? body.plan : ''
   const message = typeof body.message === 'string' ? body.message.trim() : ''
+
+  const selectedLayout: LayoutId = isLayoutId(body.selected_layout)
+    ? body.selected_layout
+    : 'fleet'
+
+  const rawNotes =
+    typeof body.layout_notes === 'string' ? body.layout_notes.trim() : ''
+  const layoutNotes = rawNotes ? rawNotes.slice(0, LAYOUT_NOTES_MAX) : null
 
   if (!name) {
     return Response.json({ error: 'Name is required' }, { status: 400 })
@@ -38,6 +48,8 @@ export async function POST(request: Request) {
       business_name: businessName,
       plan,
       business_description: message || null,
+      selected_layout: selectedLayout,
+      layout_notes: layoutNotes,
       status: 'pending',
       current_step: 'form',
       progress: 0,
