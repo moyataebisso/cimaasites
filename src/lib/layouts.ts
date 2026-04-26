@@ -4,6 +4,7 @@ export const LAYOUT_IDS = [
   'salon',
   'healthcare',
   'community',
+  'home_services',
 ] as const
 
 export type LayoutId = (typeof LAYOUT_IDS)[number]
@@ -79,6 +80,18 @@ export const LAYOUTS: LayoutMeta[] = [
     screenshot: '/images/layouts/community.png',
     previewUrl:
       'https://arsi-platform-starter-app.vercel.app/?layout=community&theme=nonprofit',
+  },
+  {
+    id: 'home_services',
+    name: 'Home Services',
+    industry: 'Lawn care, landscaping, cleaning, contractors, home pros',
+    tagline: 'Editorial and trust-forward',
+    description:
+      'Built for lawn care, landscaping, cleaning, HVAC, and other home service businesses. Cream + green editorial style with trust stats, before/after, and a strong call-now CTA.',
+    defaultTheme: 'evergreen',
+    screenshot: '/images/layouts/home_services.png',
+    previewUrl:
+      'https://arsi-platform-starter-app.vercel.app/?layout=home_services&theme=evergreen',
   },
 ]
 
