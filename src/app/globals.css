@@ -5,6 +5,45 @@
   --color-foreground: #0f172a;
   --font-sans: "Inter", system-ui, sans-serif;
   --font-heading: "Outfit", system-ui, sans-serif;
+
+  /* Cimaa design tokens — used across the marketing site. */
+  --color-cimaa-bg: #ffffff;
+  --color-cimaa-bg-warm: #fefce8;
+  --color-cimaa-bg-tan: #fef3c7;
+  --color-cimaa-bg-mint: #ecfdf5;
+  --color-cimaa-bg-amber: #fde68a;
+  /* Translucent brand yellow — header/footer read as a soft branded tint
+     over whatever sits behind them (the tan canvas, mostly). */
+  --color-cimaa-bg-yellow-tint: rgba(250, 204, 21, 0.18);
+  --color-cimaa-bg-surface: #fafaf7;
+  --color-cimaa-bg-dark: #0b1220;
+  --color-cimaa-text: #0f172a;
+  --color-cimaa-text-muted: #64748b;
+  --color-cimaa-text-subtle: #94a3b8;
+  --color-cimaa-yellow: #facc15;
+  --color-cimaa-yellow-dark: #eab308;
+  --color-cimaa-green: #15803d;
+  --color-cimaa-green-light: #dcfce7;
+  --color-cimaa-border: #e5e7eb;
+}
+
+:root {
+  --cimaa-bg: #ffffff;
+  --cimaa-bg-warm: #fefce8;
+  --cimaa-bg-tan: #fef3c7;
+  --cimaa-bg-mint: #ecfdf5;
+  --cimaa-bg-amber: #fde68a;
+  --cimaa-bg-yellow-tint: rgba(250, 204, 21, 0.18);
+  --cimaa-bg-surface: #fafaf7;
+  --cimaa-bg-dark: #0b1220;
+  --cimaa-text: #0f172a;
+  --cimaa-text-muted: #64748b;
+  --cimaa-text-subtle: #94a3b8;
+  --cimaa-yellow: #facc15;
+  --cimaa-yellow-dark: #eab308;
+  --cimaa-green: #15803d;
+  --cimaa-green-light: #dcfce7;
+  --cimaa-border: #e5e7eb;
 }
 
 html {
@@ -86,6 +125,16 @@ body {
 
 .animate-marquee {
   animation: marquee 20s linear infinite;
+}
+
+/* Centered logo-bar marquee — duplicated content scrolls -50% for a seamless loop. */
+@keyframes scroll-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-scroll-x {
+  animation: scroll-x 30s linear infinite;
 }
 
 /* Auto-scrolling gallery for features */

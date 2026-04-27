@@ -1,140 +1,182 @@
-"use client";
+import type { Metadata } from "next";
+import { ExternalLink } from "lucide-react";
+import { Container } from "@/components/ui/Container";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
+import { LAYOUTS } from "@/lib/layouts";
 
-const SUPABASE_LOGOS =
-  "https://abhpzepanwhuswhiuutu.supabase.co/storage/v1/object/public/logos";
+export const metadata: Metadata = {
+  title: "Portfolio — Cimaa Sites",
+  description:
+    "Real businesses on the Cimaa Sites platform and the broader Arsi Technology Group ecosystem.",
+};
 
-const projects = [
+interface ProjectCard {
+  name: string;
+  industry: string;
+  description: string;
+  url: string | null;
+  /** Tailwind utility classes for the placeholder gradient. */
+  accent: string;
+}
+
+const projects: ProjectCard[] = [
   {
     name: "CareConnect Live",
-    category: "Healthcare",
+    industry: "Healthcare",
     description:
-      "Professional healthcare platform connecting caregivers with families. Appointment booking, service listings, and secure messaging.",
+      "Provider matching platform with appointment booking and secure messaging.",
     url: "https://careconnectlive.org",
-    logo: `${SUPABASE_LOGOS}/careconnect-logo.png`,
+    accent: "from-emerald-100 to-cimaa-bg-tan",
   },
   {
     name: "SaveYours",
-    category: "Healthcare",
+    industry: "Training",
     description:
-      "CPR and first aid training platform. Class registration, Stripe payments, and automated emails.",
+      "CPR and first aid class registration with Stripe payments and automated emails.",
     url: "https://saveyours.net",
-    logo: `${SUPABASE_LOGOS}/saveyours-logo.png`,
-  },
-  {
-    name: "Oromo Platform",
-    category: "Community",
-    description:
-      "Oromo community hub — Academy, Businesses, Careers, News, Events, and ODDA all in one platform.",
-    url: "https://oromo-platform.vercel.app",
-    logo: `${SUPABASE_LOGOS}/odda-logo.png`,
+    accent: "from-rose-100 to-cimaa-bg-tan",
   },
   {
     name: "Entrusted Home Healthcare",
-    category: "Healthcare",
+    industry: "Healthcare",
     description:
-      "Home healthcare agency website with HIPAA compliance pages and service listings.",
+      "Home healthcare agency website with HIPAA-aligned content and service listings.",
     url: "https://entrustedhomehealthcare.org",
-    logo: `${SUPABASE_LOGOS}/entrusted-logo.png`,
+    accent: "from-sky-100 to-cimaa-bg-tan",
   },
   {
     name: "Rift Valley Transportation",
-    category: "Transportation",
+    industry: "Logistics",
     description:
       "Transportation company website serving the Twin Cities metro area.",
     url: "https://rvtusinc.com",
-    logo: `${SUPABASE_LOGOS}/riftvalley-logo.png`,
+    accent: "from-amber-100 to-cimaa-bg-tan",
   },
   {
-    name: "Indsve",
-    category: "Fashion \u00B7 Clothing",
+    name: "Oromo Platform",
+    industry: "Community",
     description:
-      "Minneapolis clothing brand with a modern Shopify-powered storefront.",
-    url: "https://indsve.com",
-    logo: `${SUPABASE_LOGOS}/indsve-logo.png`,
+      "Community hub — academy, businesses, careers, news, events, all in one platform.",
+    url: "https://oromo-platform.vercel.app",
+    accent: "from-violet-100 to-cimaa-bg-tan",
   },
   {
-    name: "portal.saveyours.net",
-    category: "SaaS \u00B7 Coming Soon",
+    name: "Arsi Technology Group",
+    industry: "Studio",
     description:
-      "B2B compliance portal for childcare facility directors to manage staff certifications.",
-    url: null,
-    logo: null,
+      "The Minneapolis-based studio behind Cimaa Sites and the rest of the platform.",
+    url: "https://arsitechgroup.com",
+    accent: "from-slate-100 to-cimaa-bg-tan",
   },
 ];
 
 export default function PortfolioPage() {
   return (
-    <main className="bg-slate-900 min-h-screen">
-      {/* Page header */}
-      <div className="text-center pt-32 pb-16 px-6">
-        <span className="text-xs font-black tracking-[0.3em] uppercase text-violet-400 mb-4 block">
-          Portfolio
-        </span>
-        <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-4">
-          Real sites for{" "}
-          <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-            real businesses
-          </span>
-        </h1>
-        <p className="text-slate-400 text-lg max-w-xl mx-auto">
-          Every site we build runs on the same enterprise stack. Here are some of
-          the businesses we have helped get online.
-        </p>
-      </div>
+    <main>
+      {/* Hero */}
+      <section className="bg-cimaa-bg-tan pt-28 pb-16 md:pt-32 md:pb-20">
+        <Container>
+          <SectionHeading
+            eyebrow="Portfolio"
+            headline="Real businesses,"
+            accent="real sites"
+            subtitle="A look at sites built and run on the Cimaa Sites platform — and the broader Arsi Technology Group ecosystem."
+          />
+        </Container>
+      </section>
 
-      {/* Project grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 pb-24">
-        {projects.map((project, i) => (
-          <div
-            key={i}
-            className="relative rounded-2xl overflow-hidden group cursor-pointer bg-slate-800 border border-slate-700 hover:border-violet-500 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/20"
-          >
-            {/* Logo area */}
-            <div className="flex items-center justify-center h-40 px-8 bg-gradient-to-br from-slate-800 to-slate-900">
-              {project.logo ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={project.logo}
-                  alt={project.name}
-                  className="max-h-16 max-w-[180px] w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              ) : (
-                <span className="text-4xl">&#128284;</span>
-              )}
-            </div>
+      {/* Projects grid */}
+      <section className="bg-white py-16 md:py-20">
+        <Container>
+          <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((p) => (
+              <ProjectTile key={p.name} project={p} />
+            ))}
+          </div>
+        </Container>
+      </section>
 
-            {/* Text */}
-            <div className="p-6 border-t border-slate-700">
-              <span className="text-xs font-black tracking-widest uppercase text-violet-400">
-                {project.category}
-              </span>
-              <h3 className="text-white font-bold text-xl mt-1">
-                {project.name}
-              </h3>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed">
-                {project.description}
-              </p>
-              {project.url ? (
+      {/* Layouts available */}
+      <section className="bg-cimaa-bg-tan py-16 md:py-20">
+        <Container>
+          <SectionHeading
+            eyebrow="Layouts available today"
+            headline="Pick the one closest"
+            accent="to your business"
+            subtitle="Every layout below is production-ready. We'll start there and tailor it to your business."
+          />
+          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {LAYOUTS.map((layout) => (
+              <div
+                key={layout.id}
+                className="rounded-2xl bg-white border border-cimaa-border shadow-sm p-6 flex flex-col"
+              >
+                <h3 className="text-lg font-bold text-cimaa-text">
+                  {layout.name}
+                </h3>
+                <p className="mt-1 text-sm text-cimaa-text-muted">
+                  {layout.industry}
+                </p>
+                <p className="mt-4 text-sm text-cimaa-text leading-relaxed flex-1">
+                  {layout.description}
+                </p>
                 <a
-                  href={project.url}
+                  href={layout.previewUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-violet-400 text-sm font-medium mt-4 hover:text-violet-300 transition-colors"
+                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cimaa-green hover:text-emerald-800 transition-colors"
                 >
-                  Visit site &rarr;
+                  See preview
+                  <ExternalLink size={14} />
                 </a>
-              ) : (
-                <span className="inline-block text-slate-500 text-sm mt-4">
-                  Coming soon
-                </span>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </Container>
+      </section>
+
+      <HomeFinalCTA
+        headline="Ready for your business"
+        accent="to be next?"
+      />
     </main>
+  );
+}
+
+function ProjectTile({ project }: { project: ProjectCard }) {
+  return (
+    <div className="rounded-2xl border border-cimaa-border bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
+      <div
+        className={`h-40 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
+      >
+        <span className="text-xl font-bold text-cimaa-text text-center leading-tight">
+          {project.name}
+        </span>
+      </div>
+      <div className="p-6 flex-1 flex flex-col">
+        <span className="text-xs font-semibold uppercase tracking-wider text-cimaa-green">
+          {project.industry}
+        </span>
+        <p className="mt-2 text-cimaa-text-muted leading-relaxed text-sm flex-1">
+          {project.description}
+        </p>
+        {project.url ? (
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-cimaa-green hover:text-emerald-800 transition-colors"
+          >
+            Visit site
+            <ExternalLink size={14} />
+          </a>
+        ) : (
+          <span className="mt-4 text-sm text-cimaa-text-subtle">
+            Coming soon
+          </span>
+        )}
+      </div>
+    </div>
   );
 }

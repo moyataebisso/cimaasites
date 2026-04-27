@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Laptop } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
+  { href: "/pricing", label: "How It Works" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -31,43 +31,52 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-slate-900/95 backdrop-blur-md border-b border-slate-700 shadow-sm"
-          : "bg-transparent"
+          ? "bg-white/95 backdrop-blur-md border-b-2 border-cimaa-bg-tan shadow-sm"
+          : "bg-white border-b-2 border-cimaa-bg-tan"
       )}
     >
       <Container>
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="text-xl font-bold">
-            <span className="text-violet-400">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-cimaa-yellow shadow-sm">
+              <Laptop className="w-5 h-5 text-cimaa-text" strokeWidth={2.25} />
+            </span>
+            <span className="text-xl font-bold text-cimaa-text">
               Cimaa Sites
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-7">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                className="text-sm font-medium text-cimaa-text-muted hover:text-cimaa-text transition-colors"
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          <div className="hidden md:flex items-center">
-            <Button href="/contact" size="sm">
-              Get Started
-            </Button>
-            <a
+          <div className="hidden md:flex items-center gap-3">
+            <Link
               href="/admin"
-              className="w-1.5 h-1.5 rounded-full bg-gray-400 opacity-20 hover:opacity-60 transition-opacity cursor-pointer ml-2"
-              title="Portal"
-            />
+              className="text-sm font-medium text-cimaa-text-muted hover:text-cimaa-text transition-colors"
+            >
+              Login
+            </Link>
+            <Button
+              href="/contact"
+              variant="primary"
+              size="sm"
+              className="shadow-md"
+            >
+              Get a Quote
+            </Button>
           </div>
 
           <button
-            className="md:hidden p-2 text-slate-300"
+            className="md:hidden p-2 text-cimaa-text"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -76,21 +85,33 @@ export function Navbar() {
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden pb-4 border-t border-slate-700 mt-2">
-            <div className="flex flex-col gap-2 pt-4">
+          <div className="md:hidden pb-4 border-t border-cimaa-border mt-2">
+            <div className="flex flex-col gap-1 pt-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-cimaa-text-muted hover:text-cimaa-text hover:bg-cimaa-bg-surface rounded-lg transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
+              <Link
+                href="/admin"
+                className="px-4 py-2 text-sm font-medium text-cimaa-text-muted hover:text-cimaa-text hover:bg-cimaa-bg-surface rounded-lg transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                Login
+              </Link>
               <div className="px-4 pt-2">
-                <Button href="/contact" size="sm" className="w-full">
-                  Get Started
+                <Button
+                  href="/contact"
+                  variant="primary"
+                  size="md"
+                  className="w-full"
+                >
+                  Get a Quote
                 </Button>
               </div>
             </div>

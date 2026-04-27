@@ -15,24 +15,24 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cimaa Sites — Professional Websites for Local Businesses | $299/mo",
+  title: "Cimaa Sites — Websites built for your local business",
   description:
-    "Professional websites built for local businesses and community entrepreneurs. Done for you, $599 setup + $299/mo, 24/7 monitored. Enterprise tech stack at small business prices.",
+    "We build, launch, and run the website for your local business. Custom quote within 24 hours, 24/7 monitoring, real human support.",
   keywords:
-    "affordable website, small business website, community business website, local business website, professional website, done for you website, website monitoring, Next.js website, Supabase website builder",
+    "small business website, local business website, professional website, done for you website, website monitoring, restaurant website, salon website, healthcare website, fleet website, home services website",
   openGraph: {
-    title: "Cimaa Sites — Powerful Websites for Local Businesses",
+    title: "Cimaa Sites — Websites built for your local business",
     description:
-      "We build and manage professional websites for local businesses. $599 setup + $299/mo with 24/7 monitoring and direct support.",
+      "We build and run websites for local businesses. Tell us about yours and we'll send a custom quote within 24 hours.",
     url: "https://cimaasites.ai",
     siteName: "Cimaa Sites",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cimaa Sites — Powerful Websites for Local Businesses",
+    title: "Cimaa Sites — Websites built for your local business",
     description:
-      "Professional websites for local businesses. $599 setup + $299/mo.",
+      "We build and run websites for local businesses. Get a custom quote in 24 hours.",
   },
 };
 
@@ -59,7 +59,7 @@ export default function RootLayout({
                 "@type": "PostalAddress",
                 addressCountry: "US",
               },
-              priceRange: "$49.99-$599",
+              priceRange: "$$",
               parentOrganization: {
                 "@type": "Organization",
                 name: "Arsi Technology Group",
@@ -73,19 +73,19 @@ export default function RootLayout({
       >
         {/* Animated page border — top */}
         <div className="fixed top-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
-          <div className="border-travel-top absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          <div className="border-travel-top absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-cimaa-yellow to-transparent" />
         </div>
         {/* Animated page border — bottom */}
         <div className="fixed bottom-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
-          <div className="border-travel-bottom absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+          <div className="border-travel-bottom absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-cimaa-yellow to-transparent" />
         </div>
         {/* Animated page border — left */}
         <div className="fixed left-0 top-0 w-[3px] h-full z-[9999] pointer-events-none overflow-hidden">
-          <div className="border-travel-left absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-violet-500 to-transparent" />
+          <div className="border-travel-left absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-cimaa-yellow to-transparent" />
         </div>
         {/* Animated page border — right */}
         <div className="fixed right-0 top-0 w-[3px] h-full z-[9999] pointer-events-none overflow-hidden">
-          <div className="border-travel-right absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
+          <div className="border-travel-right absolute left-0 w-full h-1/3 bg-gradient-to-b from-transparent via-cimaa-yellow to-transparent" />
         </div>
 
         <Navbar />

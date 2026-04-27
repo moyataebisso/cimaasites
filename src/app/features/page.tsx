@@ -1,204 +1,152 @@
-"use client";
-
-import { motion } from "framer-motion";
-import {
-  Globe,
-  Database,
-  Activity,
-  Palette,
-  Settings,
-  MessageCircle,
-  Shield,
-  Code,
-  Calendar,
-  ShoppingBag,
-  FileText,
-  Mail,
-  Star,
-  Image,
-  HelpCircle,
-  Ticket,
-} from "lucide-react";
+import type { Metadata } from "next";
+import { Check } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
+import { cn } from "@/lib/utils";
 
-const coreFeatures = [
-  {
-    icon: Globe,
-    title: "Edge Performance",
-    description:
-      "Your site runs on Vercel's global edge network — the same infrastructure that powers Notion, Loom, and TikTok. Pages load in under 1 second worldwide.",
-  },
-  {
-    icon: Database,
-    title: "You Own Your Data",
-    description:
-      "Every client gets their own Supabase database. Your customer data, leads, and content belong to you — not us. Export anytime.",
-  },
-  {
-    icon: Activity,
-    title: "24/7 Monitoring",
-    description:
-      "We check your site every 5 minutes. If anything goes wrong, we get alerted and fix it — usually before you even notice.",
-  },
-  {
-    icon: Palette,
-    title: "20+ Professional Themes",
-    description:
-      "Themes designed for real businesses — restaurants, healthcare, transportation, retail, and more. Switch themes anytime with one click.",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description:
-      "Row-level security, rate limiting, CSRF protection, webhook verification, and SSL certificates. Your site is locked down.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Real Human Support",
-    description:
-      "Text or email us directly. You talk to real people who know your site — not a ticket queue or AI chatbot.",
-  },
-];
-
-const proFeatures = [
-  { icon: Calendar, title: "Appointment Booking", description: "Customers book time slots directly on your site. Syncs with your calendar." },
-  { icon: ShoppingBag, title: "Online Store", description: "Sell products with inventory management, cart, and checkout." },
-  { icon: FileText, title: "Blog & Content", description: "Publish articles, news, and updates with a built-in CMS." },
-  { icon: Mail, title: "Email Marketing", description: "Collect subscribers and send newsletters right from your dashboard." },
-  { icon: Star, title: "Reviews System", description: "Collect and display customer reviews to build trust." },
-  { icon: Ticket, title: "Events & Tickets", description: "Create events, sell tickets, and manage RSVPs." },
-  { icon: Image, title: "Photo Gallery", description: "Showcase your work with beautiful, responsive galleries." },
-  { icon: HelpCircle, title: "FAQ Builder", description: "Create searchable FAQ pages for your customers." },
-];
-
-const fadeUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut" as const },
-  viewport: { once: true },
+export const metadata: Metadata = {
+  title: "Features — Cimaa Sites",
+  description:
+    "Everything you need to launch, run, and grow a website for your local business — included with every Cimaa Site.",
 };
+
+interface CategoryDef {
+  eyebrow: string;
+  headline: string;
+  blurb: string;
+  features: string[];
+}
+
+const categories: CategoryDef[] = [
+  {
+    eyebrow: "Launch",
+    headline: "Get online without the lift",
+    blurb:
+      "From the moment you say go, we have the layout, copy, and photos ready for your industry.",
+    features: [
+      "Industry-specific layouts: Restaurant, Salon, Healthcare, Fleet, Community, Home Services",
+      "Hand-crafted copy that fits your business",
+      "Custom photography sourced for your industry",
+      "Mobile-friendly out of the box",
+      "Live in 5–10 minutes after sign-off",
+    ],
+  },
+  {
+    eyebrow: "Grow",
+    headline: "Bring more customers in",
+    blurb:
+      "Every site is built to be found. SEO, performance, and lead capture come standard.",
+    features: [
+      "Built-in SEO that gets you found on Google",
+      "Fast hosting on global infrastructure",
+      "Lead capture forms ready out of the box",
+      "Reviews and testimonials section",
+      "Social media integration",
+    ],
+  },
+  {
+    eyebrow: "Run",
+    headline: "We handle the boring parts",
+    blurb:
+      "You shouldn't be patching plugins and renewing certificates. That's our job.",
+    features: [
+      "One-click content updates",
+      "24/7 uptime monitoring",
+      "Automatic security updates",
+      "Real human support — text or email anytime",
+      "Backups, hosting, domain — all included",
+    ],
+  },
+  {
+    eyebrow: "Trust",
+    headline: "Yours, always",
+    blurb:
+      "Your content, your customers, your brand. Cimaa Sites runs on infrastructure that doesn't lock you in.",
+    features: [
+      "Your content, your data — yours forever",
+      "SSL secured and GDPR-friendly",
+      "Built on infrastructure trusted by thousands of businesses",
+      "Transparent about what we do (and don't do) with your information",
+      "Easy export anytime — no lock-in",
+    ],
+  },
+];
 
 export default function FeaturesPage() {
   return (
-    <main className="bg-slate-900 min-h-screen pt-24">
-      <section className="py-24">
+    <main>
+      {/* Hero */}
+      <section className="bg-cimaa-bg-tan pt-28 pb-16 md:pt-32 md:pb-20">
         <Container>
-          <motion.div className="text-center max-w-3xl mx-auto" {...fadeUp}>
-            <Badge variant="blue">Features</Badge>
-            <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-white">
-              Everything your business needs.{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                Nothing it doesn&apos;t.
-              </span>
-            </h1>
-            <p className="mt-6 text-lg text-slate-400">
-              Enterprise-grade technology made simple. Every Cimaa site runs on
-              Next.js, Supabase, and Vercel — the same stack powering
-              billion-dollar companies.
-            </p>
-          </motion.div>
+          <SectionHeading
+            eyebrow="Features"
+            headline="Everything you need to launch, run &"
+            accent="grow"
+            subtitle="Each Cimaa Site comes with the tools and care you'd expect from a high-end agency build — without the agency timeline or budget."
+          />
         </Container>
       </section>
 
-      <section className="py-16 bg-slate-800/50">
-        <Container>
-          <motion.h2
-            className="text-2xl font-bold text-white mb-12"
-            {...fadeUp}
-          >
-            Core Features — Included in every plan
-          </motion.h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {coreFeatures.map((f, i) => (
-              <motion.div
-                key={f.title}
-                className="rounded-2xl bg-slate-800 border border-slate-700 p-8 transition-all hover:shadow-md hover:scale-[1.02]"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                viewport={{ once: true }}
-              >
-                <f.icon className="h-8 w-8 text-blue-600 mb-4" />
-                <h3 className="text-lg font-bold text-white mb-2">
-                  {f.title}
-                </h3>
-                <p className="text-slate-400 leading-relaxed">
-                  {f.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </Container>
-      </section>
+      {categories.map((cat, i) => (
+        <CategoryBlock
+          key={cat.eyebrow}
+          category={cat}
+          alternate={i % 2 === 1}
+        />
+      ))}
 
-      <section className="py-16">
-        <Container>
-          <motion.div {...fadeUp}>
-            <Badge variant="violet">Pro Plan</Badge>
-            <h2 className="mt-4 text-2xl font-bold text-white mb-12">
-              Pro Features — $399/mo
-            </h2>
-          </motion.div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {proFeatures.map((f, i) => (
-              <motion.div
-                key={f.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:shadow-md hover:scale-[1.02]"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.05 }}
-                viewport={{ once: true }}
-              >
-                <f.icon className="h-6 w-6 text-violet-600 mb-3" />
-                <h3 className="font-semibold text-white mb-1">
-                  {f.title}
-                </h3>
-                <p className="text-sm text-slate-400">{f.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <section className="py-16 bg-slate-800/50">
-        <Container>
-          <motion.div className="text-center max-w-2xl mx-auto" {...fadeUp}>
-            <Badge variant="gold">For Developers</Badge>
-            <h2 className="mt-4 text-2xl font-bold text-white mb-4">
-              Developer Plan — $49.99 one-time
-            </h2>
-            <p className="text-slate-400 mb-8">
-              Get the complete Next.js source code. All themes, all modules.
-              Deploy to your own Supabase and Vercel. Perfect for agencies and
-              developers who want full control.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {[
-                "Full source code",
-                "All 20 themes",
-                "All modules",
-                "Self-hosted",
-                "No monthly fees",
-                "1 setup call",
-              ].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full bg-slate-900 text-white text-sm px-4 py-2"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-            <div className="mt-8">
-              <Button href="/contact" size="lg">
-                Get the Code
-              </Button>
-            </div>
-          </motion.div>
-        </Container>
-      </section>
+      <HomeFinalCTA
+        headline="Want to see this all in"
+        accent="action?"
+        subheadline="Tell us about your business. We'll show you exactly how it comes together."
+      />
     </main>
+  );
+}
+
+function CategoryBlock({
+  category,
+  alternate,
+}: {
+  category: CategoryDef;
+  alternate: boolean;
+}) {
+  return (
+    <section
+      className={cn(
+        "py-16 md:py-20",
+        alternate ? "bg-cimaa-bg-tan" : "bg-white"
+      )}
+    >
+      <Container>
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.4fr] gap-10 lg:gap-16">
+          <div>
+            <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
+              {category.eyebrow}
+            </span>
+            <h2 className="mt-5 text-3xl sm:text-4xl font-bold text-cimaa-text leading-[1.1] tracking-tight">
+              {category.headline}
+            </h2>
+            <p className="mt-5 text-lg text-cimaa-text-muted leading-relaxed">
+              {category.blurb}
+            </p>
+          </div>
+          <ul className="space-y-4">
+            {category.features.map((f) => (
+              <li
+                key={f}
+                className="flex gap-3 rounded-xl bg-white border border-cimaa-border shadow-sm px-5 py-4"
+              >
+                <span className="shrink-0 mt-0.5 h-6 w-6 rounded-full bg-cimaa-green-light text-cimaa-green flex items-center justify-center">
+                  <Check size={14} strokeWidth={3} />
+                </span>
+                <span className="text-cimaa-text">{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Container>
+    </section>
   );
 }

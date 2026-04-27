@@ -5,15 +5,14 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LayoutPicker } from "@/components/LayoutPicker";
 import type { LayoutId } from "@/lib/layouts";
 
 const PLAN_LABELS: Record<"basic" | "pro" | "developer", string> = {
-  basic: "Basic — $599 setup + $299/mo",
-  pro: "Pro — $599 setup + $399/mo",
-  developer: "Developer — $49.99 one-time",
+  basic: "Starter — solo owners and family-run shops",
+  pro: "Growth — multi-location and growing teams",
+  developer: "Custom — anyone with specific needs",
 };
 
 type PlanKey = keyof typeof PLAN_LABELS;
@@ -28,7 +27,7 @@ const fadeUp = {
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<main className="bg-slate-900 min-h-screen pt-24" />}>
+    <Suspense fallback={<main className="bg-cimaa-bg-tan min-h-screen pt-24" />}>
       <ContactPageInner />
     </Suspense>
   );
@@ -95,64 +94,55 @@ function ContactPageInner() {
     }
   };
 
+  const inputClass =
+    "w-full rounded-xl bg-white border border-cimaa-border text-cimaa-text placeholder-cimaa-text-subtle px-4 py-3 text-sm focus:border-cimaa-green focus:ring-2 focus:ring-cimaa-green/20 outline-none transition-all";
+
   return (
-    <main className="bg-slate-900 min-h-screen pt-24">
-      <section className="py-24">
+    <main>
+      <section className="bg-cimaa-bg-tan pt-28 pb-16 md:pt-32 md:pb-20">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
             <motion.div {...fadeUp}>
-              <Badge variant="blue">Get Started</Badge>
-              <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-white">
+              <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
+                Get Started
+              </span>
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-cimaa-text">
                 Let&apos;s build your{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                  website
-                </span>
+                <span className="text-cimaa-green">website</span>
               </h1>
-              <p className="mt-6 text-lg text-slate-400 leading-relaxed">
+              <p className="mt-6 text-lg text-cimaa-text-muted leading-relaxed">
                 Fill out the form and we&apos;ll get back to you within 24
-                hours. Most sites are live within 3-5 business days.
+                hours. Most sites are live within 3–5 business days.
               </p>
 
-              <div className="mt-10 space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-violet-400">
-                    <Mail size={20} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">Email us</p>
+              <div className="mt-10 space-y-5">
+                <ContactRow
+                  icon={<Mail size={18} />}
+                  label="Email us"
+                  value={
                     <a
                       href="mailto:arsitechgroup@gmail.com"
-                      className="text-slate-400 hover:text-blue-600 transition-colors"
+                      className="text-cimaa-text-muted hover:text-cimaa-green transition-colors"
                     >
                       arsitechgroup@gmail.com
                     </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-violet-400">
-                    <MapPin size={20} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">Location</p>
-                    <p className="text-slate-400">United States</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-violet-400">
-                    <Clock size={20} />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">Response time</p>
-                    <p className="text-slate-400">Within 24 hours</p>
-                  </div>
-                </div>
+                  }
+                />
+                <ContactRow
+                  icon={<MapPin size={18} />}
+                  label="Location"
+                  value={<span className="text-cimaa-text-muted">United States</span>}
+                />
+                <ContactRow
+                  icon={<Clock size={18} />}
+                  label="Response time"
+                  value={<span className="text-cimaa-text-muted">Within 24 hours</span>}
+                />
               </div>
             </motion.div>
 
             <motion.div
-              className="rounded-2xl border border-slate-700 bg-slate-800 p-8 shadow-sm"
+              className="rounded-2xl border border-cimaa-border bg-white p-7 sm:p-8 shadow-sm"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
@@ -160,15 +150,18 @@ function ContactPageInner() {
             >
               {status === "success" ? (
                 <div className="flex flex-col items-center text-center py-8">
-                  <CheckCircle2 size={56} className="text-green-400" />
-                  <h2 className="mt-6 text-2xl font-bold text-white">
+                  <span className="h-14 w-14 rounded-full bg-cimaa-green-light text-cimaa-green flex items-center justify-center">
+                    <CheckCircle2 size={32} strokeWidth={2.5} />
+                  </span>
+                  <h2 className="mt-6 text-2xl font-bold text-cimaa-text">
                     Message received!
                   </h2>
-                  <p className="mt-3 text-slate-400">
+                  <p className="mt-3 text-cimaa-text-muted">
                     We&apos;ll get back to you within 24 hours at {email}.
                   </p>
                   <Button
                     type="button"
+                    variant="outline"
                     className="mt-8"
                     size="lg"
                     onClick={resetForm}
@@ -180,52 +173,52 @@ function ContactPageInner() {
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-cimaa-text mb-2">
                         Name
                       </label>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+                        className={inputClass}
                         placeholder="Your name"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-cimaa-text mb-2">
                         Email
                       </label>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+                        className={inputClass}
                         placeholder="you@email.com"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-cimaa-text mb-2">
                       Business name
                     </label>
                     <input
                       type="text"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+                      className={inputClass}
                       placeholder="Your business name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-cimaa-text mb-2">
                       Which plan are you interested in?
                     </label>
                     <select
                       value={plan}
                       onChange={(e) => setPlan(e.target.value as PlanKey)}
-                      className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all"
+                      className={inputClass}
                     >
                       <option value="basic">{PLAN_LABELS.basic}</option>
                       <option value="pro">{PLAN_LABELS.pro}</option>
@@ -234,25 +227,25 @@ function ContactPageInner() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-cimaa-text mb-2">
                       Tell us about your business
                     </label>
                     <textarea
                       rows={4}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
+                      className={`${inputClass} resize-none`}
                       placeholder="What does your business do? What do you need from your website?"
                     />
                   </div>
 
-                  <div className="pt-2 border-t border-slate-700">
-                    <h3 className="text-base font-semibold text-white mt-4">
+                  <div className="pt-2 border-t border-cimaa-border">
+                    <h3 className="text-base font-semibold text-cimaa-text mt-4">
                       Pick a starting layout (optional)
                     </h3>
-                    <p className="mt-1 text-sm text-slate-400">
-                      We&apos;ll use this as a starting point. You can change it
-                      anytime — and we may suggest a different fit based on
+                    <p className="mt-1 text-sm text-cimaa-text-muted">
+                      We&apos;ll use this as a starting point. You can change
+                      it anytime — and we may suggest a different fit based on
                       your business.
                     </p>
 
@@ -264,7 +257,7 @@ function ContactPageInner() {
                     </div>
 
                     <div className="mt-5">
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-cimaa-text mb-2">
                         Anything specific you&apos;d like to see? (optional)
                       </label>
                       <textarea
@@ -272,18 +265,19 @@ function ContactPageInner() {
                         value={layoutNotes}
                         onChange={(e) => setLayoutNotes(e.target.value)}
                         maxLength={1000}
-                        className="w-full rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all resize-none"
+                        className={`${inputClass} resize-none`}
                         placeholder="e.g., warm earthy colors, more photos than text, prefer no menu section..."
                       />
                     </div>
                   </div>
 
                   {status === "error" && errorMessage && (
-                    <p className="text-sm text-red-400">{errorMessage}</p>
+                    <p className="text-sm text-red-600">{errorMessage}</p>
                   )}
 
                   <Button
                     type="submit"
+                    variant="primary"
                     className="w-full"
                     size="lg"
                     disabled={status === "submitting"}
@@ -291,8 +285,9 @@ function ContactPageInner() {
                     {status === "submitting" ? "Sending..." : "Send Message"}
                   </Button>
 
-                  <p className="text-center text-xs text-slate-500">
-                    No credit card required. We&apos;ll get back to you within 24 hours.
+                  <p className="text-center text-xs text-cimaa-text-subtle">
+                    No credit card required. We&apos;ll get back to you within
+                    24 hours.
                   </p>
                 </form>
               )}
@@ -301,5 +296,27 @@ function ContactPageInner() {
         </Container>
       </section>
     </main>
+  );
+}
+
+function ContactRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-4">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cimaa-green-light text-cimaa-green">
+        {icon}
+      </span>
+      <div>
+        <p className="font-semibold text-cimaa-text">{label}</p>
+        {value}
+      </div>
+    </div>
   );
 }
