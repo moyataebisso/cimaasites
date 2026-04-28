@@ -6,9 +6,9 @@ import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Features — Cimaa Sites",
+  title: "Features",
   description:
-    "Everything you need to launch, run, and grow a website for your local business — included with every Cimaa Site.",
+    "Everything you need to launch, run, and grow a website for your local business — included with every Waji site.",
 };
 
 interface CategoryDef {
@@ -62,7 +62,7 @@ const categories: CategoryDef[] = [
     eyebrow: "Trust",
     headline: "Yours, always",
     blurb:
-      "Your content, your customers, your brand. Cimaa Sites runs on infrastructure that doesn't lock you in.",
+      "Your content, your customers, your brand. Waji runs on infrastructure that doesn't lock you in.",
     features: [
       "Your content, your data — yours forever",
       "SSL secured and GDPR-friendly",
@@ -83,7 +83,7 @@ export default function FeaturesPage() {
             eyebrow="Features"
             headline="Everything you need to launch, run &"
             accent="grow"
-            subtitle="Each Cimaa Site comes with the tools and care you'd expect from a high-end agency build — without the agency timeline or budget."
+            subtitle="Every Waji site comes with the tools and care you'd expect from a high-end agency build — without the agency timeline or budget."
           />
         </Container>
       </section>
@@ -125,7 +125,7 @@ function CategoryBlock({
             <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
               {category.eyebrow}
             </span>
-            <h2 className="mt-5 text-3xl sm:text-4xl font-bold text-cimaa-text leading-[1.1] tracking-tight">
+            <h2 className="mt-5 text-3xl sm:text-4xl font-heading font-semibold text-cimaa-text leading-[1.1] tracking-tight">
               {category.headline}
             </h2>
             <p className="mt-5 text-lg text-cimaa-text-muted leading-relaxed">

@@ -20,11 +20,11 @@ export function Footer() {
       <Container>
         <div className="py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
-            <span className="text-lg font-bold text-cimaa-text">
-              Cimaa Sites
+            <span className="font-heading text-lg font-semibold text-cimaa-text">
+              Waji Professional Websites
             </span>
             <p className="mt-3 text-sm text-cimaa-text-muted leading-relaxed max-w-xs">
-              Websites built, launched, and run for local businesses.
+              Custom websites for local businesses.
             </p>
           </div>
 
@@ -32,7 +32,7 @@ export function Footer() {
           <FooterColumn title="Support" links={supportLinks} />
 
           <div>
-            <h4 className="text-sm font-semibold text-cimaa-text mb-4">
+            <h4 className="font-heading text-sm font-semibold text-cimaa-text mb-4">
               Stay connected
             </h4>
             <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ export function Footer() {
         </div>
 
         <div className="py-6 border-t border-cimaa-border flex flex-col sm:flex-row gap-4 sm:items-center justify-between text-xs text-cimaa-text-muted">
-          <p>&copy; 2026 Cimaa Sites by Arsi Technology Group</p>
+          <p>&copy; 2026 Waji Professional Websites by Arsi Technology Group</p>
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"
@@ -98,7 +98,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h4 className="text-sm font-semibold text-cimaa-text mb-4">{title}</h4>
+      <h4 className="font-heading text-sm font-semibold text-cimaa-text mb-4">{title}</h4>
       <ul className="space-y-2">
         {links.map((link) => (
           <li key={link.label}>

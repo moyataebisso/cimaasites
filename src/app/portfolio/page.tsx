@@ -6,9 +6,9 @@ import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { LAYOUTS } from "@/lib/layouts";
 
 export const metadata: Metadata = {
-  title: "Portfolio — Cimaa Sites",
+  title: "Portfolio",
   description:
-    "Real businesses on the Cimaa Sites platform and the broader Arsi Technology Group ecosystem.",
+    "Real businesses on the Waji Professional Websites platform and the broader Arsi Technology Group ecosystem.",
 };
 
 interface ProjectCard {
@@ -65,7 +65,7 @@ const projects: ProjectCard[] = [
     name: "Arsi Technology Group",
     industry: "Studio",
     description:
-      "The Minneapolis-based studio behind Cimaa Sites and the rest of the platform.",
+      "The Minneapolis-based studio behind Waji and the rest of the platform.",
     url: "https://arsitechgroup.com",
     accent: "from-slate-100 to-cimaa-bg-tan",
   },
@@ -81,7 +81,7 @@ export default function PortfolioPage() {
             eyebrow="Portfolio"
             headline="Real businesses,"
             accent="real sites"
-            subtitle="A look at sites built and run on the Cimaa Sites platform — and the broader Arsi Technology Group ecosystem."
+            subtitle="A look at sites built and run on the Waji Professional Websites platform — and the broader Arsi Technology Group ecosystem."
           />
         </Container>
       </section>
@@ -112,7 +112,7 @@ export default function PortfolioPage() {
                 key={layout.id}
                 className="rounded-2xl bg-white border border-cimaa-border shadow-sm p-6 flex flex-col"
               >
-                <h3 className="text-lg font-bold text-cimaa-text">
+                <h3 className="font-heading text-lg font-semibold text-cimaa-text">
                   {layout.name}
                 </h3>
                 <p className="mt-1 text-sm text-cimaa-text-muted">
@@ -150,7 +150,7 @@ function ProjectTile({ project }: { project: ProjectCard }) {
       <div
         className={`h-40 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
       >
-        <span className="text-xl font-bold text-cimaa-text text-center leading-tight">
+        <span className="font-heading text-xl font-semibold text-cimaa-text text-center leading-tight">
           {project.name}
         </span>
       </div>

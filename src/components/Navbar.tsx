@@ -37,12 +37,17 @@ export function Navbar() {
     >
       <Container>
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2.5">
             <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-cimaa-yellow shadow-sm">
               <Laptop className="w-5 h-5 text-cimaa-text" strokeWidth={2.25} />
             </span>
-            <span className="text-xl font-bold text-cimaa-text">
-              Cimaa Sites
+            <span className="flex flex-col">
+              <span className="font-heading text-xl font-semibold text-cimaa-text leading-tight">
+                Waji
+              </span>
+              <span className="hidden md:block text-[10px] text-cimaa-text-muted leading-tight tracking-[0.15em] uppercase">
+                Professional Websites
+              </span>
             </span>
           </Link>
 

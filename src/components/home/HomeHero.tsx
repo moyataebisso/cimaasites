@@ -31,14 +31,15 @@ export function HomeHero() {
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.08] tracking-tight text-cimaa-text">
               Affordable websites for local businesses.{" "}
               <span className="text-cimaa-green">
-                Built however you need them.
+                Custom built for however you need it.
               </span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-cimaa-text-muted leading-relaxed max-w-xl">
-              From restaurants to home services to nonprofits — Cimaa Sites
-              builds, launches, and protects your website. So you can focus on
-              what you do best.
+              From restaurants to home services to nonprofits — Waji
+              Professional Websites builds, launches, maintains, and protects
+              your website. So you can focus on what you do best. All coded
+              from scratch.
             </p>
 
             <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center md:justify-start w-full sm:w-auto">

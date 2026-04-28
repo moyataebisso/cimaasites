@@ -114,7 +114,7 @@ export default function PreviewPage({
           <div className="flex items-center justify-between h-14 gap-2">
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                Cimaa Sites
+                Waji
               </span>
               <Badge variant="blue" className="hidden sm:inline-flex">Preview Mode</Badge>
             </div>

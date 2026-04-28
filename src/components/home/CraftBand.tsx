@@ -27,11 +27,11 @@ export function CraftBand() {
             <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-cimaa-yellow text-xs font-semibold uppercase tracking-wider">
               Built for local business
             </span>
-            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight">
+            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-heading font-semibold leading-[1.1] tracking-tight">
               Hand-crafted content that fits your business
             </h2>
             <p className="mt-5 text-lg text-white/70 leading-relaxed max-w-xl">
-              Every site we build gets copy written for your business, photos
+              Every site we build gets coded from scratch for your business, photos
               picked for your industry, and layouts shaped to how your customers
               think. Real care, every time.
             </p>

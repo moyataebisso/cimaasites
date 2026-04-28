@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const from = `Cimaa Sites <${process.env.RESEND_FROM_EMAIL || 'noreply@cimaasites.ai'}>`
+const from = `Waji Professional Websites <${process.env.RESEND_FROM_EMAIL || 'noreply@cimaasites.ai'}>`
 
 export async function sendPreviewReadyEmail(data: {
   email: string
@@ -30,7 +30,7 @@ export async function sendPreviewReadyEmail(data: {
            Email: ${data.adminEmail}<br>
            Password: ${data.adminPassword}</p>
         <p style="color:#888;font-size:12px">
-          Cimaa Sites — Powerful websites for powerful businesses
+          Waji Professional Websites — Custom websites for local businesses
         </p>
       </div>
     `,
@@ -58,7 +58,7 @@ export async function sendSiteLiveEmail(data: {
         <p>Manage your site anytime from your <a href="${data.adminUrl}">admin panel</a>.</p>
         <p>We are monitoring your site 24/7. If anything ever goes wrong, we will fix it immediately.</p>
         <p style="color:#888;font-size:12px">
-          Cimaa Sites — Powerful websites for powerful businesses
+          Waji Professional Websites — Custom websites for local businesses
         </p>
       </div>
     `,
@@ -93,16 +93,16 @@ export async function sendContactAutoReply(data: {
   await resend.emails.send({
     from,
     to: data.email,
-    subject: 'Thanks for reaching out — Cimaa Sites',
-    text: `Hi ${data.contactName}, thanks for telling us about ${data.businessName}. We'll review your info and get back to you within 24 hours with next steps.\n\n— The Cimaa Sites team`,
+    subject: 'Thanks for reaching out — Waji Professional Websites',
+    text: `Hi ${data.contactName}, thanks for telling us about ${data.businessName}. We'll review your info and get back to you within 24 hours with next steps.\n\n— The Waji team`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
         <h1 style="color:#2563EB">Thanks for reaching out!</h1>
         <p>Hi ${data.contactName},</p>
         <p>Thanks for telling us about <strong>${data.businessName}</strong>. We'll review your info and get back to you within 24 hours with next steps.</p>
-        <p>— The Cimaa Sites team</p>
+        <p>— The Waji team</p>
         <p style="color:#888;font-size:12px">
-          Cimaa Sites — Powerful websites for powerful businesses
+          Waji Professional Websites — Custom websites for local businesses
         </p>
       </div>
     `,
@@ -119,7 +119,7 @@ export async function sendPaymentReceivedEmail(data: {
     from,
     to: data.email,
     subject: `Payment received — building your site now (${data.businessName})`,
-    text: `Hi ${data.contactName},\n\nWe just received your payment for ${data.businessName} — thank you! Your site is being built right now.\n\nMost sites are ready to preview within 5-10 minutes. We'll email you the moment your preview link is ready, along with your admin login so you can start customizing it. (No further action needed from you right now.)\n\nIf you have any questions or want to add details we should include, just reply to this email — we'll see it before your site goes live.\n\n— The Cimaa Sites team`,
+    text: `Hi ${data.contactName},\n\nWe just received your payment for ${data.businessName} — thank you! Your site is being built right now.\n\nMost sites are ready to preview within 5-10 minutes. We'll email you the moment your preview link is ready, along with your admin login so you can start customizing it. (No further action needed from you right now.)\n\nIf you have any questions or want to add details we should include, just reply to this email — we'll see it before your site goes live.\n\n— The Waji team`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
         <h1 style="color:#16a34a">Payment received — we're building your site!</h1>
@@ -127,9 +127,9 @@ export async function sendPaymentReceivedEmail(data: {
         <p>We just received your payment for <strong>${data.businessName}</strong> — thank you! Your site is being built right now.</p>
         <p>Most sites are ready to preview within 5-10 minutes. We'll email you the moment your preview link is ready, along with your admin login so you can start customizing it. (No further action needed from you right now.)</p>
         <p>If you have any questions or want to add details we should include, just reply to this email — we'll see it before your site goes live.</p>
-        <p>— The Cimaa Sites team</p>
+        <p>— The Waji team</p>
         <p style="color:#888;font-size:12px">
-          Cimaa Sites — Powerful websites for powerful businesses
+          Waji Professional Websites — Custom websites for local businesses
         </p>
       </div>
     `,
@@ -146,8 +146,8 @@ export async function sendCheckoutLinkEmail(data: {
   await resend.emails.send({
     from,
     to: data.email,
-    subject: `Your Cimaa Sites checkout link — ${data.businessName}`,
-    text: `Hi ${data.contactName},\n\nWe've reviewed your request to build a ${data.plan} site for ${data.businessName} and we're ready to get started. Click the link below to complete your checkout — once paid, your site will be built and live within 24 hours.\n\n${data.checkoutUrl}\n\nHave a question? Reply to this email and we'll get back to you within a few hours.\n\n— The Cimaa Sites team`,
+    subject: `Your Waji Professional Websites checkout link — ${data.businessName}`,
+    text: `Hi ${data.contactName},\n\nWe've reviewed your request to build a ${data.plan} site for ${data.businessName} and we're ready to get started. Click the link below to complete your checkout — once paid, your site will be built and live within 24 hours.\n\n${data.checkoutUrl}\n\nHave a question? Reply to this email and we'll get back to you within a few hours.\n\n— The Waji team`,
     html: `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
         <h1 style="color:#2563EB">You're approved — let's get you live!</h1>
@@ -164,9 +164,9 @@ export async function sendCheckoutLinkEmail(data: {
           <a href="${data.checkoutUrl}" style="color:#2563EB;word-break:break-all">${data.checkoutUrl}</a>
         </p>
         <p>Have a question? Reply to this email and we'll get back to you within a few hours.</p>
-        <p>— The Cimaa Sites team</p>
+        <p>— The Waji team</p>
         <p style="color:#888;font-size:12px">
-          Cimaa Sites — Powerful websites for powerful businesses
+          Waji Professional Websites — Custom websites for local businesses
         </p>
       </div>
     `,

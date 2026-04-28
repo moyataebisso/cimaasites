@@ -7,9 +7,9 @@ import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "How It Works — Cimaa Sites",
+  title: "How It Works",
   description:
-    "What you get with Cimaa Sites. Tell us about your business and we'll send a custom quote within 24 hours.",
+    "What you get with Waji Professional Websites. Tell us about your business and we'll send a custom quote within 24 hours.",
 };
 
 interface Tier {
@@ -72,7 +72,7 @@ export default function PricingPage() {
           <SectionHeading
             eyebrow="What you get"
             headline="What you get with"
-            accent="Cimaa Sites."
+            accent="Waji Professional Websites."
             subtitle="Every business is different — so instead of one-size-fits-all pricing, we send you a custom quote within 24 hours."
           />
         </Container>
@@ -94,7 +94,7 @@ export default function PricingPage() {
             <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
               Why no prices?
             </span>
-            <h2 className="mt-5 text-2xl sm:text-3xl font-bold text-cimaa-text leading-tight">
+            <h2 className="mt-5 text-2xl sm:text-3xl font-heading font-semibold text-cimaa-text leading-tight">
               Every business is different. Tell us about yours and we&apos;ll
               send you a quote in 24 hours.
             </h2>
@@ -136,7 +136,7 @@ function TierCard({ tier }: { tier: Tier }) {
           Most popular
         </span>
       )}
-      <h3 className="text-2xl font-bold text-cimaa-text">{tier.name}</h3>
+      <h3 className="font-heading text-2xl font-semibold text-cimaa-text">{tier.name}</h3>
       <p className="mt-1 text-sm text-cimaa-text-muted">
         Best for: <span className="text-cimaa-text">{tier.bestFor}</span>
       </p>

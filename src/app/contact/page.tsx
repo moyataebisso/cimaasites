@@ -106,7 +106,7 @@ function ContactPageInner() {
               <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
                 Get Started
               </span>
-              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-cimaa-text">
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-heading font-semibold leading-[1.05] tracking-tight text-cimaa-text">
                 Let&apos;s build your{" "}
                 <span className="text-cimaa-green">website</span>
               </h1>
@@ -153,7 +153,7 @@ function ContactPageInner() {
                   <span className="h-14 w-14 rounded-full bg-cimaa-green-light text-cimaa-green flex items-center justify-center">
                     <CheckCircle2 size={32} strokeWidth={2.5} />
                   </span>
-                  <h2 className="mt-6 text-2xl font-bold text-cimaa-text">
+                  <h2 className="mt-6 text-2xl font-heading font-semibold text-cimaa-text">
                     Message received!
                   </h2>
                   <p className="mt-3 text-cimaa-text-muted">

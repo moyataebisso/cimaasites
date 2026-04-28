@@ -62,7 +62,7 @@ export function FeatureBlock({
             <span className="inline-block px-3 py-1 rounded-full bg-cimaa-green-light text-cimaa-green text-xs font-semibold uppercase tracking-wider">
               {eyebrow}
             </span>
-            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] tracking-tight text-cimaa-text">
+            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-heading font-semibold leading-[1.1] tracking-tight text-cimaa-text">
               {headline}
             </h2>
 

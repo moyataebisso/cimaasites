@@ -24,24 +24,30 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cimaa Sites — Websites built for your local business",
+  title: {
+    default:
+      "Waji Professional Websites — Custom Websites for Local Businesses",
+    template: "%s | Waji Professional Websites",
+  },
   description:
-    "We build, launch, and run the website for your local business. Custom quote within 24 hours, 24/7 monitoring, real human support.",
+    "Custom websites for local and small businesses. Built, launched, secured, and supported — so you can focus on what you do best.",
   keywords:
     "small business website, local business website, professional website, done for you website, website monitoring, restaurant website, salon website, healthcare website, fleet website, home services website",
   openGraph: {
-    title: "Cimaa Sites — Websites built for your local business",
+    title:
+      "Waji Professional Websites — Custom Websites for Local Businesses",
     description:
-      "We build and run websites for local businesses. Tell us about yours and we'll send a custom quote within 24 hours.",
+      "Custom websites for local businesses. Built, launched, secured, and supported. Get a quote in 24 hours.",
     url: "https://cimaasites.ai",
-    siteName: "Cimaa Sites",
+    siteName: "Waji Professional Websites",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cimaa Sites — Websites built for your local business",
+    title:
+      "Waji Professional Websites — Custom Websites for Local Businesses",
     description:
-      "We build and run websites for local businesses. Get a custom quote in 24 hours.",
+      "Custom websites for local businesses. Get a quote in 24 hours.",
   },
 };
 
@@ -59,9 +65,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "LocalBusiness",
-              name: "Cimaa Sites",
+              name: "Waji Professional Websites",
               description:
-                "Professional website development and management for local businesses and community entrepreneurs.",
+                "Custom websites for local and small businesses. Built, launched, secured, and supported.",
               url: "https://cimaasites.ai",
               email: "arsitechgroup@gmail.com",
               address: {

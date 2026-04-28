@@ -24,7 +24,7 @@ export default function Home() {
             eyebrow="One platform"
             headline="One platform to launch, run, and"
             accent="grow your website."
-            subtitle="From the first quote to the first thousand visitors — Cimaa Sites covers the parts most owners would rather not deal with."
+            subtitle="From the first quote to the first thousand visitors — Waji covers the parts most owners would rather not deal with."
           />
         </Container>
       </section>
