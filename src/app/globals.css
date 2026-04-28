@@ -3,8 +3,11 @@
 @theme inline {
   --color-background: #ffffff;
   --color-foreground: #0f172a;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Outfit", system-ui, sans-serif;
+  /* Body uses Inter via --font-body; headings use Manrope via --font-heading.
+     Both variables are injected by next/font in layout.tsx. */
+  --font-sans: var(--font-body), "Inter", system-ui, sans-serif;
+  --font-body: var(--font-body), "Inter", system-ui, sans-serif;
+  --font-heading: var(--font-heading), "Manrope", system-ui, sans-serif;
 
   /* Cimaa design tokens — used across the marketing site. */
   --color-cimaa-bg: #ffffff;

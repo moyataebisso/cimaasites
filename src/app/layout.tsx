@@ -1,14 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Manrope, Outfit } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body",
+  display: "swap",
 });
 
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+// Outfit kept for backwards compatibility with any styles still referencing it.
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
@@ -69,7 +78,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${outfit.variable} font-sans antialiased`}
+        className={`${inter.variable} ${manrope.variable} ${outfit.variable} font-sans antialiased`}
       >
         {/* Animated page border — top */}
         <div className="fixed top-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
