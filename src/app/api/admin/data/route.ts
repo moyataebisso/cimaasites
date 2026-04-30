@@ -17,9 +17,9 @@ export async function GET(request: Request) {
     .schema('cimaasites')
     .from('onboarding_submissions')
     .select(
-      'id, business_name, email, plan, status, current_step, created_at, amount_cents, selected_layout, layout_notes, contact_name, phone, business_description, checkout_url, stripe_session_id, approved_at, paid_at, client_live_url, intake_token, intake_sent_at, intake_completed_at'
+      'id, business_name, email, plan, status, current_step, submitted_at, amount_cents, selected_layout, layout_notes, contact_name, phone, business_description, checkout_url, stripe_session_id, approved_at, paid_at, client_live_url, intake_token, intake_sent_at, intake_completed_at'
     )
-    .order('created_at', { ascending: false })
+    .order('submitted_at', { ascending: false })
     .limit(50)
 
   return Response.json({ clients: clients || [], submissions: submissions || [] })

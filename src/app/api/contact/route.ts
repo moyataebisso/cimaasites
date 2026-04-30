@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       progress: 0,
     })
     .select(
-      'id, contact_name, email, business_name, plan, business_description, selected_layout, layout_notes, created_at'
+      'id, contact_name, email, business_name, plan, business_description, selected_layout, layout_notes, submitted_at'
     )
     .single()
 

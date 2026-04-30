@@ -37,7 +37,7 @@ interface Submission {
   plan: string
   status: string
   current_step?: string | null
-  created_at: string
+  submitted_at: string
   amount_cents: number
   selected_layout: string | null
   layout_notes: string | null
@@ -436,7 +436,7 @@ export default function AdminPage() {
                               <StatusBadge status={s.status} />
                             </td>
                             <td className="px-6 py-3 text-slate-500">
-                              {new Date(s.created_at).toLocaleDateString()}
+                              {new Date(s.submitted_at).toLocaleDateString()}
                             </td>
                           </tr>
                           {isExpanded && (
@@ -1000,7 +1000,7 @@ function SubmissionDetail({
         />
         <DetailRow
           label="Submitted"
-          value={new Date(submission.created_at).toLocaleString()}
+          value={new Date(submission.submitted_at).toLocaleString()}
         />
         {submission.approved_at && (
           <DetailRow

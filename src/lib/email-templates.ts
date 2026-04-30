@@ -417,7 +417,7 @@ export interface AdminAlertSubmission {
   selected_layout?: string | null
   message?: string | null
   layout_notes?: string | null
-  created_at?: string | null
+  submitted_at?: string | null
 }
 
 export function contactReceivedAdminAlert({
@@ -425,7 +425,7 @@ export function contactReceivedAdminAlert({
 }: {
   submission: AdminAlertSubmission
 }) {
-  const submittedAt = formatTimestamp(submission.created_at)
+  const submittedAt = formatTimestamp(submission.submitted_at)
   const subject = `🔔 New Waji inquiry — ${submission.business_name} (${submission.plan})`
   const html = buildEmail({
     preheader: `${submission.business_name} · ${submission.plan} · ${submission.email}`,

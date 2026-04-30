@@ -45,7 +45,7 @@ export interface OnboardingSubmission {
   selected_layout?: string | null
   layout_notes?: string | null
   amount_cents?: number | null
-  created_at?: string | null
+  submitted_at?: string | null
   client_preview_url?: string | null
   client_admin_email?: string | null
   client_admin_password?: string | null
@@ -99,7 +99,7 @@ export async function sendContactAdminAlert(
     selected_layout: submission.selected_layout ?? null,
     message: submission.business_description ?? null,
     layout_notes: submission.layout_notes ?? null,
-    created_at: submission.created_at ?? null,
+    submitted_at: submission.submitted_at ?? null,
   }
   const { subject, html } = contactReceivedAdminAlert({ submission: adminSubmission })
   return send({
@@ -147,7 +147,7 @@ export async function sendIntakeCompleteAdminAlert(
     selected_layout: submission.selected_layout ?? null,
     message: submission.business_description ?? null,
     layout_notes: submission.layout_notes ?? null,
-    created_at: submission.created_at ?? null,
+    submitted_at: submission.submitted_at ?? null,
   }
   const { subject, html } = intakeCompleteAdminAlertEmail({
     submission: adminSubmission,
@@ -380,7 +380,7 @@ export async function sendNewContactLeadEmail(data: {
     selected_layout: data.selectedLayout ?? null,
     message: data.message,
     layout_notes: data.layoutNotes ?? null,
-    created_at: new Date().toISOString(),
+    submitted_at: new Date().toISOString(),
   }
   const { subject, html } = contactReceivedAdminAlert({
     submission: adminSubmission,

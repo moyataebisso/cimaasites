@@ -27,7 +27,7 @@ const mock = {
   adminEmail: 'sarah@adamarestaurant.com',
   adminPassword: 'Xk9mP3nQ7wRt',
   submissionId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  createdAt: new Date().toISOString(),
+  submittedAt: new Date().toISOString(),
 }
 
 type TemplateKey =
@@ -74,7 +74,7 @@ const TEMPLATES: TemplateMeta[] = [
           selected_layout: mock.selected_layout,
           message: mock.message,
           layout_notes: mock.layout_notes,
-          created_at: mock.createdAt,
+          submitted_at: mock.submittedAt,
         },
       }),
   },

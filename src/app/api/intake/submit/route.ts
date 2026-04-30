@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     .schema('cimaasites')
     .from('onboarding_submissions')
     .select(
-      'id, intake_token, contact_name, email, business_name, plan, status, intake_completed_at, business_description, selected_layout, layout_notes, created_at'
+      'id, intake_token, contact_name, email, business_name, plan, status, intake_completed_at, business_description, selected_layout, layout_notes, submitted_at'
     )
     .eq('intake_token', token)
     .single()
