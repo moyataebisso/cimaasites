@@ -199,7 +199,7 @@ function ContactPageInner() {
                 <span className="text-cimaa-green">website</span>
               </h1>
               <p className="mt-6 text-lg text-cimaa-text-muted leading-relaxed">
-                Tell us a bit about your business. Moa will review and send a
+                Tell us a bit about your business. We will review and send a
                 custom proposal within 24 hours — usually faster.
               </p>
 

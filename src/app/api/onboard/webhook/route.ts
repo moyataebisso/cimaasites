@@ -28,7 +28,12 @@ export async function POST(request: Request) {
       return new Response('No submissionId', { status: 400 })
     }
 
-    await supabaseAdmin
+    // Atomic claim: only the first delivery of a checkout.session.completed
+    // event for this submission flips the row to paid. Stripe retries the
+    // event for ~24h on non-2xx responses; subsequent deliveries (or operator
+    // re-sends from the dashboard) hit the .is('paid_at', null) filter and
+    // match zero rows, so we treat them as duplicates and short-circuit.
+    const { data: paidRow, error: payErr } = await supabaseAdmin
       .schema('cimaasites')
       .from('onboarding_submissions')
       .update({
@@ -39,6 +44,24 @@ export async function POST(request: Request) {
         amount_cents: session.amount_total,
       })
       .eq('id', submissionId)
+      .is('paid_at', null)
+      .select('id')
+      .maybeSingle()
+
+    if (payErr) {
+      console.error('[webhook] paid claim error', { submissionId, error: payErr })
+      // Don't return 500 — Stripe would retry forever. Return 200 and let
+      // operator triage from logs.
+      return new Response('OK (db error logged)', { status: 200 })
+    }
+
+    if (!paidRow) {
+      console.warn('[webhook] duplicate event for already-paid submission', {
+        sessionId: session.id,
+        submissionId,
+      })
+      return new Response('OK (duplicate)', { status: 200 })
+    }
 
     await supabaseAdmin
       .schema('cimaasites')
