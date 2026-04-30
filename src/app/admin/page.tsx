@@ -36,6 +36,7 @@ interface Submission {
   email: string
   plan: string
   status: string
+  current_step?: string | null
   created_at: string
   amount_cents: number
   selected_layout: string | null
@@ -46,7 +47,11 @@ interface Submission {
   checkout_url: string | null
   stripe_session_id: string | null
   approved_at: string | null
+  paid_at?: string | null
   client_live_url: string | null
+  intake_token?: string | null
+  intake_sent_at?: string | null
+  intake_completed_at?: string | null
 }
 
 interface ChangeRequest {
@@ -373,11 +378,12 @@ export default function AdminPage() {
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50">
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Business</th>
+                      <th className="px-6 py-3 text-left font-medium text-slate-500">Contact</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Email</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Plan</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Layout</th>
                       <th className="px-6 py-3 text-left font-medium text-slate-500">Status</th>
-                      <th className="px-6 py-3 text-left font-medium text-slate-500">Date</th>
+                      <th className="px-6 py-3 text-left font-medium text-slate-500">Submitted</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -401,6 +407,9 @@ export default function AdminPage() {
                                 )}
                                 {s.business_name}
                               </div>
+                            </td>
+                            <td className="px-6 py-3 text-slate-600">
+                              {s.contact_name || '—'}
                             </td>
                             <td className="px-6 py-3 text-slate-600">{s.email}</td>
                             <td className="px-6 py-3">
@@ -432,7 +441,7 @@ export default function AdminPage() {
                           </tr>
                           {isExpanded && (
                             <tr className="bg-slate-50/70 border-b border-slate-100">
-                              <td colSpan={6} className="px-6 py-4">
+                              <td colSpan={7} className="px-6 py-4">
                                 <SubmissionDetail
                                   submission={s}
                                   adminPassword={storedPassword}
@@ -446,7 +455,7 @@ export default function AdminPage() {
                     })}
                     {submissions.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                        <td colSpan={7} className="px-6 py-8 text-center text-slate-400">
                           No submissions yet
                         </td>
                       </tr>
@@ -786,20 +795,29 @@ function StatCard({
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const label =
+    status === 'intake_sent'
+      ? 'Intake Sent'
+      : status === 'intake_done'
+        ? 'Intake Done'
+        : status
   return (
     <span
       className={cn(
         'px-2 py-0.5 rounded-full text-xs font-medium',
         status === 'live' && 'bg-green-100 text-green-700',
         status === 'preview' && 'bg-blue-100 text-blue-700',
-        status === 'paid' && 'bg-amber-100 text-amber-700',
+        status === 'paid' && 'bg-green-100 text-green-700',
         status === 'failed' && 'bg-red-100 text-red-700',
-        status === 'pending' && 'bg-slate-100 text-slate-600',
+        status === 'cancelled' && 'bg-red-100 text-red-700',
+        status === 'pending' && 'bg-slate-200 text-slate-600',
+        status === 'intake_sent' && 'bg-blue-100 text-blue-700',
+        status === 'intake_done' && 'bg-amber-100 text-amber-700',
         status === 'approved' && 'bg-violet-100 text-violet-700',
         status === 'provisioning' && 'bg-blue-100 text-blue-700'
       )}
     >
-      {status}
+      {label}
     </span>
   )
 }
@@ -813,7 +831,9 @@ function SubmissionDetail({
   adminPassword: string
   onChanged: () => void
 }) {
-  const [busy, setBusy] = useState<null | 'approve' | 'approve_email' | 'resend'>(null)
+  const [busy, setBusy] = useState<
+    null | 'approve' | 'approve_email' | 'resend' | 'intake' | 'payment_link'
+  >(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -891,6 +911,71 @@ function SubmissionDetail({
     }
   }
 
+  const sendIntake = async () => {
+    setError(null)
+    setSuccess(null)
+    setBusy('intake')
+    try {
+      const res = await fetch('/api/admin/send-intake-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword,
+        },
+        body: JSON.stringify({ submission_id: submission.id }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not send intake link')
+      }
+      if (data.emailError) {
+        setSuccess(
+          `Intake URL ready (email failed: ${data.emailError}). Copy the link from the detail panel.`
+        )
+      } else {
+        setSuccess(`Intake link sent to ${submission.email}.`)
+      }
+      onChanged()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send intake link')
+    }
+    setBusy(null)
+  }
+
+  const sendPaymentLink = async () => {
+    // intake_done → approve_for_payment with email
+    setError(null)
+    setSuccess(null)
+    setBusy('payment_link')
+    try {
+      const res = await fetch('/api/onboard/approve', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': adminPassword,
+        },
+        body: JSON.stringify({
+          submissionId: submission.id,
+          mode: 'approve_for_payment',
+          sendEmail: true,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Could not send payment link')
+      }
+      setSuccess(
+        data.emailError
+          ? `Checkout link generated. ${data.emailError}`
+          : `Payment link sent to ${submission.email}.`
+      )
+      onChanged()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send payment link')
+    }
+    setBusy(null)
+  }
+
   return (
     <div className="space-y-4">
       {/* Detail */}
@@ -952,38 +1037,111 @@ function SubmissionDetail({
       {/* Actions */}
       <div className="pt-3 border-t border-slate-200">
         {status === 'pending' && (
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-3">
+            <p className="text-xs text-slate-500">
+              Two paths from here: send the customer the Step 2 intake form, or
+              skip straight to a Stripe checkout link.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={sendIntake}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 cursor-pointer"
+              >
+                {busy === 'intake' ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Sending intake link...
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} />
+                    Send Intake Link
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => approve(true)}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-60 cursor-pointer"
+              >
+                {busy === 'approve_email' ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Generating link...
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} />
+                    Skip intake — Email Checkout
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => approve(false)}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60 cursor-pointer"
+              >
+                {busy === 'approve' ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    Generating link...
+                  </>
+                ) : (
+                  'Approve (Manual Send)'
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === 'intake_sent' && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <span>
+                Intake link sent
+                {submission.intake_sent_at &&
+                  ` ${new Date(submission.intake_sent_at).toLocaleString()}`}
+                . Waiting on customer.
+              </span>
+            </div>
+            {submission.intake_token && (
+              <div className="flex items-stretch gap-2">
+                <code className="flex-1 px-3 py-2 rounded-lg bg-slate-900 text-slate-100 text-xs font-mono break-all">
+                  /intake/{submission.intake_token}
+                </code>
+              </div>
+            )}
+          </div>
+        )}
+
+        {status === 'intake_done' && (
+          <div className="space-y-3">
+            <p className="text-xs text-slate-500">
+              Customer completed the intake form
+              {submission.intake_completed_at &&
+                ` at ${new Date(submission.intake_completed_at).toLocaleString()}`}
+              . Generate a Stripe checkout link and send it.
+            </p>
             <button
               type="button"
-              onClick={() => approve(true)}
+              onClick={sendPaymentLink}
               disabled={busy !== null}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 cursor-pointer"
             >
-              {busy === 'approve_email' ? (
+              {busy === 'payment_link' ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Generating link...
+                  Generating checkout...
                 </>
               ) : (
                 <>
                   <Mail size={14} />
-                  Approve & Email Customer
+                  Send Payment Link
                 </>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => approve(false)}
-              disabled={busy !== null}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60 cursor-pointer"
-            >
-              {busy === 'approve' ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" />
-                  Generating link...
-                </>
-              ) : (
-                'Approve (Manual Send)'
               )}
             </button>
           </div>

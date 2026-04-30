@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import {
   sendContactAdminAlert,
@@ -7,7 +8,6 @@ import { isLayoutId, type LayoutId } from '@/lib/layouts'
 
 const VALID_PLANS = ['basic', 'pro', 'developer'] as const
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const LAYOUT_NOTES_MAX = 1000
 
 // Some clients (and at least one upstream form processor) wrap email
 // addresses in markdown link syntax: "[a@b.com](mailto:a@b.com)".
@@ -18,6 +18,8 @@ function unwrapMarkdownEmail(s: string): string {
   return m ? m[1] : s
 }
 
+const digitsOnly = (s: string) => s.replace(/[^0-9]/g, '')
+
 export async function POST(request: Request) {
   const body = await request.json()
   const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -25,19 +27,17 @@ export async function POST(request: Request) {
   const email = unwrapMarkdownEmail(rawEmail).trim()
   const businessName =
     typeof body.business_name === 'string' ? body.business_name.trim() : ''
+  const phoneRaw = typeof body.phone === 'string' ? body.phone.trim() : ''
+  const phone = digitsOnly(phoneRaw)
   const plan = typeof body.plan === 'string' ? body.plan : ''
   const message = typeof body.message === 'string' ? body.message.trim() : ''
 
-  const selectedLayout: LayoutId = isLayoutId(body.selected_layout)
-    ? body.selected_layout
-    : 'fleet'
-
-  const rawNotes =
-    typeof body.layout_notes === 'string' ? body.layout_notes.trim() : ''
-  const layoutNotes = rawNotes ? rawNotes.slice(0, LAYOUT_NOTES_MAX) : null
-
-  if (!name) {
-    return Response.json({ error: 'Name is required' }, { status: 400 })
+  // ── Server-side validation (don't trust client) ──────────
+  if (name.length < 2) {
+    return Response.json(
+      { error: 'Name must be at least 2 characters' },
+      { status: 400 }
+    )
   }
   if (!email) {
     return Response.json({ error: 'Email is required' }, { status: 400 })
@@ -45,12 +45,28 @@ export async function POST(request: Request) {
   if (!EMAIL_REGEX.test(email)) {
     return Response.json({ error: 'Invalid email address' }, { status: 400 })
   }
-  if (!businessName) {
-    return Response.json({ error: 'Business name is required' }, { status: 400 })
+  if (businessName.length < 2) {
+    return Response.json(
+      { error: 'Business name must be at least 2 characters' },
+      { status: 400 }
+    )
+  }
+  if (phone.length < 10) {
+    return Response.json(
+      { error: 'Phone must contain at least 10 digits' },
+      { status: 400 }
+    )
   }
   if (!VALID_PLANS.includes(plan as (typeof VALID_PLANS)[number])) {
     return Response.json({ error: 'Invalid plan' }, { status: 400 })
   }
+  if (!isLayoutId(body.selected_layout)) {
+    return Response.json({ error: 'Invalid layout' }, { status: 400 })
+  }
+  const selectedLayout: LayoutId = body.selected_layout
+
+  // ── Insert ───────────────────────────────────────────────
+  const intakeToken = randomBytes(16).toString('hex')
 
   const { data, error } = await supabaseAdmin
     .schema('cimaasites')
@@ -58,11 +74,13 @@ export async function POST(request: Request) {
     .insert({
       contact_name: name,
       email,
+      phone,
       business_name: businessName,
       plan,
       business_description: message || null,
       selected_layout: selectedLayout,
-      layout_notes: layoutNotes,
+      layout_notes: null, // moved to Step 2 intake
+      intake_token: intakeToken,
       status: 'pending',
       current_step: 'form',
       progress: 0,
@@ -91,5 +109,5 @@ export async function POST(request: Request) {
     console.error('sendContactReceivedConfirmation error:', customerResult.error)
   }
 
-  return Response.json({ success: true, submissionId: data.id })
+  return Response.json({ success: true, id: data.id, submissionId: data.id })
 }
