@@ -1,6 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendIntakeCompleteAdminAlert } from '@/lib/emails'
 
+export const maxDuration = 30
+export const dynamic = 'force-dynamic'
+
 interface ServiceInput {
   name?: unknown
   description?: unknown

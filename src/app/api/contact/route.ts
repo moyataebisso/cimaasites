@@ -6,6 +6,9 @@ import {
 } from '@/lib/emails'
 import { isLayoutId, type LayoutId } from '@/lib/layouts'
 
+export const maxDuration = 30
+export const dynamic = 'force-dynamic'
+
 const VALID_PLANS = ['basic', 'pro', 'developer'] as const
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 

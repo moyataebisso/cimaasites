@@ -5,6 +5,9 @@ import {
   type CheckoutPlan,
 } from '@/lib/stripe-checkout'
 
+export const maxDuration = 60
+export const dynamic = 'force-dynamic'
+
 const VALID_PLANS: CheckoutPlan[] = ['basic', 'pro', 'developer']
 
 export async function POST(request: Request) {

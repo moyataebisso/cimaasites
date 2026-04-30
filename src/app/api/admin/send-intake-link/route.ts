@@ -2,6 +2,9 @@ import { randomBytes } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendIntakeLink } from '@/lib/emails'
 
+export const maxDuration = 30
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   const password = request.headers.get('x-admin-password')
   if (password !== process.env.ADMIN_PASSWORD) {

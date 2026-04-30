@@ -9,6 +9,9 @@ import {
   type CheckoutPlan,
 } from '@/lib/stripe-checkout'
 
+export const maxDuration = 60
+export const dynamic = 'force-dynamic'
+
 type Mode = 'go_live' | 'approve_for_payment'
 
 const VALID_PLANS: CheckoutPlan[] = ['basic', 'pro', 'developer']

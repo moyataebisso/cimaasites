@@ -8,6 +8,11 @@ import { createClientSchema } from '@/lib/provision/create-client-schema'
 import { generateSlug } from '@/lib/provision/slug'
 import { sendPreviewReadyEmail, sendYouNewClientEmail } from '@/lib/emails'
 
+// Vercel Pro: allow up to ~13 minutes for the full provisioning pipeline
+// (Anthropic content generation + Vercel API calls + deploy poll + seeding).
+export const maxDuration = 800
+export const dynamic = 'force-dynamic'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SubmissionRow = any
 
