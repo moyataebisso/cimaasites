@@ -52,39 +52,56 @@ export async function POST(request: Request) {
         completed_at: new Date().toISOString(),
       })
 
-    // Best-effort: notify customer that payment was received and build is starting.
-    // Do NOT block provisioning if the email fails.
-    try {
-      const { data: paidSubmission } = await supabaseAdmin
-        .schema('cimaasites')
-        .from('onboarding_submissions')
-        .select('contact_name, business_name, email, plan')
-        .eq('id', submissionId)
-        .single()
+    // Best-effort: notify customer that payment was received. Fire-and-forget
+    // so we don't delay the webhook response — Stripe times out around 10s.
+    sendPaymentReceiptInBackground(submissionId).catch((err) => {
+      console.error('[webhook] sendPaymentReceivedEmail error:', err)
+    })
 
-      if (paidSubmission?.email) {
-        await sendPaymentReceivedEmail({
-          email: paidSubmission.email,
-          contactName:
-            paidSubmission.contact_name || paidSubmission.business_name,
-          businessName: paidSubmission.business_name,
-          plan: paidSubmission.plan,
-        })
-      }
-    } catch (err) {
-      console.error('sendPaymentReceivedEmail error:', err)
-    }
-
-    // Only run full provisioning for setup payments (not recurring invoices)
+    // Trigger provisioning for setup/developer checkouts (not recurring invoices).
+    // Use a host-header fallback so this works even when NEXT_PUBLIC_APP_URL is
+    // missing in the deploy env (which silently broke this fetch in prod).
     const isSetup = checkoutType === 'setup' || checkoutType === 'developer'
 
     if (isSetup) {
-      // Fire and forget provisioning
-      fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/onboard/provision`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ submissionId }),
-      }).catch(console.error)
+      const host = request.headers.get('host')
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        (host ? `https://${host}` : null)
+
+      if (!baseUrl) {
+        console.error(
+          '[webhook] cannot trigger provision — no NEXT_PUBLIC_APP_URL and no host header',
+          { submissionId }
+        )
+      } else {
+        const provisionUrl = `${baseUrl}/api/onboard/provision`
+        console.log('[webhook] triggering provision', {
+          submissionId,
+          checkoutType,
+          provisionUrl,
+        })
+
+        // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
+        fetch(provisionUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionId }),
+        })
+          .then((res) => {
+            console.log('[webhook] provision trigger response', {
+              submissionId,
+              status: res.status,
+            })
+          })
+          .catch((err) => {
+            console.error('[webhook] failed to trigger provision', {
+              submissionId,
+              provisionUrl,
+              error: err instanceof Error ? err.message : String(err),
+            })
+          })
+      }
     }
   }
 
@@ -122,4 +139,23 @@ export async function POST(request: Request) {
   }
 
   return new Response('OK', { status: 200 })
+}
+
+async function sendPaymentReceiptInBackground(submissionId: string) {
+  const { data: paidSubmission } = await supabaseAdmin
+    .schema('cimaasites')
+    .from('onboarding_submissions')
+    .select('contact_name, business_name, email, plan')
+    .eq('id', submissionId)
+    .single()
+
+  if (paidSubmission?.email) {
+    await sendPaymentReceivedEmail({
+      email: paidSubmission.email,
+      contactName:
+        paidSubmission.contact_name || paidSubmission.business_name,
+      businessName: paidSubmission.business_name,
+      plan: paidSubmission.plan,
+    })
+  }
 }
