@@ -1,15 +1,28 @@
 import { supabaseAdmin } from '@/lib/supabase'
-import { sendContactAutoReply, sendNewContactLeadEmail } from '@/lib/emails'
+import {
+  sendContactAdminAlert,
+  sendContactReceivedConfirmation,
+} from '@/lib/emails'
 import { isLayoutId, type LayoutId } from '@/lib/layouts'
 
 const VALID_PLANS = ['basic', 'pro', 'developer'] as const
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const LAYOUT_NOTES_MAX = 1000
 
+// Some clients (and at least one upstream form processor) wrap email
+// addresses in markdown link syntax: "[a@b.com](mailto:a@b.com)".
+// Strip that down to the plain address before validation.
+const MARKDOWN_EMAIL_RE = /^\[([^\]]+)\]\(mailto:[^)]+\)$/
+function unwrapMarkdownEmail(s: string): string {
+  const m = s.match(MARKDOWN_EMAIL_RE)
+  return m ? m[1] : s
+}
+
 export async function POST(request: Request) {
   const body = await request.json()
   const name = typeof body.name === 'string' ? body.name.trim() : ''
-  const email = typeof body.email === 'string' ? body.email.trim() : ''
+  const rawEmail = typeof body.email === 'string' ? body.email.trim() : ''
+  const email = unwrapMarkdownEmail(rawEmail).trim()
   const businessName =
     typeof body.business_name === 'string' ? body.business_name.trim() : ''
   const plan = typeof body.plan === 'string' ? body.plan : ''
@@ -54,7 +67,9 @@ export async function POST(request: Request) {
       current_step: 'form',
       progress: 0,
     })
-    .select('id')
+    .select(
+      'id, contact_name, email, business_name, plan, business_description, selected_layout, layout_notes, created_at'
+    )
     .single()
 
   if (error || !data) {
@@ -65,27 +80,15 @@ export async function POST(request: Request) {
     )
   }
 
-  try {
-    await sendNewContactLeadEmail({
-      contactName: name,
-      email,
-      businessName,
-      plan,
-      message,
-      submissionId: data.id,
-    })
-  } catch (err) {
-    console.error('sendNewContactLeadEmail error:', err)
+  // Fire both emails best-effort. Never block the response on email failure.
+  const adminResult = await sendContactAdminAlert(data)
+  if (!adminResult.success) {
+    console.error('sendContactAdminAlert error:', adminResult.error)
   }
 
-  try {
-    await sendContactAutoReply({
-      email,
-      contactName: name,
-      businessName,
-    })
-  } catch (err) {
-    console.error('sendContactAutoReply error:', err)
+  const customerResult = await sendContactReceivedConfirmation(data)
+  if (!customerResult.success) {
+    console.error('sendContactReceivedConfirmation error:', customerResult.error)
   }
 
   return Response.json({ success: true, submissionId: data.id })

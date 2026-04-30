@@ -1,7 +1,184 @@
 import { Resend } from 'resend'
+import {
+  contactReceivedEmail,
+  contactReceivedAdminAlert,
+  intakeFormLinkEmail,
+  intakeCompleteEmail,
+  paymentReceiptEmail,
+  siteLiveEmail,
+  type AdminAlertSubmission,
+} from './email-templates'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const from = `Waji Professional Websites <${process.env.RESEND_FROM_EMAIL || 'noreply@cimaasites.ai'}>`
+// ─────────────────────────────────────────────
+// Lazy Resend init — avoid touching env at import time
+// so build/test contexts don't crash without RESEND_API_KEY.
+// ─────────────────────────────────────────────
+let resendInstance: Resend | null = null
+function getResend(): Resend {
+  if (!resendInstance) {
+    resendInstance = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resendInstance
+}
+
+const FROM_DEFAULT = 'noreply@cimaasites.ai'
+function fromAddress(): string {
+  return `Waji Professional Websites <${process.env.RESEND_FROM_EMAIL || FROM_DEFAULT}>`
+}
+
+const ADMIN_INBOX = 'arsitechgroup@gmail.com'
+
+// ─────────────────────────────────────────────
+// Common types
+// ─────────────────────────────────────────────
+
+export type SendResult = { success: true } | { success: false; error: string }
+
+export interface OnboardingSubmission {
+  id: string
+  contact_name: string | null
+  email: string
+  business_name: string
+  plan: string
+  business_description?: string | null
+  selected_layout?: string | null
+  layout_notes?: string | null
+  amount_cents?: number | null
+  created_at?: string | null
+  client_preview_url?: string | null
+  client_admin_email?: string | null
+  client_admin_password?: string | null
+}
+
+async function send(args: {
+  to: string | string[]
+  subject: string
+  html: string
+  replyTo?: string
+}): Promise<SendResult> {
+  try {
+    await getResend().emails.send({
+      from: fromAddress(),
+      to: args.to,
+      subject: args.subject,
+      html: args.html,
+      ...(args.replyTo ? { replyTo: args.replyTo } : {}),
+    })
+    return { success: true }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown email error'
+    console.error('Email send failed:', message)
+    return { success: false, error: message }
+  }
+}
+
+// ═════════════════════════════════════════════
+// NEW SPEC API — submission-based
+// ═════════════════════════════════════════════
+
+export async function sendContactReceivedConfirmation(
+  submission: OnboardingSubmission
+): Promise<SendResult> {
+  const { subject, html } = contactReceivedEmail({
+    contactName: submission.contact_name || '',
+    businessName: submission.business_name,
+  })
+  return send({ to: submission.email, subject, html })
+}
+
+export async function sendContactAdminAlert(
+  submission: OnboardingSubmission
+): Promise<SendResult> {
+  const adminSubmission: AdminAlertSubmission = {
+    id: submission.id,
+    contact_name: submission.contact_name,
+    email: submission.email,
+    business_name: submission.business_name,
+    plan: submission.plan,
+    selected_layout: submission.selected_layout ?? null,
+    message: submission.business_description ?? null,
+    layout_notes: submission.layout_notes ?? null,
+    created_at: submission.created_at ?? null,
+  }
+  const { subject, html } = contactReceivedAdminAlert({ submission: adminSubmission })
+  return send({
+    to: ADMIN_INBOX,
+    subject,
+    html,
+    replyTo: submission.email,
+  })
+}
+
+export async function sendIntakeLink(
+  submission: OnboardingSubmission,
+  intakeUrl: string
+): Promise<SendResult> {
+  const { subject, html } = intakeFormLinkEmail({
+    contactName: submission.contact_name || '',
+    businessName: submission.business_name,
+    intakeUrl,
+    plan: submission.plan,
+  })
+  return send({ to: submission.email, subject, html })
+}
+
+export async function sendIntakeComplete(
+  submission: OnboardingSubmission,
+  paymentUrl: string
+): Promise<SendResult> {
+  const { subject, html } = intakeCompleteEmail({
+    contactName: submission.contact_name || '',
+    businessName: submission.business_name,
+    paymentUrl,
+  })
+  return send({ to: submission.email, subject, html })
+}
+
+export async function sendPaymentReceipt(
+  submission: OnboardingSubmission
+): Promise<SendResult> {
+  const amountUsd =
+    submission.amount_cents && submission.amount_cents > 0
+      ? Math.round(submission.amount_cents / 100)
+      : null
+  const { subject, html } = paymentReceiptEmail({
+    contactName: submission.contact_name || '',
+    businessName: submission.business_name,
+    amountUsd,
+    plan: submission.plan,
+  })
+  return send({ to: submission.email, subject, html })
+}
+
+export async function sendSiteLive(
+  submission: OnboardingSubmission
+): Promise<SendResult> {
+  if (
+    !submission.client_preview_url ||
+    !submission.client_admin_email ||
+    !submission.client_admin_password
+  ) {
+    return {
+      success: false,
+      error: 'Submission missing client_preview_url / admin credentials',
+    }
+  }
+  const { subject, html } = siteLiveEmail({
+    contactName: submission.contact_name || '',
+    businessName: submission.business_name,
+    previewUrl: submission.client_preview_url,
+    adminUrl: `${submission.client_preview_url}/admin`,
+    adminEmail: submission.client_admin_email,
+    adminPassword: submission.client_admin_password,
+  })
+  return send({ to: submission.email, subject, html })
+}
+
+// ═════════════════════════════════════════════
+// LEGACY API — preserved so existing callers
+// (provision/webhook/approve/send-checkout-link routes)
+// keep working unchanged. Internally rebranded via templates.
+// ═════════════════════════════════════════════
 
 export async function sendPreviewReadyEmail(data: {
   email: string
@@ -10,30 +187,21 @@ export async function sendPreviewReadyEmail(data: {
   adminEmail: string
   adminPassword: string
   submissionId: string
+  contactName?: string
 }) {
-  await resend.emails.send({
-    from,
+  const { subject, html } = siteLiveEmail({
+    contactName: data.contactName || '',
+    businessName: data.businessName,
+    previewUrl: data.previewUrl,
+    adminUrl: `${data.previewUrl}/admin`,
+    adminEmail: data.adminEmail,
+    adminPassword: data.adminPassword,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
     to: data.email,
-    subject: `Your ${data.businessName} website preview is ready!`,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#2563EB">Your website is ready to preview!</h1>
-        <p>Hi there,</p>
-        <p>Your <strong>${data.businessName}</strong> website has been built and is ready for your review.</p>
-        <a href="${data.previewUrl}"
-           style="display:inline-block;background:linear-gradient(135deg,#2563EB,#7C3AED);color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0">
-          View Your Website Preview
-        </a>
-        <p>Once you approve it, your site goes live instantly.</p>
-        <h3>Your Admin Panel Login:</h3>
-        <p>URL: ${data.previewUrl}/admin<br>
-           Email: ${data.adminEmail}<br>
-           Password: ${data.adminPassword}</p>
-        <p style="color:#888;font-size:12px">
-          Waji Professional Websites — Custom websites for local businesses
-        </p>
-      </div>
-    `,
+    subject,
+    html,
   })
 }
 
@@ -42,26 +210,46 @@ export async function sendSiteLiveEmail(data: {
   businessName: string
   liveUrl: string
   adminUrl: string
+  adminEmail?: string
+  adminPassword?: string
+  contactName?: string
 }) {
-  await resend.emails.send({
-    from,
+  // Legacy "site live" — used at handleGoLive. We don't always have admin
+  // credentials here (post-launch confirmation), so fall back to a focused
+  // "your site is live" message reusing the siteLiveEmail template when we
+  // do, otherwise a lightweight version via intakeCompleteEmail-style copy.
+  if (data.adminEmail && data.adminPassword) {
+    const { subject, html } = siteLiveEmail({
+      contactName: data.contactName || '',
+      businessName: data.businessName,
+      previewUrl: data.liveUrl,
+      adminUrl: data.adminUrl,
+      adminEmail: data.adminEmail,
+      adminPassword: data.adminPassword,
+    })
+    await getResend().emails.send({
+      from: fromAddress(),
+      to: data.email,
+      subject,
+      html,
+    })
+    return
+  }
+
+  // Fallback: just a "live" announcement without re-sending credentials.
+  const { subject, html } = siteLiveEmail({
+    contactName: data.contactName || '',
+    businessName: data.businessName,
+    previewUrl: data.liveUrl,
+    adminUrl: data.adminUrl,
+    adminEmail: 'See previous email',
+    adminPassword: 'See previous email',
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
     to: data.email,
-    subject: `${data.businessName} is now LIVE!`,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#16a34a">Your website is LIVE!</h1>
-        <p>Congratulations! <strong>${data.businessName}</strong> is now live on the internet.</p>
-        <a href="${data.liveUrl}"
-           style="display:inline-block;background:#16a34a;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0">
-          Visit Your Live Website
-        </a>
-        <p>Manage your site anytime from your <a href="${data.adminUrl}">admin panel</a>.</p>
-        <p>We are monitoring your site 24/7. If anything ever goes wrong, we will fix it immediately.</p>
-        <p style="color:#888;font-size:12px">
-          Waji Professional Websites — Custom websites for local businesses
-        </p>
-      </div>
-    `,
+    subject: `🚀 ${data.businessName} is now LIVE!`,
+    html,
   })
 }
 
@@ -71,17 +259,26 @@ export async function sendYouNewClientEmail(data: {
   plan: string
   revenue: string
 }) {
-  await resend.emails.send({
-    from,
-    to: 'arsitechgroup@gmail.com',
-    subject: `New client: ${data.businessName} (${data.plan})`,
-    html: `
-      <h2>New Cimaa Sites client!</h2>
-      <p>Business: ${data.businessName}</p>
-      <p>Email: ${data.email}</p>
-      <p>Plan: ${data.plan}</p>
-      <p>Revenue: ${data.revenue}/mo</p>
-    `,
+  // Internal operational alert. Branded with the same shell.
+  const { buildEmail } = await import('./email-templates')
+  const html = buildEmail({
+    preheader: `${data.businessName} · ${data.plan} · ${data.revenue}/mo`,
+    title: `New client: ${data.businessName}`,
+    intro: `${data.businessName} just signed up on the <strong>${data.plan}</strong> plan.`,
+    bodyHtml: `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fafaf7;border:1px solid #e7e5e4;border-radius:10px;">
+  <tr><td style="padding:14px 18px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:#18181b;line-height:1.7;">
+    <strong>Email:</strong> ${data.email}<br/>
+    <strong>Plan:</strong> ${data.plan}<br/>
+    <strong>Revenue:</strong> ${data.revenue}/mo
+  </td></tr>
+</table>`,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
+    to: ADMIN_INBOX,
+    subject: `New Waji client: ${data.businessName} (${data.plan})`,
+    html,
   })
 }
 
@@ -90,22 +287,15 @@ export async function sendContactAutoReply(data: {
   contactName: string
   businessName: string
 }) {
-  await resend.emails.send({
-    from,
+  const { subject, html } = contactReceivedEmail({
+    contactName: data.contactName,
+    businessName: data.businessName,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
     to: data.email,
-    subject: 'Thanks for reaching out — Waji Professional Websites',
-    text: `Hi ${data.contactName}, thanks for telling us about ${data.businessName}. We'll review your info and get back to you within 24 hours with next steps.\n\n— The Waji team`,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#2563EB">Thanks for reaching out!</h1>
-        <p>Hi ${data.contactName},</p>
-        <p>Thanks for telling us about <strong>${data.businessName}</strong>. We'll review your info and get back to you within 24 hours with next steps.</p>
-        <p>— The Waji team</p>
-        <p style="color:#888;font-size:12px">
-          Waji Professional Websites — Custom websites for local businesses
-        </p>
-      </div>
-    `,
+    subject,
+    html,
   })
 }
 
@@ -114,25 +304,19 @@ export async function sendPaymentReceivedEmail(data: {
   contactName: string
   businessName: string
   plan: string
+  amountUsd?: number | null
 }) {
-  await resend.emails.send({
-    from,
+  const { subject, html } = paymentReceiptEmail({
+    contactName: data.contactName,
+    businessName: data.businessName,
+    amountUsd: data.amountUsd ?? null,
+    plan: data.plan,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
     to: data.email,
-    subject: `Payment received — building your site now (${data.businessName})`,
-    text: `Hi ${data.contactName},\n\nWe just received your payment for ${data.businessName} — thank you! Your site is being built right now.\n\nMost sites are ready to preview within 5-10 minutes. We'll email you the moment your preview link is ready, along with your admin login so you can start customizing it. (No further action needed from you right now.)\n\nIf you have any questions or want to add details we should include, just reply to this email — we'll see it before your site goes live.\n\n— The Waji team`,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#16a34a">Payment received — we're building your site!</h1>
-        <p>Hi ${data.contactName},</p>
-        <p>We just received your payment for <strong>${data.businessName}</strong> — thank you! Your site is being built right now.</p>
-        <p>Most sites are ready to preview within 5-10 minutes. We'll email you the moment your preview link is ready, along with your admin login so you can start customizing it. (No further action needed from you right now.)</p>
-        <p>If you have any questions or want to add details we should include, just reply to this email — we'll see it before your site goes live.</p>
-        <p>— The Waji team</p>
-        <p style="color:#888;font-size:12px">
-          Waji Professional Websites — Custom websites for local businesses
-        </p>
-      </div>
-    `,
+    subject,
+    html,
   })
 }
 
@@ -143,33 +327,16 @@ export async function sendCheckoutLinkEmail(data: {
   plan: string
   checkoutUrl: string
 }) {
-  await resend.emails.send({
-    from,
+  const { subject, html } = intakeCompleteEmail({
+    contactName: data.contactName,
+    businessName: data.businessName,
+    paymentUrl: data.checkoutUrl,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
     to: data.email,
-    subject: `Your Waji Professional Websites checkout link — ${data.businessName}`,
-    text: `Hi ${data.contactName},\n\nWe've reviewed your request to build a ${data.plan} site for ${data.businessName} and we're ready to get started. Click the link below to complete your checkout — once paid, your site will be built and live within 24 hours.\n\n${data.checkoutUrl}\n\nHave a question? Reply to this email and we'll get back to you within a few hours.\n\n— The Waji team`,
-    html: `
-      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-        <h1 style="color:#2563EB">You're approved — let's get you live!</h1>
-        <p>Hi ${data.contactName},</p>
-        <p>We've reviewed your request to build a <strong>${data.plan}</strong> site for <strong>${data.businessName}</strong> and we're ready to get started. Click below to complete your checkout — once paid, your site will be built and live within 24 hours.</p>
-        <p style="margin:24px 0">
-          <a href="${data.checkoutUrl}"
-             style="display:inline-block;background:linear-gradient(135deg,#2563EB,#7C3AED);color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold">
-            Complete Checkout
-          </a>
-        </p>
-        <p style="font-size:13px;color:#475569">
-          Or paste this link into your browser:<br>
-          <a href="${data.checkoutUrl}" style="color:#2563EB;word-break:break-all">${data.checkoutUrl}</a>
-        </p>
-        <p>Have a question? Reply to this email and we'll get back to you within a few hours.</p>
-        <p>— The Waji team</p>
-        <p style="color:#888;font-size:12px">
-          Waji Professional Websites — Custom websites for local businesses
-        </p>
-      </div>
-    `,
+    subject,
+    html,
   })
 }
 
@@ -180,20 +347,28 @@ export async function sendNewContactLeadEmail(data: {
   plan: string
   message: string
   submissionId: string
+  selectedLayout?: string | null
+  layoutNotes?: string | null
 }) {
-  const adminUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://cimaasites.ai'}/admin`
-  await resend.emails.send({
-    from,
-    to: 'arsitechgroup@gmail.com',
-    subject: `New Cimaa Sites lead: ${data.businessName}`,
-    html: `
-      <h2>New Cimaa Sites lead!</h2>
-      <p>Contact: ${data.contactName}</p>
-      <p>Email: ${data.email}</p>
-      <p>Business: ${data.businessName}</p>
-      <p>Plan: ${data.plan}</p>
-      <p>Message:<br>${data.message ? data.message.replace(/\n/g, '<br>') : '<em>(none)</em>'}</p>
-      <p>Review in <a href="${adminUrl}">admin</a> — submission ID: <code>${data.submissionId}</code></p>
-    `,
+  const adminSubmission: AdminAlertSubmission = {
+    id: data.submissionId,
+    contact_name: data.contactName,
+    email: data.email,
+    business_name: data.businessName,
+    plan: data.plan,
+    selected_layout: data.selectedLayout ?? null,
+    message: data.message,
+    layout_notes: data.layoutNotes ?? null,
+    created_at: new Date().toISOString(),
+  }
+  const { subject, html } = contactReceivedAdminAlert({
+    submission: adminSubmission,
+  })
+  await getResend().emails.send({
+    from: fromAddress(),
+    to: ADMIN_INBOX,
+    replyTo: data.email,
+    subject,
+    html,
   })
 }
