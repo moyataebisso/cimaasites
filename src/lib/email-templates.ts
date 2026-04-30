@@ -563,6 +563,38 @@ export function paymentReceiptEmail({
 }
 
 // ─────────────────────────────────────────────
+// 6b. Intake complete → admin alert
+// ─────────────────────────────────────────────
+
+export interface IntakeCompleteAdminAlertArgs {
+  submission: AdminAlertSubmission
+}
+
+export function intakeCompleteAdminAlertEmail({
+  submission,
+}: IntakeCompleteAdminAlertArgs) {
+  const subject = `🟡 Intake done — send payment link for ${submission.business_name}`
+  const html = buildEmail({
+    preheader: `${submission.business_name} finished the Step 2 intake form.`,
+    title: `Intake complete: ${escapeHtml(submission.business_name)}`,
+    intro: `Customer finished the Step 2 intake. Generate a Stripe checkout link and send it.`,
+    bodyHtml: infoTable([
+      { label: 'Contact', value: escapeHtml(submission.contact_name || '—') },
+      {
+        label: 'Email',
+        value: `<a href="mailto:${escapeHtml(submission.email)}" style="color:#15803d;text-decoration:underline;">${escapeHtml(submission.email)}</a>`,
+      },
+      { label: 'Business', value: escapeHtml(submission.business_name) },
+      { label: 'Plan', value: escapeHtml(submission.plan) },
+    ]),
+    ctaText: 'Send payment link',
+    ctaUrl: `${APP_URL}/admin`,
+    footerNote: `ID: ${submission.id}`,
+  })
+  return { subject, html }
+}
+
+// ─────────────────────────────────────────────
 // 6. Site live → customer
 // ─────────────────────────────────────────────
 

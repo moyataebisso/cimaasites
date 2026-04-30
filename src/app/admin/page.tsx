@@ -943,22 +943,18 @@ function SubmissionDetail({
   }
 
   const sendPaymentLink = async () => {
-    // intake_done → approve_for_payment with email
+    // intake_done → /api/admin/send-payment-link
     setError(null)
     setSuccess(null)
     setBusy('payment_link')
     try {
-      const res = await fetch('/api/onboard/approve', {
+      const res = await fetch('/api/admin/send-payment-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-password': adminPassword,
         },
-        body: JSON.stringify({
-          submissionId: submission.id,
-          mode: 'approve_for_payment',
-          sendEmail: true,
-        }),
+        body: JSON.stringify({ submission_id: submission.id }),
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
@@ -966,7 +962,7 @@ function SubmissionDetail({
       }
       setSuccess(
         data.emailError
-          ? `Checkout link generated. ${data.emailError}`
+          ? `Checkout link generated (${data.emailError}). Use Resend if needed.`
           : `Payment link sent to ${submission.email}.`
       )
       onChanged()

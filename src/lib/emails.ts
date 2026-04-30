@@ -4,6 +4,7 @@ import {
   contactReceivedAdminAlert,
   intakeFormLinkEmail,
   intakeCompleteEmail,
+  intakeCompleteAdminAlertEmail,
   paymentReceiptEmail,
   siteLiveEmail,
   type AdminAlertSubmission,
@@ -132,6 +133,26 @@ export async function sendIntakeComplete(
     paymentUrl,
   })
   return send({ to: submission.email, subject, html })
+}
+
+export async function sendIntakeCompleteAdminAlert(
+  submission: OnboardingSubmission
+): Promise<SendResult> {
+  const adminSubmission: AdminAlertSubmission = {
+    id: submission.id,
+    contact_name: submission.contact_name,
+    email: submission.email,
+    business_name: submission.business_name,
+    plan: submission.plan,
+    selected_layout: submission.selected_layout ?? null,
+    message: submission.business_description ?? null,
+    layout_notes: submission.layout_notes ?? null,
+    created_at: submission.created_at ?? null,
+  }
+  const { subject, html } = intakeCompleteAdminAlertEmail({
+    submission: adminSubmission,
+  })
+  return send({ to: ADMIN_INBOX, subject, html, replyTo: submission.email })
 }
 
 export async function sendPaymentReceipt(

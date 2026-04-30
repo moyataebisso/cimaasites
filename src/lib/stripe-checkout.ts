@@ -8,6 +8,8 @@ export interface CreateCheckoutInput {
   plan: CheckoutPlan
   email: string
   businessName: string
+  successUrl?: string
+  cancelUrl?: string
 }
 
 export interface CreateCheckoutResult {
@@ -27,8 +29,11 @@ export async function createCheckoutSession(
 ): Promise<CreateCheckoutResult> {
   const { submissionId, plan, email, businessName } = input
 
-  const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/building/${submissionId}?session_id={CHECKOUT_SESSION_ID}`
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/get-started?cancelled=true`
+  const successUrl =
+    input.successUrl ||
+    `${process.env.NEXT_PUBLIC_APP_URL}/building/${submissionId}?session_id={CHECKOUT_SESSION_ID}`
+  const cancelUrl =
+    input.cancelUrl || `${process.env.NEXT_PUBLIC_APP_URL}/get-started?cancelled=true`
 
   let session
 
