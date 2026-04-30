@@ -310,58 +310,54 @@ function ContactPageInner() {
                     </div>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-cimaa-text mb-2">
-                        Business name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        ref={businessRef}
-                        type="text"
-                        value={businessName}
-                        onChange={(e) => {
-                          setBusinessName(e.target.value);
-                          updateField("businessName", e.target.value);
-                        }}
-                        onBlur={(e) =>
-                          handleBlur("businessName", e.target.value)
-                        }
-                        className={
-                          errors.businessName ? inputErrorClass : inputClass
-                        }
-                        placeholder="Your business name"
-                        aria-invalid={Boolean(errors.businessName)}
-                      />
-                      {errors.businessName && (
-                        <p className="mt-1 text-xs text-red-600">
-                          {errors.businessName}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-cimaa-text mb-2">
-                        Phone <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        ref={phoneRef}
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => {
-                          setPhone(e.target.value);
-                          updateField("phone", e.target.value);
-                        }}
-                        onBlur={(e) => handleBlur("phone", e.target.value)}
-                        className={errors.phone ? inputErrorClass : inputClass}
-                        placeholder="(555) 123-4567"
-                        inputMode="tel"
-                        aria-invalid={Boolean(errors.phone)}
-                      />
-                      {errors.phone && (
-                        <p className="mt-1 text-xs text-red-600">
-                          {errors.phone}
-                        </p>
-                      )}
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-cimaa-text mb-2">
+                      Phone <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      ref={phoneRef}
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        updateField("phone", e.target.value);
+                      }}
+                      onBlur={(e) => handleBlur("phone", e.target.value)}
+                      className={errors.phone ? inputErrorClass : inputClass}
+                      placeholder="(612) 555-0100"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      aria-invalid={Boolean(errors.phone)}
+                    />
+                    {errors.phone && (
+                      <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-cimaa-text mb-2">
+                      Business name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      ref={businessRef}
+                      type="text"
+                      value={businessName}
+                      onChange={(e) => {
+                        setBusinessName(e.target.value);
+                        updateField("businessName", e.target.value);
+                      }}
+                      onBlur={(e) => handleBlur("businessName", e.target.value)}
+                      className={
+                        errors.businessName ? inputErrorClass : inputClass
+                      }
+                      placeholder="Your business name"
+                      aria-invalid={Boolean(errors.businessName)}
+                    />
+                    {errors.businessName && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors.businessName}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -382,7 +378,7 @@ function ContactPageInner() {
 
                   <div>
                     <label className="block text-sm font-medium text-cimaa-text mb-2">
-                      Anything we should know?{" "}
+                      Tell us about your business{" "}
                       <span className="text-cimaa-text-subtle">(optional)</span>
                     </label>
                     <textarea
