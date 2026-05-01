@@ -19,7 +19,10 @@ type SubmissionRow = any
 export async function POST(request: NextRequest) {
   const { submissionId } = await request.json()
 
+  console.log('[provision] entry', { submissionId })
+
   if (!submissionId) {
+    console.warn('[provision] missing submissionId in request body')
     return Response.json({ error: 'submissionId required' }, { status: 400 })
   }
 
@@ -44,29 +47,53 @@ export async function POST(request: NextRequest) {
     .select('*')
     .maybeSingle()
 
+  console.log('[provision] claim result', {
+    submissionId,
+    claimed: !!claim,
+    claimErr: claimErr?.message ?? null,
+    rowId: claim?.id ?? null,
+    businessName: claim?.business_name ?? null,
+  })
+
   if (claimErr) {
     console.error('[provision] claim error', { submissionId, error: claimErr })
     return Response.json({ error: 'claim failed' }, { status: 500 })
   }
 
   if (!claim) {
-    // Either the submission doesn't exist, is already in progress, or already provisioned.
     console.log('[provision] already claimed or provisioned, skipping', {
       submissionId,
     })
     return Response.json({ success: true, skipped: true })
   }
 
-  // We won the claim. Run provisioning in the background; respond fast.
-  provisionSite(submissionId, claim).catch(async (error: Error) => {
-    console.error('[provision] error', { submissionId, error: error.message })
+  console.log('[provision] proceeding with provisioning', {
+    submissionId,
+    id: claim.id,
+    business_name: claim.business_name,
+    plan: claim.plan,
+  })
+
+  // ─── Run provisioning INLINE ──────────────────────────────
+  // Vercel terminates fire-and-forget promises when the function response
+  // is sent — the previous .catch() pattern silently killed the pipeline
+  // mid-execution after the claim UPDATE returned. With maxDuration=800
+  // we have ~13 min, and the caller (webhook) already fire-and-forgets
+  // its POST to us, so blocking here doesn't hold the webhook open.
+  try {
+    const result = await provisionSite(submissionId, claim)
+    console.log('[provision] complete', { submissionId, ...result })
+    return Response.json({ success: true, ...result })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[provision] error', { submissionId, error: message })
 
     await logStep(
       submissionId,
       'provision_failed',
       'failed',
       'An error occurred during provisioning',
-      error.message
+      message
     ).catch(console.error)
 
     // Release the claim so a manual retry can pick it up. Clear
@@ -77,7 +104,7 @@ export async function POST(request: NextRequest) {
         .from('onboarding_submissions')
         .update({
           status: 'failed',
-          error_message: error.message,
+          error_message: message,
           provisioning_started_at: null,
         })
         .eq('id', submissionId)
@@ -89,14 +116,11 @@ export async function POST(request: NextRequest) {
       businessName: 'PROVISIONING FAILED',
       email: submissionId,
       plan: 'ERROR',
-      revenue: error.message,
+      revenue: message,
     }).catch(console.error)
-  })
 
-  return new Response(
-    JSON.stringify({ message: 'Provisioning started' }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } }
-  )
+    return Response.json({ success: false, error: message }, { status: 500 })
+  }
 }
 
 // ─── Provisioning pipeline ───────────────────────────────────
@@ -106,8 +130,9 @@ export async function POST(request: NextRequest) {
 async function provisionSite(
   submissionId: string,
   submission: SubmissionRow
-) {
+): Promise<{ previewUrl: string; schemaName: string }> {
   const slug = generateSlug(submission.business_name)
+  console.log('[provision] step: schema creation', { submissionId, slug })
 
   // ─── 0: Per-customer Postgres schema ───
   let schemaName: string = submission.client_supabase_schema
@@ -133,6 +158,7 @@ async function provisionSite(
       'done',
       `Database ready (${schemaName})`
     )
+    console.log('[provision] schema created', { submissionId, schemaName })
   } else {
     await logStep(
       submissionId,
@@ -140,9 +166,11 @@ async function provisionSite(
       'done',
       `Reusing existing schema (${schemaName})`
     )
+    console.log('[provision] schema reused', { submissionId, schemaName })
   }
 
   // ─── A: Generate content with Claude AI ───
+  console.log('[provision] step: AI copy generation', { submissionId })
   let content: Awaited<ReturnType<typeof generateContent>>
   if (submission.generated_hero_headline) {
     content = {
@@ -159,6 +187,7 @@ async function provisionSite(
       'done',
       'Reusing existing copy'
     )
+    console.log('[provision] content reused from DB', { submissionId })
   } else {
     await logStep(
       submissionId,
@@ -188,9 +217,14 @@ async function provisionSite(
       'done',
       'Website copy generated'
     )
+    console.log('[provision] content generated', {
+      submissionId,
+      headlineLen: content.heroHeadline?.length ?? 0,
+    })
   }
 
   // ─── B: Vercel project ───
+  console.log('[provision] step: vercel project creation', { submissionId })
   let vercelProjectId: string = submission.client_vercel_project_id
   let previewUrl: string = submission.client_preview_url
   let assignedSubdomain: string = submission.assigned_subdomain
@@ -227,6 +261,11 @@ async function provisionSite(
       'done',
       'Website deployed successfully'
     )
+    console.log('[provision] vercel project created', {
+      submissionId,
+      vercelProjectId,
+      previewUrl,
+    })
   } else {
     await logStep(
       submissionId,
@@ -234,9 +273,15 @@ async function provisionSite(
       'done',
       'Reusing existing Vercel project'
     )
+    console.log('[provision] vercel project reused', {
+      submissionId,
+      vercelProjectId,
+      previewUrl,
+    })
   }
 
   // ─── C: Seed database (admin user + content) ───
+  console.log('[provision] step: seed database', { submissionId })
   let adminEmail: string = submission.client_admin_email
   let adminPassword: string = submission.client_admin_password
 
@@ -267,6 +312,7 @@ async function provisionSite(
       'done',
       'Business information configured'
     )
+    console.log('[provision] database seeded', { submissionId, adminEmail })
   } else {
     await logStep(
       submissionId,
@@ -274,9 +320,14 @@ async function provisionSite(
       'done',
       'Reusing existing admin credentials'
     )
+    console.log('[provision] admin creds reused', { submissionId, adminEmail })
   }
 
   // ─── D: Welcome email (idempotent — guarded by welcome_email_sent_at) ───
+  console.log('[provision] step: welcome email', {
+    submissionId,
+    alreadySent: !!submission.welcome_email_sent_at,
+  })
   if (!submission.welcome_email_sent_at) {
     await logStep(
       submissionId,
@@ -318,6 +369,10 @@ async function provisionSite(
       'done',
       'Preview email sent!'
     )
+    console.log('[provision] welcome emails sent', {
+      submissionId,
+      to: submission.email,
+    })
   } else {
     await logStep(
       submissionId,
@@ -325,6 +380,9 @@ async function provisionSite(
       'done',
       'Preview email already sent — skipping duplicate'
     )
+    console.log('[provision] welcome email skipped (already sent)', {
+      submissionId,
+    })
   }
 
   // ─── E: Mark complete ───
@@ -346,4 +404,6 @@ async function provisionSite(
     'done',
     'Your website is ready to preview!'
   )
+
+  return { previewUrl, schemaName }
 }
