@@ -1,6 +1,41 @@
 import * as https from 'https'
 
 const TEMPLATE_REPO = 'moyataebisso/arsi-platform'
+const TEMPLATE_BRANCH = 'main'
+
+// Vercel's /v13/deployments requires gitSource.repoId as the NUMERIC GitHub
+// repo ID. /v9/projects accepts the string `repo` path, so we only need to
+// resolve the numeric id at deployment trigger time.
+async function getGitHubRepoId(repo: string): Promise<number> {
+  const ghToken = process.env.GITHUB_TOKEN
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  }
+  if (ghToken) {
+    headers['Authorization'] = `Bearer ${ghToken}`
+  }
+
+  const res = await fetch(`https://api.github.com/repos/${repo}`, { headers })
+
+  if (res.status === 404) {
+    console.error(
+      '[provision] github repo not found — may be private (set GITHUB_TOKEN with `repo` scope) or repo path wrong',
+      { repo, hadToken: !!ghToken }
+    )
+  }
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(
+      `GitHub API error (${res.status} fetching ${repo}): ${body}`
+    )
+  }
+
+  const data = (await res.json()) as { id: number }
+  console.log('[provision] resolved github repo id', { repo, id: data.id })
+  return data.id
+}
 
 function getToken() {
   return process.env.VERCEL_API_TOKEN!
@@ -107,18 +142,18 @@ export async function createClientVercelProject(
 
   await vercelAPI('POST', `/v10/projects/${projectId}/env`, envVars)
 
+  // Resolve numeric GitHub repo ID — /v13/deployments rejects the string path.
+  const repoIdNumeric = await getGitHubRepoId(TEMPLATE_REPO)
+
   // 3. Trigger deployment
-  // gitSource.repoId expects a NUMERIC GitHub repo ID, not a string path.
-  // Use `repo` (string path) — Vercel resolves it against the project's Git
-  // link from step 1. `target: 'production'` publishes to prod environment.
   const deployBody = {
     name: projectName,
     project: projectId,
     target: 'production',
     gitSource: {
       type: 'github',
-      ref: 'main',
-      repo: TEMPLATE_REPO,
+      ref: TEMPLATE_BRANCH,
+      repoId: repoIdNumeric,
     },
   }
   console.log('[provision] vercel deploy request', {

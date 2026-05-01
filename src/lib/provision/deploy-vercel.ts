@@ -2,11 +2,53 @@ import { generateSlug } from './slug'
 
 const VERCEL_API = 'https://api.vercel.com'
 
+// Single source of truth for the starter-app repo we deploy from.
+const TEMPLATE_REPO = 'moyataebisso/arsi-platform'
+const TEMPLATE_BRANCH = 'main'
+
 function getHeaders() {
   return {
     Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
     'Content-Type': 'application/json',
   }
+}
+
+// Vercel's /v13/deployments endpoint requires gitSource.repoId to be the
+// NUMERIC GitHub repo ID — string path is rejected with "missing required
+// property `repoId`". /v9/projects accepts the string `repo` field, so we
+// only need the numeric id at deployment trigger time.
+//
+// Public repos work without a token (60 req/hr per IP). If GITHUB_TOKEN is
+// set, the limit jumps to 5000/hr and it covers private repos.
+async function getGitHubRepoId(repo: string): Promise<number> {
+  const ghToken = process.env.GITHUB_TOKEN
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  }
+  if (ghToken) {
+    headers['Authorization'] = `Bearer ${ghToken}`
+  }
+
+  const res = await fetch(`https://api.github.com/repos/${repo}`, { headers })
+
+  if (res.status === 404) {
+    console.error(
+      '[provision] github repo not found — may be private (set GITHUB_TOKEN with `repo` scope) or repo path wrong',
+      { repo, hadToken: !!ghToken }
+    )
+  }
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(
+      `GitHub API error (${res.status} fetching ${repo}): ${body}`
+    )
+  }
+
+  const data = (await res.json()) as { id: number }
+  console.log('[provision] resolved github repo id', { repo, id: data.id })
+  return data.id
 }
 
 // Build a Vercel API URL with the correct teamId scope. Pro/Team accounts
@@ -66,7 +108,7 @@ export async function createVercelProject(
       framework: 'nextjs',
       gitRepository: {
         type: 'github',
-        repo: 'moyataebisso/arsi-platform',
+        repo: TEMPLATE_REPO,
       },
       rootDirectory: 'apps/starter-app',
       buildCommand:
@@ -106,19 +148,18 @@ export async function createVercelProject(
     body: JSON.stringify(envVars),
   })
 
+  // Resolve numeric GitHub repo ID — /v13/deployments rejects the string path.
+  const repoIdNumeric = await getGitHubRepoId(TEMPLATE_REPO)
+
   // 3. Trigger deployment
-  // gitSource.repoId expects a NUMERIC GitHub repo ID, not the string path.
-  // Use `repo` (string path) instead — Vercel resolves it against the project's
-  // already-established Git link from step 1. Adding `target: 'production'`
-  // also tells Vercel to publish to the project's production environment.
   const deployBody = {
     name: projectName,
     project: project.id,
     target: 'production',
     gitSource: {
       type: 'github',
-      ref: 'main',
-      repo: 'moyataebisso/arsi-platform',
+      ref: TEMPLATE_BRANCH,
+      repoId: repoIdNumeric,
     },
   }
   console.log('[provision] vercel deploy request', {
