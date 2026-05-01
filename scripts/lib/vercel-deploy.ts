@@ -108,15 +108,25 @@ export async function createClientVercelProject(
   await vercelAPI('POST', `/v10/projects/${projectId}/env`, envVars)
 
   // 3. Trigger deployment
-  const deployment = await vercelAPI('POST', '/v13/deployments', {
+  // gitSource.repoId expects a NUMERIC GitHub repo ID, not a string path.
+  // Use `repo` (string path) — Vercel resolves it against the project's Git
+  // link from step 1. `target: 'production'` publishes to prod environment.
+  const deployBody = {
     name: projectName,
     project: projectId,
+    target: 'production',
     gitSource: {
       type: 'github',
       ref: 'main',
-      repoId: TEMPLATE_REPO,
+      repo: TEMPLATE_REPO,
     },
+  }
+  console.log('[provision] vercel deploy request', {
+    project: projectId,
+    gitSource: deployBody.gitSource,
+    target: deployBody.target,
   })
+  const deployment = await vercelAPI('POST', '/v13/deployments', deployBody)
 
   // 4. Poll until ready
   const deploymentUrl = await waitForDeployment(deployment.id)

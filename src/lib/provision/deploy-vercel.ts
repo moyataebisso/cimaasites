@@ -107,17 +107,28 @@ export async function createVercelProject(
   })
 
   // 3. Trigger deployment
+  // gitSource.repoId expects a NUMERIC GitHub repo ID, not the string path.
+  // Use `repo` (string path) instead — Vercel resolves it against the project's
+  // already-established Git link from step 1. Adding `target: 'production'`
+  // also tells Vercel to publish to the project's production environment.
+  const deployBody = {
+    name: projectName,
+    project: project.id,
+    target: 'production',
+    gitSource: {
+      type: 'github',
+      ref: 'main',
+      repo: 'moyataebisso/arsi-platform',
+    },
+  }
+  console.log('[provision] vercel deploy request', {
+    project: project.id,
+    gitSource: deployBody.gitSource,
+    target: deployBody.target,
+  })
   const deployment = await vercelFetch('/v13/deployments', {
     method: 'POST',
-    body: JSON.stringify({
-      name: projectName,
-      project: project.id,
-      gitSource: {
-        type: 'github',
-        ref: 'main',
-        repoId: 'moyataebisso/arsi-platform',
-      },
-    }),
+    body: JSON.stringify(deployBody),
   })
 
   // 4. Poll until deployment ready (max 10 min)
