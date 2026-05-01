@@ -1,5 +1,8 @@
 import { supabaseAdmin } from '@/lib/supabase'
 
+// Layout → default hero variant. Kept here so the AI/starter-app don't have
+// to know about layout-specific defaults — site_settings carries the resolved
+// variant string the starter-app reads on boot.
 const LAYOUT_DEFAULT_HERO: Record<string, string> = {
   fleet: 'solid_color',
   restaurant: 'image_overlay',
@@ -9,6 +12,7 @@ const LAYOUT_DEFAULT_HERO: Record<string, string> = {
   home_services: 'image_overlay',
 }
 
+// 12 chars, no ambiguous (0/O/1/l/I) so customers can re-type from email.
 function generatePassword(): string {
   const chars =
     'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
@@ -19,167 +23,164 @@ function generatePassword(): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Submission = any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GeneratedContent = any
+
 export async function seedClientDatabase(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  submission: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content: any,
+  submission: Submission,
+  content: GeneratedContent,
   schemaName: string
 ) {
-  const layoutId: string = submission.selected_layout || 'fleet'
+  console.log('[seed] start', { schemaName, submissionId: submission.id })
+
+  const db = supabaseAdmin.schema(schemaName)
+
+  const layoutId: string = submission.selected_layout || 'restaurant'
   const heroVariant: string =
     LAYOUT_DEFAULT_HERO[layoutId] || LAYOUT_DEFAULT_HERO.fleet
 
-  const settingsToSeed = [
-    {
-      key: 'business_name',
-      value: submission.business_name,
-      value_json: submission.business_name,
-    },
-    {
-      key: 'business_type',
-      value: submission.business_type,
-      value_json: submission.business_type,
-    },
-    {
-      key: 'phone',
-      value: submission.phone || '',
-      value_json: submission.phone || '',
-    },
-    {
-      key: 'email',
-      value: submission.email,
-      value_json: submission.email,
-    },
-    {
-      key: 'address',
-      value: `${submission.address || ''} ${submission.city || ''} ${submission.state || ''}`.trim(),
-      value_json: `${submission.address || ''} ${submission.city || ''} ${submission.state || ''}`.trim(),
-    },
-    {
-      key: 'active_layout',
-      value: layoutId,
-      value_json: layoutId,
-    },
-    {
-      key: 'active_theme',
-      value: submission.selected_theme || 'warm',
-      value_json: submission.selected_theme || 'warm',
-    },
-    {
-      key: 'active_hero_variant',
-      value: heroVariant,
-      value_json: heroVariant,
-    },
-    {
-      key: 'hero_headline',
-      value: content.heroHeadline,
-      value_json: content.heroHeadline,
-    },
-    {
-      key: 'hero_subheading',
-      value: content.heroSubheading,
-      value_json: content.heroSubheading,
-    },
-    {
-      key: 'about_text',
-      value: content.aboutText,
-      value_json: content.aboutText,
-    },
+  // ─── 1. site_settings ───────────────────────────────────
+  // public.site_settings columns: key (text PK), value (jsonb).
+  // supabase-js serializes strings/objects/arrays to JSON correctly when
+  // the column is jsonb, so we just hand it native values.
+  const settings: { key: string; value: unknown }[] = [
+    { key: 'business_name', value: submission.business_name || '' },
     {
       key: 'tagline',
-      value: submission.tagline || content.heroSubheading,
-      value_json: submission.tagline || content.heroSubheading,
+      value: submission.tagline || content?.heroSubheading || '',
     },
     {
-      key: 'hours',
-      value: JSON.stringify(submission.hours || {}),
-      value_json: submission.hours || {},
+      key: 'business_description',
+      value: submission.business_description || content?.aboutText || '',
     },
+    { key: 'business_type', value: submission.business_type || '' },
+    { key: 'phone', value: submission.phone || '' },
+    { key: 'email', value: submission.email || '' },
+    { key: 'address', value: submission.address || '' },
+    { key: 'city', value: submission.city || '' },
+    { key: 'state', value: submission.state || '' },
+    { key: 'zip', value: submission.zip || '' },
+    { key: 'hours', value: submission.hours || {} },
+    { key: 'selected_layout', value: layoutId },
     {
-      key: 'color_primary',
-      value: submission.primary_color || '',
-      value_json: submission.primary_color || '',
+      key: 'selected_theme',
+      value: submission.selected_theme || 'warm',
     },
+    { key: 'active_hero_variant', value: heroVariant },
     {
-      key: 'logo_url',
-      value: submission.logo_url || '',
-      value_json: submission.logo_url || '',
+      key: 'primary_color',
+      value: submission.primary_color || '#facc15',
     },
-    {
-      key: 'meta_title',
-      value: content.metaTitle,
-      value_json: content.metaTitle,
-    },
-    {
-      key: 'meta_description',
-      value: content.metaDescription,
-      value_json: content.metaDescription,
-    },
-    {
-      key: 'social_links',
-      value: JSON.stringify(submission.social_links || {}),
-      value_json: submission.social_links || {},
-    },
+    { key: 'logo_url', value: submission.logo_url || '' },
+    { key: 'photo_urls', value: submission.photo_urls || [] },
+    { key: 'social_links', value: submission.social_links || {} },
+    { key: 'hero_headline', value: content?.heroHeadline || '' },
+    { key: 'hero_subheading', value: content?.heroSubheading || '' },
+    { key: 'about_text', value: content?.aboutText || '' },
+    { key: 'meta_title', value: content?.metaTitle || '' },
+    { key: 'meta_description', value: content?.metaDescription || '' },
   ]
 
-  for (const setting of settingsToSeed) {
-    await supabaseAdmin
-      .schema(schemaName)
+  console.log('[seed] inserting site_settings', { count: settings.length })
+  try {
+    const { error } = await db
       .from('site_settings')
-      .upsert(
-        {
-          key: setting.key,
-          value: setting.value,
-          value_json: setting.value_json,
-        },
-        { onConflict: 'key' }
-      )
+      .upsert(settings, { onConflict: 'key' })
+    if (error) throw error
+  } catch (err) {
+    console.error('[seed] site_settings upsert failed', { schemaName, err })
+    throw err
   }
 
-  // Seed services into booking_services
-  if (submission.services?.length > 0) {
-    for (const service of submission.services) {
-      if (!service.name) continue
+  // ─── 2. services ────────────────────────────────────────
+  // Prefer AI-generated services (richer copy) when available, fall back to
+  // raw submission services from the intake form.
+  type ServiceSrc = {
+    name?: string
+    title?: string
+    description?: string
+    summary?: string
+    price?: string | number
+    cost?: string | number
+  }
+  const generatedServices: ServiceSrc[] = Array.isArray(content?.services)
+    ? content.services
+    : []
+  const submittedServices: ServiceSrc[] = Array.isArray(submission.services)
+    ? submission.services
+    : []
+  const services: ServiceSrc[] =
+    generatedServices.length > 0 ? generatedServices : submittedServices
 
-      const matchedContent = content.services?.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (s: any) => s.name.toLowerCase() === service.name.toLowerCase()
-      )
+  console.log('[seed] inserting services', { count: services.length })
+  try {
+    for (let i = 0; i < services.length; i++) {
+      const svc = services[i]
+      const name = (svc.name || svc.title || `Service ${i + 1}`).trim()
+      if (!name) continue
 
-      await supabaseAdmin
-        .schema(schemaName)
-        .from('booking_services')
-        .insert({
-          name: service.name,
-          description:
-            matchedContent?.description || service.description || '',
-          duration_minutes: parseInt(service.duration) || 60,
-          price: 0,
-          active: true,
-        })
+      const { error } = await db.from('services').insert({
+        name,
+        description: (svc.description || svc.summary || '').toString(),
+        price: (svc.price ?? svc.cost ?? '').toString(),
+        sort_order: i,
+        is_active: true,
+      })
+      if (error) {
+        // Duplicate-name on retries is fine. Anything else surface up.
+        if (error.code === '23505') {
+          console.log('[seed] service already exists, skipping', { name })
+          continue
+        }
+        throw error
+      }
     }
+  } catch (err) {
+    console.error('[seed] services insert failed', { schemaName, err })
+    throw err
   }
 
-  // Create admin auth user for client
+  // ─── 3. admin auth user ─────────────────────────────────
+  console.log('[seed] creating admin user', { email: submission.email })
   const adminPassword = generatePassword()
 
-  const { data: authData, error: authError } =
-    await supabaseAdmin.auth.admin.createUser({
-      email: submission.email,
-      password: adminPassword,
-      user_metadata: { role: 'admin' },
-      email_confirm: true,
-    })
+  let adminUserId: string | undefined
+  try {
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email: submission.email,
+        password: adminPassword,
+        user_metadata: { role: 'admin', schema: schemaName },
+        email_confirm: true,
+      })
 
-  if (authError) {
-    console.error('Failed to create admin user:', authError)
-    // Don't throw — site can still work, client can reset password
+    if (authError) {
+      // If the user already exists from a previous attempt, this isn't fatal —
+      // they'll need to reset their password but the site still works.
+      console.error('[seed] auth.admin.createUser error (non-fatal)', {
+        message: authError.message,
+        status: authError.status,
+      })
+    } else {
+      adminUserId = authData?.user?.id
+    }
+  } catch (err) {
+    console.error('[seed] createUser threw', { err })
+    // Don't throw — site is still usable; client can reset password via email.
   }
+
+  console.log('[seed] complete', {
+    schemaName,
+    adminEmail: submission.email,
+    adminUserId,
+    settingsWritten: settings.length,
+    servicesWritten: services.length,
+  })
 
   return {
     adminEmail: submission.email,
     adminPassword,
-    adminUserId: authData?.user?.id,
+    adminUserId,
   }
 }
