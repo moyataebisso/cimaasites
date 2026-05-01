@@ -94,6 +94,11 @@ export async function seedClientDatabase(
   }
 
   // ─── 2. services ────────────────────────────────────────
+  // public.services columns (verified):
+  //   id (uuid PK), name (text NOT NULL), description (text), duration_min (int),
+  //   price (numeric), is_active (bool), max_capacity (int),
+  //   requires_prepayment (bool), created_at (timestamptz)
+  //
   // Prefer AI-generated services (richer copy) when available, fall back to
   // raw submission services from the intake form.
   type ServiceSrc = {
@@ -103,6 +108,7 @@ export async function seedClientDatabase(
     summary?: string
     price?: string | number
     cost?: string | number
+    duration?: number
   }
   const generatedServices: ServiceSrc[] = Array.isArray(content?.services)
     ? content.services
@@ -119,23 +125,48 @@ export async function seedClientDatabase(
     const name = (svc.name || svc.title || `Service ${i + 1}`).trim()
     if (!name) continue
 
-    // Match the actual public.services columns. `sort_order` does NOT exist
-    // on this table — including it produces PGRST204 schema-cache errors.
+    // Parse price to numeric. The column is `numeric`, NOT text — sending an
+    // empty string here used to produce "invalid input syntax for type numeric".
+    // Customer-entered prices are messy ("$15-25 per plate", "Custom quote",
+    // "Free"); anything that doesn't reduce to a positive number → null.
+    const rawPrice = svc.price ?? svc.cost
+    let priceNumeric: number | null = null
+    if (rawPrice != null && rawPrice !== '') {
+      const parsed =
+        typeof rawPrice === 'number'
+          ? rawPrice
+          : Number(String(rawPrice).replace(/[^0-9.]/g, ''))
+      priceNumeric = Number.isFinite(parsed) && parsed > 0 ? parsed : null
+    }
+
+    // If the customer typed a descriptive price ("$15-25 per plate", "Free",
+    // "Call for quote"), preserve it by appending to description so it's not
+    // silently lost. The customer can always tidy it via the admin UI.
+    const baseDescription = (svc.description || svc.summary || '').toString()
+    const rawPriceStr =
+      rawPrice != null ? String(rawPrice).trim() : ''
+    const isDescriptivePrice = rawPriceStr.length > 0 && priceNumeric === null
+    const finalDescription = isDescriptivePrice
+      ? `${baseDescription}\n\nPricing: ${rawPriceStr}`.trim()
+      : baseDescription
+
     try {
       const { error } = await db.from('services').insert({
         name,
-        description: (svc.description || svc.summary || '').toString(),
-        price: (svc.price ?? svc.cost ?? '').toString(),
+        description: finalDescription,
+        price: priceNumeric, // numeric or null
+        duration_min: typeof svc.duration === 'number' ? svc.duration : null,
         is_active: true,
       })
       if (error) throw error
+      console.log('[seed] service inserted', { name, priceNumeric })
     } catch (err) {
       const code = (err as { code?: string })?.code
       if (code === '23505') {
         // duplicate name on retry — silently skip
         console.log('[seed] skipping duplicate service', { name })
       } else {
-        console.error('[seed] services insert failed', { schemaName, name, err })
+        console.error('[seed] service insert failed', { schemaName, name, err })
         throw err
       }
     }
