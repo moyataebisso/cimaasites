@@ -12,6 +12,20 @@ const LAYOUT_DEFAULT_HERO: Record<string, string> = {
   home_services: 'image_overlay',
 }
 
+// Coerce arbitrary value into a text representation for the `value` column
+// of site_settings. The starter-app reads from value_json; `value` is a text
+// mirror kept for legacy tools that don't speak jsonb.
+function toText(v: unknown): string {
+  if (v === null || v === undefined) return ''
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  try {
+    return JSON.stringify(v)
+  } catch {
+    return ''
+  }
+}
+
 // 12 chars, no ambiguous (0/O/1/l/I) so customers can re-type from email.
 function generatePassword(): string {
   const chars =
@@ -41,9 +55,10 @@ export async function seedClientDatabase(
     LAYOUT_DEFAULT_HERO[layoutId] || LAYOUT_DEFAULT_HERO.fleet
 
   // ─── 1. site_settings ───────────────────────────────────
-  // public.site_settings columns: key (text PK), value (jsonb).
-  // supabase-js serializes strings/objects/arrays to JSON correctly when
-  // the column is jsonb, so we just hand it native values.
+  // public.site_settings has BOTH `value` (text) and `value_json` (jsonb).
+  // The starter-app reads from value_json — but we mirror to value (text)
+  // so legacy queries / older tooling don't see NULL. Native JS values
+  // (objects, arrays) only round-trip correctly through value_json.
   const settings: { key: string; value: unknown }[] = [
     { key: 'business_name', value: submission.business_name || '' },
     {
@@ -82,12 +97,21 @@ export async function seedClientDatabase(
     { key: 'meta_description', value: content?.metaDescription || '' },
   ]
 
-  console.log('[seed] inserting site_settings', { count: settings.length })
+  // Write both columns. `onConflict: 'key'` overwrites any prior partial
+  // garbage from earlier failed runs.
+  const upsertPayload = settings.map((s) => ({
+    key: s.key,
+    value: toText(s.value), // text mirror
+    value_json: s.value, // primary — what the starter-app reads
+  }))
+
+  console.log('[seed] inserting site_settings', { count: upsertPayload.length })
   try {
     const { error } = await db
       .from('site_settings')
-      .upsert(settings, { onConflict: 'key' })
+      .upsert(upsertPayload, { onConflict: 'key' })
     if (error) throw error
+    console.log('[seed] site_settings upsert ok', { count: upsertPayload.length })
   } catch (err) {
     console.error('[seed] site_settings upsert failed', { schemaName, err })
     throw err
