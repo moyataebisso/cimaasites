@@ -30,11 +30,12 @@ export async function POST(request: Request) {
       return new Response('No submissionId', { status: 400 })
     }
 
-    // Atomic claim: only the first delivery of a checkout.session.completed
-    // event for this submission flips the row to paid. Stripe retries the
-    // event for ~24h on non-2xx responses; subsequent deliveries (or operator
-    // re-sends from the dashboard) hit the .is('paid_at', null) filter and
-    // match zero rows, so we treat them as duplicates and short-circuit.
+    // Atomic payment claim. Stripe retries the event for ~24h on non-2xx
+    // responses, and operators can resend from the dashboard. The
+    // .is('paid_at', null) filter ensures the payment fields + receipt
+    // email only fire on the FIRST delivery. The provision trigger below
+    // runs unconditionally based on provisioned_at — so a duplicate event
+    // arriving before provisioning has run will still kick it off.
     const { data: paidRow, error: payErr } = await supabaseAdmin
       .schema('cimaasites')
       .from('onboarding_submissions')
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
       })
       .eq('id', submissionId)
       .is('paid_at', null)
-      .select('id')
+      .select('id, paid_at, provisioned_at')
       .maybeSingle()
 
     if (payErr) {
@@ -57,38 +58,67 @@ export async function POST(request: Request) {
       return new Response('OK (db error logged)', { status: 200 })
     }
 
-    if (!paidRow) {
+    // Resolve current provisioned_at — either from the claim (first time,
+    // freshly updated row) or by re-reading the row (duplicate event path).
+    let provisionedAt: string | null
+    const wasDuplicate = !paidRow
+
+    if (paidRow) {
+      // First-time delivery: log payment + send receipt.
+      provisionedAt = paidRow.provisioned_at
+
+      await supabaseAdmin
+        .schema('cimaasites')
+        .from('provisioning_logs')
+        .insert({
+          submission_id: submissionId,
+          step: 'payment_received',
+          status: 'done',
+          message: 'Payment confirmed by Stripe',
+          started_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+        })
+
+      sendPaymentReceiptInBackground(submissionId).catch((err) => {
+        console.error('[webhook] sendPaymentReceivedEmail error:', err)
+      })
+    } else {
+      // Duplicate event: don't re-update payment fields, don't re-send
+      // receipt. But we DO need to know if provisioning has happened so we
+      // can re-trigger if it never ran.
+      const { data: existing } = await supabaseAdmin
+        .schema('cimaasites')
+        .from('onboarding_submissions')
+        .select('paid_at, provisioned_at')
+        .eq('id', submissionId)
+        .maybeSingle()
+
+      provisionedAt = existing?.provisioned_at ?? null
+
       console.warn('[webhook] duplicate event for already-paid submission', {
         sessionId: session.id,
         submissionId,
+        originalPaidAt: existing?.paid_at ?? null,
+        provisionedAt,
       })
-      return new Response('OK (duplicate)', { status: 200 })
     }
 
-    await supabaseAdmin
-      .schema('cimaasites')
-      .from('provisioning_logs')
-      .insert({
-        submission_id: submissionId,
-        step: 'payment_received',
-        status: 'done',
-        message: 'Payment confirmed by Stripe',
-        started_at: new Date().toISOString(),
-        completed_at: new Date().toISOString(),
-      })
-
-    // Best-effort: notify customer that payment was received. Fire-and-forget
-    // so we don't delay the webhook response — Stripe times out around 10s.
-    sendPaymentReceiptInBackground(submissionId).catch((err) => {
-      console.error('[webhook] sendPaymentReceivedEmail error:', err)
-    })
-
-    // Trigger provisioning for setup/developer checkouts (not recurring invoices).
-    // Use a host-header fallback so this works even when NEXT_PUBLIC_APP_URL is
-    // missing in the deploy env (which silently broke this fetch in prod).
+    // ALWAYS evaluate the provision trigger based on provisioned_at, not on
+    // first-vs-duplicate. The provision route's own atomic claim guarantees
+    // only one run actually executes even if we trigger multiple times.
     const isSetup = checkoutType === 'setup' || checkoutType === 'developer'
 
-    if (isSetup) {
+    if (provisionedAt) {
+      console.log('[webhook] already provisioned, skipping provision trigger', {
+        submissionId,
+        provisionedAt,
+      })
+    } else if (!isSetup) {
+      console.log('[webhook] non-setup checkout — skipping provision trigger', {
+        submissionId,
+        checkoutType,
+      })
+    } else {
       const host = request.headers.get('host')
       const baseUrl =
         process.env.NEXT_PUBLIC_APP_URL ||
@@ -105,6 +135,7 @@ export async function POST(request: Request) {
           submissionId,
           checkoutType,
           provisionUrl,
+          wasDuplicate,
         })
 
         // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
