@@ -5,16 +5,28 @@ const TEMPLATE_REPO = 'moyataebisso/arsi-platform'
 function getToken() {
   return process.env.VERCEL_API_TOKEN!
 }
-function getAccountId() {
-  return process.env.VERCEL_ACCOUNT_ID!
+function getTeamId(): string | undefined {
+  // Prefer VERCEL_TEAM_ID; fall back to legacy VERCEL_ACCOUNT_ID.
+  return process.env.VERCEL_TEAM_ID || process.env.VERCEL_ACCOUNT_ID
+}
+
+function vercelPath(path: string): string {
+  // Pro/Team accounts return 401 without ?teamId. Append cleanly so paths
+  // that already carry query params still work.
+  const teamId = getTeamId()
+  if (!teamId) return path
+  const separator = path.includes('?') ? '&' : '?'
+  return `${path}${separator}teamId=${encodeURIComponent(teamId)}`
 }
 
 function vercelAPI(method: string, path: string, body?: unknown): Promise<any> {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify(body) : undefined
+    const fullPath = vercelPath(path)
+    console.log('[provision] vercel call', { url: `https://api.vercel.com${fullPath}`, method })
     const options = {
       hostname: 'api.vercel.com',
-      path: `${path}?teamId=${getAccountId()}`,
+      path: fullPath,
       method,
       headers: {
         Authorization: `Bearer ${getToken()}`,

@@ -9,10 +9,26 @@ function getHeaders() {
   }
 }
 
+// Build a Vercel API URL with the correct teamId scope. Pro/Team accounts
+// reject calls without ?teamId — we'd see 401 "Not authorized" otherwise.
+// Prefer VERCEL_TEAM_ID; fall back to legacy VERCEL_ACCOUNT_ID so a deploy
+// mid-rollout doesn't break.
+function vercelUrl(path: string, additionalParams?: Record<string, string>): string {
+  const url = new URL(`${VERCEL_API}${path}`)
+  const teamId = process.env.VERCEL_TEAM_ID || process.env.VERCEL_ACCOUNT_ID
+  if (teamId) {
+    url.searchParams.set('teamId', teamId)
+  }
+  for (const [k, v] of Object.entries(additionalParams || {})) {
+    url.searchParams.set(k, v)
+  }
+  return url.toString()
+}
+
 async function vercelFetch(path: string, options: RequestInit = {}) {
-  const teamId = process.env.VERCEL_ACCOUNT_ID
-  const separator = path.includes('?') ? '&' : '?'
-  const url = `${VERCEL_API}${path}${separator}teamId=${teamId}`
+  const url = vercelUrl(path)
+  const method = options.method || 'GET'
+  console.log('[provision] vercel call', { url, method })
 
   const res = await fetch(url, {
     ...options,
@@ -26,7 +42,7 @@ async function vercelFetch(path: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     throw new Error(
-      `Vercel API error: ${data.error?.message || JSON.stringify(data)}`
+      `Vercel API error (${res.status} on ${method} ${path}): ${data.error?.message || JSON.stringify(data)}`
     )
   }
 
