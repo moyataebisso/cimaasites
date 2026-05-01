@@ -114,31 +114,31 @@ export async function seedClientDatabase(
     generatedServices.length > 0 ? generatedServices : submittedServices
 
   console.log('[seed] inserting services', { count: services.length })
-  try {
-    for (let i = 0; i < services.length; i++) {
-      const svc = services[i]
-      const name = (svc.name || svc.title || `Service ${i + 1}`).trim()
-      if (!name) continue
+  for (let i = 0; i < services.length; i++) {
+    const svc = services[i]
+    const name = (svc.name || svc.title || `Service ${i + 1}`).trim()
+    if (!name) continue
 
+    // Match the actual public.services columns. `sort_order` does NOT exist
+    // on this table — including it produces PGRST204 schema-cache errors.
+    try {
       const { error } = await db.from('services').insert({
         name,
         description: (svc.description || svc.summary || '').toString(),
         price: (svc.price ?? svc.cost ?? '').toString(),
-        sort_order: i,
         is_active: true,
       })
-      if (error) {
-        // Duplicate-name on retries is fine. Anything else surface up.
-        if (error.code === '23505') {
-          console.log('[seed] service already exists, skipping', { name })
-          continue
-        }
-        throw error
+      if (error) throw error
+    } catch (err) {
+      const code = (err as { code?: string })?.code
+      if (code === '23505') {
+        // duplicate name on retry — silently skip
+        console.log('[seed] skipping duplicate service', { name })
+      } else {
+        console.error('[seed] services insert failed', { schemaName, name, err })
+        throw err
       }
     }
-  } catch (err) {
-    console.error('[seed] services insert failed', { schemaName, err })
-    throw err
   }
 
   // ─── 3. admin auth user ─────────────────────────────────

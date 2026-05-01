@@ -85,8 +85,17 @@ export async function POST(request: NextRequest) {
     console.log('[provision] complete', { submissionId, ...result })
     return Response.json({ success: true, ...result })
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error('[provision] error', { submissionId, error: message })
+    // String(err) on plain objects yields "[object Object]" — that's how
+    // "Revenue: [object Object]/mo" leaked into the failure alert email.
+    // Postgres error objects from supabase-js are { code, message, details, hint };
+    // pull message out explicitly, then fall back to JSON.
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null && 'message' in error
+          ? String((error as { message: unknown }).message)
+          : JSON.stringify(error)
+    console.error('[provision] error', { submissionId, error: message, raw: error })
 
     await logStep(
       submissionId,
