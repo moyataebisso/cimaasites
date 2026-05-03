@@ -23,7 +23,7 @@ interface Tier {
 
 const tiers: Tier[] = [
   {
-    name: "Starter",
+    name: "Basic",
     bestFor: "Solo owners and family-run shops",
     description:
       "Everything you need to look polished online and start collecting leads.",
@@ -39,9 +39,9 @@ const tiers: Tier[] = [
     name: "Pro",
     bestFor: "Multi-location and growing teams",
     description:
-      "Everything in Starter, plus tools to bring more customers back.",
+      "Everything in Basic, plus tools to bring more customers back.",
     features: [
-      "Everything in Starter",
+      "Everything in Basic",
       "Bookings, leads, and reviews dashboard",
       "Email follow-up automation",
       "Custom domain + branded email",
@@ -50,7 +50,7 @@ const tiers: Tier[] = [
     highlight: true,
   },
   {
-    name: "Custom",
+    name: "Developer",
     bestFor: "Anyone with specific needs",
     description:
       "Built around your workflow — integrations, custom flows, and your own data.",

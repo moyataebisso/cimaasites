@@ -68,7 +68,7 @@ function buildShell({ preheader, headerTitle, bodyHtml }: BuildArgs): string {
           <span style="color:${COLORS.textMuted}">Designed in Minneapolis, MN</span><br>
           <a href="${SITE_URL}/contact" style="color:${COLORS.text};text-decoration:underline">Get a Quote</a>
           &nbsp;·&nbsp;
-          <a href="${SITE_URL}/login" style="color:${COLORS.text};text-decoration:underline">Customer Login</a>
+          <a href="${SITE_URL}/admin" style="color:${COLORS.text};text-decoration:underline">Customer Login</a>
           &nbsp;·&nbsp;
           <a href="${SITE_URL}/contact" style="color:${COLORS.text};text-decoration:underline">Contact</a>
         </td></tr>
