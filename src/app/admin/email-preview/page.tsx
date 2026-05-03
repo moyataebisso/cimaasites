@@ -8,7 +8,7 @@ import {
   intakeCompleteEmail,
   paymentReceiptEmail,
   siteLiveEmail,
-} from '@/lib/email-templates'
+} from '@/lib/email-templates-v2'
 
 // Mock data shared across all templates
 const mock = {

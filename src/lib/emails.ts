@@ -8,7 +8,7 @@ import {
   paymentReceiptEmail,
   siteLiveEmail,
   type AdminAlertSubmission,
-} from './email-templates'
+} from './email-templates-v2'
 
 // ─────────────────────────────────────────────
 // Lazy Resend init — avoid touching env at import time
@@ -22,9 +22,15 @@ function getResend(): Resend {
   return resendInstance
 }
 
-const FROM_DEFAULT = 'noreply@cimaasites.ai'
+// Hardcoded per spec — Resend must have arsitechgroup.com domain verified
+// or every send will bounce. Keep the env override available as a kill
+// switch if we ever need to roll back to cimaasites.ai in a hurry.
+const FROM_DEFAULT = 'Waji Sites <noreply@arsitechgroup.com>'
+const REPLY_TO = 'support@arsitechgroup.com'
 function fromAddress(): string {
-  return `Waji Professional Websites <${process.env.RESEND_FROM_EMAIL || FROM_DEFAULT}>`
+  return process.env.RESEND_FROM_EMAIL
+    ? `Waji Sites <${process.env.RESEND_FROM_EMAIL}>`
+    : FROM_DEFAULT
 }
 
 const ADMIN_INBOX = 'arsitechgroup@gmail.com'
@@ -68,6 +74,7 @@ async function send(args: {
   to: string | string[]
   subject: string
   html: string
+  text?: string
   replyTo?: string
 }): Promise<SendResult> {
   try {
@@ -76,7 +83,11 @@ async function send(args: {
       to: args.to,
       subject: args.subject,
       html: args.html,
-      ...(args.replyTo ? { replyTo: args.replyTo } : {}),
+      // Plain-text fallback for clients that block HTML.
+      ...(args.text ? { text: args.text } : {}),
+      // Default replyTo to support inbox; callers can override (admin alerts
+      // override to the customer's email so admin can reply direct).
+      replyTo: args.replyTo || REPLY_TO,
     })
     return { success: true }
   } catch (err) {
@@ -93,11 +104,11 @@ async function send(args: {
 export async function sendContactReceivedConfirmation(
   submission: OnboardingSubmission
 ): Promise<SendResult> {
-  const { subject, html } = contactReceivedEmail({
+  const { subject, html, text } = contactReceivedEmail({
     contactName: submission.contact_name || '',
     businessName: submission.business_name,
   })
-  return send({ to: submission.email, subject, html })
+  return send({ to: submission.email, subject, html, text })
 }
 
 export async function sendContactAdminAlert(
@@ -114,11 +125,12 @@ export async function sendContactAdminAlert(
     layout_notes: submission.layout_notes ?? null,
     submitted_at: submission.submitted_at ?? null,
   }
-  const { subject, html } = contactReceivedAdminAlert({ submission: adminSubmission })
+  const { subject, html, text } = contactReceivedAdminAlert({ submission: adminSubmission })
   return send({
     to: ADMIN_INBOX,
     subject,
     html,
+    text,
     replyTo: submission.email,
   })
 }
@@ -127,25 +139,25 @@ export async function sendIntakeLink(
   submission: OnboardingSubmission,
   intakeUrl: string
 ): Promise<SendResult> {
-  const { subject, html } = intakeFormLinkEmail({
+  const { subject, html, text } = intakeFormLinkEmail({
     contactName: submission.contact_name || '',
     businessName: submission.business_name,
     intakeUrl,
     plan: submission.plan,
   })
-  return send({ to: submission.email, subject, html })
+  return send({ to: submission.email, subject, html, text })
 }
 
 export async function sendIntakeComplete(
   submission: OnboardingSubmission,
   paymentUrl: string
 ): Promise<SendResult> {
-  const { subject, html } = intakeCompleteEmail({
+  const { subject, html, text } = intakeCompleteEmail({
     contactName: submission.contact_name || '',
     businessName: submission.business_name,
     paymentUrl,
   })
-  return send({ to: submission.email, subject, html })
+  return send({ to: submission.email, subject, html, text })
 }
 
 export async function sendIntakeCompleteAdminAlert(
@@ -162,10 +174,16 @@ export async function sendIntakeCompleteAdminAlert(
     layout_notes: submission.layout_notes ?? null,
     submitted_at: submission.submitted_at ?? null,
   }
-  const { subject, html } = intakeCompleteAdminAlertEmail({
+  const { subject, html, text } = intakeCompleteAdminAlertEmail({
     submission: adminSubmission,
   })
-  return send({ to: ADMIN_INBOX, subject, html, replyTo: submission.email })
+  return send({
+    to: ADMIN_INBOX,
+    subject,
+    html,
+    text,
+    replyTo: submission.email,
+  })
 }
 
 export async function sendPaymentReceipt(
@@ -175,13 +193,13 @@ export async function sendPaymentReceipt(
     submission.amount_cents && submission.amount_cents > 0
       ? Math.round(submission.amount_cents / 100)
       : null
-  const { subject, html } = paymentReceiptEmail({
+  const { subject, html, text } = paymentReceiptEmail({
     contactName: submission.contact_name || '',
     businessName: submission.business_name,
     amountUsd,
     plan: submission.plan,
   })
-  return send({ to: submission.email, subject, html })
+  return send({ to: submission.email, subject, html, text })
 }
 
 export async function sendSiteLive(
@@ -197,7 +215,7 @@ export async function sendSiteLive(
       error: 'Submission missing client_preview_url / admin credentials',
     }
   }
-  const { subject, html } = siteLiveEmail({
+  const { subject, html, text } = siteLiveEmail({
     contactName: submission.contact_name || '',
     businessName: submission.business_name,
     previewUrl: submission.client_preview_url,
@@ -205,7 +223,7 @@ export async function sendSiteLive(
     adminEmail: submission.client_admin_email,
     adminPassword: submission.client_admin_password,
   })
-  return send({ to: submission.email, subject, html })
+  return send({ to: submission.email, subject, html, text })
 }
 
 // ═════════════════════════════════════════════
@@ -294,7 +312,7 @@ export async function sendYouNewClientEmail(data: {
   revenue: string
 }) {
   // Internal operational alert. Branded with the same shell.
-  const { buildEmail } = await import('./email-templates')
+  const { buildEmail } = await import('./email-templates-v2')
   const html = buildEmail({
     preheader: `${data.businessName} · ${data.plan} · ${data.revenue}/mo`,
     title: `New client: ${data.businessName}`,
