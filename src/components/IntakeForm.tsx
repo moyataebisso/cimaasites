@@ -30,24 +30,65 @@ interface ServiceItem {
   price: string
 }
 
+// Layout-specific blocks (stored on submission as discrete columns + intake_data)
+interface RestaurantData {
+  cuisine_type: string
+  cuisine_type_other: string
+  dietary_options: string[]
+  reservations: '' | 'yes' | 'no' | 'not_yet'
+  takeout: '' | 'yes' | 'no'
+  delivery: '' | 'yes' | 'third_party' | 'no'
+  seating_capacity: string // string in form, parsed on submit
+  atmosphere: string[]
+}
+
+interface SalonData {
+  salon_services: string[]
+  booking_required: '' | 'yes' | 'walk_ins' | 'both'
+  staff_count: string
+  products_sold: '' | 'yes' | 'no'
+  specializations: string
+}
+
+interface AutoData {
+  auto_services: string[]
+  makes_models: string
+  certifications: string
+  warranty: '' | 'yes' | 'no' | 'details_below'
+  loaner_vehicles: '' | 'yes' | 'no'
+}
+
+interface GeneralData {
+  service_area_radius: string
+  certifications: string
+}
+
 export interface IntakeData {
-  // Section 1
+  // Section 1 — About
   tagline: string
   business_description: string
   business_type: string
-  // Section 2
+  // Section 2 — Story
+  business_story: string
+  years_in_business: string
+  // Section 3 — Reach
   address: string
   city: string
   state: string
   zip: string
   hours: Record<string, DayHours>
-  // Section 3
+  // Section 4 — Offerings
   services: ServiceItem[]
-  // Section 4
+  // Section 5 — Layout-specific
+  restaurant: RestaurantData
+  salon: SalonData
+  auto: AutoData
+  general: GeneralData
+  // Section 6 — Style
   selected_theme: string
   primary_color: string
   logo_url: string
-  photo_urls: string[] // parsed from textarea on submit
+  photo_urls: string[]
   photo_urls_raw: string
   notes: string
 }
@@ -97,10 +138,77 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 const SECTIONS = [
   { id: 1, title: 'About your business' },
-  { id: 2, title: 'How customers reach you' },
-  { id: 3, title: 'What you offer' },
-  { id: 4, title: 'Style and content' },
+  { id: 2, title: 'Tell us your story' },
+  { id: 3, title: 'How customers reach you' },
+  { id: 4, title: 'What you offer' },
+  { id: 5, title: 'A few details about your work' },
+  { id: 6, title: 'Style and content' },
 ] as const
+
+const TOTAL_SECTIONS = SECTIONS.length
+
+const CUISINE_OPTIONS = [
+  'Ethiopian',
+  'Italian',
+  'American',
+  'Mexican',
+  'Asian Fusion',
+  'Mediterranean',
+  'Indian',
+  'Caribbean',
+  'Other',
+] as const
+
+const DIETARY_OPTIONS = [
+  'Vegan',
+  'Vegetarian',
+  'Gluten-free',
+  'Halal',
+  'Kosher',
+  'Dairy-free',
+  'Nut-free',
+] as const
+
+const ATMOSPHERE_OPTIONS = [
+  'Casual',
+  'Fine-dining',
+  'Family-friendly',
+  'Romantic',
+  'Sports-bar',
+  'Cafe',
+] as const
+
+const SALON_SERVICE_OPTIONS = [
+  'Hair',
+  'Nails',
+  'Makeup',
+  'Lashes',
+  'Wellness',
+  'Massage',
+] as const
+
+const AUTO_SERVICE_OPTIONS = [
+  'Oil change',
+  'Tires',
+  'Brakes',
+  'Engine',
+  'Body work',
+  'Custom',
+] as const
+
+const MIN_SERVICES = 4
+const MAX_SERVICES = 8
+
+// Map raw layout id from contact-form step to the layout-specific bundle.
+type LayoutKind = 'restaurant' | 'salon' | 'auto' | 'general'
+
+function layoutKind(layout: string | null | undefined): LayoutKind {
+  const l = (layout || '').toLowerCase()
+  if (l === 'restaurant' || l === 'bistro') return 'restaurant'
+  if (l === 'salon' || l === 'spa') return 'salon'
+  if (l === 'auto' || l === 'mechanic') return 'auto'
+  return 'general' // fleet, healthcare, community, home_services, anything else
+}
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
@@ -111,7 +219,9 @@ const fadeUp = {
 // ─── Component ──────────────────────────────────────────
 
 export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
-  const [currentSection, setCurrentSection] = useState<1 | 2 | 3 | 4>(1)
+  const layout = layoutKind(submission.selected_layout)
+
+  const [currentSection, setCurrentSection] = useState<number>(1)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -120,16 +230,46 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
     tagline: '',
     business_description: submission.business_description || '',
     business_type: '',
+    business_story: '',
+    years_in_business: '',
     address: '',
     city: '',
     state: 'MN',
     zip: '',
     hours: DEFAULT_HOURS,
-    services: [
-      { name: '', description: '', price: '' },
-      { name: '', description: '', price: '' },
-      { name: '', description: '', price: '' },
-    ],
+    services: Array.from({ length: MIN_SERVICES }, () => ({
+      name: '',
+      description: '',
+      price: '',
+    })),
+    restaurant: {
+      cuisine_type: '',
+      cuisine_type_other: '',
+      dietary_options: [],
+      reservations: '',
+      takeout: '',
+      delivery: '',
+      seating_capacity: '',
+      atmosphere: [],
+    },
+    salon: {
+      salon_services: [],
+      booking_required: '',
+      staff_count: '',
+      products_sold: '',
+      specializations: '',
+    },
+    auto: {
+      auto_services: [],
+      makes_models: '',
+      certifications: '',
+      warranty: '',
+      loaner_vehicles: '',
+    },
+    general: {
+      service_area_radius: '',
+      certifications: '',
+    },
     selected_theme: 'warm',
     primary_color: '#facc15',
     logo_url: '',
@@ -142,14 +282,20 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
     setData((prev) => ({ ...prev, [key]: value }))
   }
 
-  const validation = useMemo(() => validateSection(currentSection, data), [currentSection, data])
+  function toggleArrayValue(arr: string[], value: string): string[] {
+    return arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]
+  }
+
+  const validation = useMemo(
+    () => validateSection(currentSection, data, layout),
+    [currentSection, data, layout]
+  )
 
   const goNext = () => {
     if (!validation.ok) return
-    setCurrentSection((s) => (s < 4 ? ((s + 1) as 1 | 2 | 3 | 4) : s))
+    setCurrentSection((s) => Math.min(TOTAL_SECTIONS, s + 1))
   }
-  const goBack = () =>
-    setCurrentSection((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3 | 4) : s))
+  const goBack = () => setCurrentSection((s) => Math.max(1, s - 1))
 
   const handleSubmit = async () => {
     if (!validation.ok) return
@@ -161,6 +307,57 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
       .map((s) => s.trim())
       .filter(Boolean)
 
+    // Resolve cuisine: free-text wins when "Other" was selected.
+    const cuisineFinal =
+      data.restaurant.cuisine_type === 'Other'
+        ? data.restaurant.cuisine_type_other.trim()
+        : data.restaurant.cuisine_type
+
+    // Build the layout-specific payload (only the relevant block + universals)
+    const layoutPayload: Record<string, unknown> =
+      layout === 'restaurant'
+        ? {
+            cuisine_type: cuisineFinal || null,
+            dietary_options: data.restaurant.dietary_options,
+            reservations: data.restaurant.reservations || null,
+            takeout: data.restaurant.takeout || null,
+            delivery: data.restaurant.delivery || null,
+            seating_capacity: parseIntOrNull(data.restaurant.seating_capacity),
+            atmosphere: data.restaurant.atmosphere,
+          }
+        : layout === 'salon'
+          ? {
+              salon_services: data.salon.salon_services,
+              booking_required: data.salon.booking_required || null,
+              staff_count: parseIntOrNull(data.salon.staff_count),
+              products_sold:
+                data.salon.products_sold === 'yes'
+                  ? true
+                  : data.salon.products_sold === 'no'
+                    ? false
+                    : null,
+              specializations: data.salon.specializations.trim() || null,
+            }
+          : layout === 'auto'
+            ? {
+                auto_services: data.auto.auto_services,
+                makes_models: data.auto.makes_models.trim() || null,
+                certifications: data.auto.certifications.trim() || null,
+                warranty: data.auto.warranty || null,
+                loaner_vehicles:
+                  data.auto.loaner_vehicles === 'yes'
+                    ? true
+                    : data.auto.loaner_vehicles === 'no'
+                      ? false
+                      : null,
+              }
+            : {
+                service_area_radius: parseIntOrNull(
+                  data.general.service_area_radius
+                ),
+                certifications: data.general.certifications.trim() || null,
+              }
+
     try {
       const res = await fetch('/api/intake/submit', {
         method: 'POST',
@@ -171,6 +368,8 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
             tagline: data.tagline.trim(),
             business_description: data.business_description.trim(),
             business_type: data.business_type.trim(),
+            business_story: data.business_story.trim(),
+            years_in_business: parseIntOrNull(data.years_in_business),
             address: data.address.trim(),
             city: data.city.trim(),
             state: data.state,
@@ -183,6 +382,8 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
                 description: s.description.trim(),
                 price: s.price.trim(),
               })),
+            layout_kind: layout,
+            ...layoutPayload,
             selected_theme: data.selected_theme,
             primary_color: data.primary_color,
             logo_url: data.logo_url.trim() || null,
@@ -231,13 +432,16 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold tracking-wider uppercase text-cimaa-text-muted">
-            Section {currentSection} of 4
+            Section {currentSection} of {TOTAL_SECTIONS}
           </p>
           <p className="text-xs text-cimaa-text-subtle">
             {SECTIONS[currentSection - 1].title}
           </p>
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div
+          className="grid gap-2"
+          style={{ gridTemplateColumns: `repeat(${TOTAL_SECTIONS}, minmax(0, 1fr))` }}
+        >
           {SECTIONS.map((s) => {
             const done = s.id < currentSection
             const active = s.id === currentSection
@@ -258,7 +462,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
         </div>
       </div>
 
-      {/* Sections */}
+      {/* Section 1: About */}
       {currentSection === 1 && (
         <motion.div {...fadeUp} className="space-y-6">
           <SectionHeader
@@ -283,7 +487,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
           <Field
             label="Business description"
             required
-            helper="What you do, who you serve. Used to write your site copy."
+            helper="What you do, who you serve. One paragraph."
             error={validation.errors.business_description}
           >
             <textarea
@@ -294,7 +498,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
               maxLength={500}
               rows={4}
               className={`${inputClass(!!validation.errors.business_description)} resize-none`}
-              placeholder="Family-owned restaurant serving traditional Ethiopian and Eritrean dishes. We've been a Saint Paul staple for 12 years."
+              placeholder="Family-owned restaurant serving traditional Ethiopian and Eritrean dishes."
             />
             <CharCount value={data.business_description} max={500} />
           </Field>
@@ -314,7 +518,50 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
         </motion.div>
       )}
 
+      {/* Section 2: Story */}
       {currentSection === 2 && (
+        <motion.div {...fadeUp} className="space-y-6">
+          <SectionHeader
+            title="Tell us your story"
+            subtitle="The deeper context our AI uses to write copy that sounds like you."
+          />
+          <Field
+            label="What makes your business special?"
+            required
+            helper="When did you start? Who do you serve? What do customers say about you? This is the most important field for AI-generated copy."
+            error={validation.errors.business_story}
+          >
+            <textarea
+              value={data.business_story}
+              onChange={(e) =>
+                updateField('business_story', e.target.value.slice(0, 500))
+              }
+              maxLength={500}
+              rows={6}
+              className={`${inputClass(!!validation.errors.business_story)} resize-none`}
+              placeholder="My grandmother taught me to cook injera in our village outside Addis Ababa. We opened the restaurant in 2014 to share that food with our neighbors in Saint Paul..."
+            />
+            <CharCount value={data.business_story} max={500} />
+          </Field>
+          <Field
+            label="Years in business"
+            helper="Optional. Used for trust signals like 'Serving Minnesota since 2014'."
+          >
+            <input
+              type="number"
+              min="0"
+              max="200"
+              value={data.years_in_business}
+              onChange={(e) => updateField('years_in_business', e.target.value)}
+              className={inputClass(false) + ' max-w-[160px]'}
+              placeholder="e.g. 12"
+            />
+          </Field>
+        </motion.div>
+      )}
+
+      {/* Section 3: Reach */}
+      {currentSection === 3 && (
         <motion.div {...fadeUp} className="space-y-6">
           <SectionHeader
             title="How customers reach you"
@@ -353,7 +600,9 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
             <Field label="Zip" required error={validation.errors.zip}>
               <input
                 value={data.zip}
-                onChange={(e) => updateField('zip', e.target.value.replace(/[^0-9]/g, '').slice(0, 5))}
+                onChange={(e) =>
+                  updateField('zip', e.target.value.replace(/[^0-9]/g, '').slice(0, 5))
+                }
                 inputMode="numeric"
                 className={inputClass(!!validation.errors.zip)}
                 placeholder="55104"
@@ -362,9 +611,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-cimaa-text mb-2">
-              Hours
-            </label>
+            <label className="block text-sm font-medium text-cimaa-text mb-2">Hours</label>
             <div className="space-y-2">
               {DAYS.map((day) => {
                 const h = data.hours[day]
@@ -421,11 +668,16 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
         </motion.div>
       )}
 
-      {currentSection === 3 && (
+      {/* Section 4: Offerings (≥4 services) */}
+      {currentSection === 4 && (
         <motion.div {...fadeUp} className="space-y-6">
           <SectionHeader
             title="What you offer"
-            subtitle="These show on your services page. You can edit anytime later."
+            subtitle={`At least ${MIN_SERVICES} services. These show on your services page and feed AI menu generation.`}
+          />
+          <ServiceCounter
+            count={data.services.filter((s) => s.name.trim().length > 0).length}
+            min={MIN_SERVICES}
           />
           {validation.errors.services && (
             <p className="text-sm text-red-600">{validation.errors.services}</p>
@@ -470,7 +722,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
                     className={inputClass(false)}
                     placeholder="Service name (e.g., Doro Wat)"
                   />
-                  <input
+                  <textarea
                     value={service.description}
                     onChange={(e) =>
                       updateField(
@@ -480,8 +732,9 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
                         )
                       )
                     }
-                    className={inputClass(false)}
-                    placeholder="Short description"
+                    rows={2}
+                    className={inputClass(false) + ' resize-none'}
+                    placeholder="Short description — 1 to 2 sentences"
                   />
                   <input
                     value={service.price}
@@ -494,13 +747,13 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
                       )
                     }
                     className={inputClass(false)}
-                    placeholder="Price (e.g., $18 or 'starts at $50')"
+                    placeholder="Price (e.g., $18, $15-25, $50/hr, Custom)"
                   />
                 </div>
               </div>
             ))}
           </div>
-          {data.services.length < 10 && (
+          {data.services.length < MAX_SERVICES && (
             <button
               type="button"
               onClick={() =>
@@ -512,13 +765,50 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
               className="inline-flex items-center gap-2 text-sm font-medium text-cimaa-green hover:text-cimaa-text transition-colors cursor-pointer"
             >
               <Plus size={16} />
-              Add another service
+              Add another service ({data.services.length}/{MAX_SERVICES})
             </button>
           )}
         </motion.div>
       )}
 
-      {currentSection === 4 && (
+      {/* Section 5: Layout-specific */}
+      {currentSection === 5 && (
+        <motion.div {...fadeUp} className="space-y-6">
+          {layout === 'restaurant' && (
+            <RestaurantSection
+              data={data.restaurant}
+              errors={validation.errors}
+              onChange={(next) => updateField('restaurant', next)}
+              toggleArrayValue={toggleArrayValue}
+            />
+          )}
+          {layout === 'salon' && (
+            <SalonSection
+              data={data.salon}
+              errors={validation.errors}
+              onChange={(next) => updateField('salon', next)}
+              toggleArrayValue={toggleArrayValue}
+            />
+          )}
+          {layout === 'auto' && (
+            <AutoSection
+              data={data.auto}
+              errors={validation.errors}
+              onChange={(next) => updateField('auto', next)}
+              toggleArrayValue={toggleArrayValue}
+            />
+          )}
+          {layout === 'general' && (
+            <GeneralSection
+              data={data.general}
+              onChange={(next) => updateField('general', next)}
+            />
+          )}
+        </motion.div>
+      )}
+
+      {/* Section 6: Style */}
+      {currentSection === 6 && (
         <motion.div {...fadeUp} className="space-y-6">
           <SectionHeader
             title="Style and content"
@@ -552,18 +842,11 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-cimaa-text">
-                        {opt.name}
-                      </p>
-                      <p className="text-xs text-cimaa-text-muted">
-                        {opt.description}
-                      </p>
+                      <p className="text-sm font-semibold text-cimaa-text">{opt.name}</p>
+                      <p className="text-xs text-cimaa-text-muted">{opt.description}</p>
                     </div>
                     {active && (
-                      <CheckCircle2
-                        size={18}
-                        className="ml-auto text-cimaa-green"
-                      />
+                      <CheckCircle2 size={18} className="ml-auto text-cimaa-green" />
                     )}
                   </button>
                 )
@@ -591,10 +874,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
             </div>
           </Field>
 
-          <Field
-            label="Logo URL"
-            helper="Paste a URL or leave blank — we'll add later."
-          >
+          <Field label="Logo URL" helper="Paste a URL or leave blank — we'll add later.">
             <input
               value={data.logo_url}
               onChange={(e) => updateField('logo_url', e.target.value)}
@@ -613,14 +893,11 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
               onChange={(e) => updateField('photo_urls_raw', e.target.value)}
               rows={4}
               className={inputClass(false) + ' resize-none font-mono text-xs'}
-              placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg&#10;https://example.com/photo3.jpg"
+              placeholder={'https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg'}
             />
           </Field>
 
-          <Field
-            label="Anything else?"
-            helper="Special requests, must-haves, or hard-no's."
-          >
+          <Field label="Anything else?" helper="Special requests, must-haves, or hard-no's.">
             <textarea
               value={data.notes}
               onChange={(e) => updateField('notes', e.target.value)}
@@ -633,9 +910,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
       )}
 
       {/* Errors */}
-      {errorMessage && (
-        <p className="mt-4 text-sm text-red-600">{errorMessage}</p>
-      )}
+      {errorMessage && <p className="mt-4 text-sm text-red-600">{errorMessage}</p>}
 
       {/* Navigation */}
       <div className="mt-8 flex items-center justify-between gap-3 border-t border-cimaa-border pt-6">
@@ -650,7 +925,7 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
           Back
         </Button>
 
-        {currentSection < 4 ? (
+        {currentSection < TOTAL_SECTIONS ? (
           <Button
             type="button"
             variant="primary"
@@ -678,15 +953,395 @@ export function IntakeForm({ submission }: { submission: IntakeSubmission }) {
   )
 }
 
+// ─── Layout-specific section components ─────────────────
+
+function RestaurantSection({
+  data,
+  errors,
+  onChange,
+  toggleArrayValue,
+}: {
+  data: RestaurantData
+  errors: Record<string, string>
+  onChange: (next: RestaurantData) => void
+  toggleArrayValue: (arr: string[], v: string) => string[]
+}) {
+  return (
+    <>
+      <SectionHeader
+        title="A few details about your restaurant"
+        subtitle="Helps us generate accurate menu items, dietary tags, and the right look."
+      />
+      <Field label="Cuisine type" required error={errors.cuisine_type}>
+        <select
+          value={data.cuisine_type}
+          onChange={(e) => onChange({ ...data, cuisine_type: e.target.value })}
+          className={inputClass(!!errors.cuisine_type)}
+        >
+          <option value="">Select cuisine…</option>
+          {CUISINE_OPTIONS.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </Field>
+      {data.cuisine_type === 'Other' && (
+        <Field label="Tell us your cuisine" required error={errors.cuisine_type_other}>
+          <input
+            value={data.cuisine_type_other}
+            onChange={(e) => onChange({ ...data, cuisine_type_other: e.target.value })}
+            className={inputClass(!!errors.cuisine_type_other)}
+            placeholder="e.g., Eritrean, West African, Filipino"
+          />
+        </Field>
+      )}
+      <Field label="Dietary options" helper="Multi-select — tag any that apply.">
+        <CheckboxGrid
+          options={DIETARY_OPTIONS}
+          values={data.dietary_options}
+          onToggle={(v) =>
+            onChange({ ...data, dietary_options: toggleArrayValue(data.dietary_options, v) })
+          }
+        />
+      </Field>
+      <Field label="Reservations">
+        <RadioRow
+          name="reservations"
+          value={data.reservations}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+            { value: 'not_yet', label: 'Not yet' },
+          ]}
+          onChange={(v) => onChange({ ...data, reservations: v as RestaurantData['reservations'] })}
+        />
+      </Field>
+      <Field label="Takeout">
+        <RadioRow
+          name="takeout"
+          value={data.takeout}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+          ]}
+          onChange={(v) => onChange({ ...data, takeout: v as RestaurantData['takeout'] })}
+        />
+      </Field>
+      <Field label="Delivery">
+        <RadioRow
+          name="delivery"
+          value={data.delivery}
+          options={[
+            { value: 'yes', label: 'Yes — our service' },
+            { value: 'third_party', label: 'Third-party only (DoorDash etc)' },
+            { value: 'no', label: 'No' },
+          ]}
+          onChange={(v) => onChange({ ...data, delivery: v as RestaurantData['delivery'] })}
+        />
+      </Field>
+      <Field label="Seating capacity">
+        <input
+          type="number"
+          min="0"
+          value={data.seating_capacity}
+          onChange={(e) => onChange({ ...data, seating_capacity: e.target.value })}
+          className={inputClass(false) + ' max-w-[160px]'}
+          placeholder="e.g. 48"
+        />
+      </Field>
+      <Field label="Atmosphere" helper="Multi-select — pick all that fit.">
+        <CheckboxGrid
+          options={ATMOSPHERE_OPTIONS}
+          values={data.atmosphere}
+          onToggle={(v) =>
+            onChange({ ...data, atmosphere: toggleArrayValue(data.atmosphere, v) })
+          }
+        />
+      </Field>
+    </>
+  )
+}
+
+function SalonSection({
+  data,
+  errors,
+  onChange,
+  toggleArrayValue,
+}: {
+  data: SalonData
+  errors: Record<string, string>
+  onChange: (next: SalonData) => void
+  toggleArrayValue: (arr: string[], v: string) => string[]
+}) {
+  return (
+    <>
+      <SectionHeader
+        title="A few details about your salon"
+        subtitle="Helps us tag services, booking flow, and overall feel."
+      />
+      <Field label="Services offered" required error={errors.salon_services}>
+        <CheckboxGrid
+          options={SALON_SERVICE_OPTIONS}
+          values={data.salon_services}
+          onToggle={(v) =>
+            onChange({ ...data, salon_services: toggleArrayValue(data.salon_services, v) })
+          }
+        />
+      </Field>
+      <Field label="Booking required">
+        <RadioRow
+          name="booking_required"
+          value={data.booking_required}
+          options={[
+            { value: 'yes', label: 'Yes — appointment only' },
+            { value: 'walk_ins', label: 'Walk-ins welcome' },
+            { value: 'both', label: 'Both' },
+          ]}
+          onChange={(v) =>
+            onChange({ ...data, booking_required: v as SalonData['booking_required'] })
+          }
+        />
+      </Field>
+      <Field label="Staff count">
+        <input
+          type="number"
+          min="0"
+          value={data.staff_count}
+          onChange={(e) => onChange({ ...data, staff_count: e.target.value })}
+          className={inputClass(false) + ' max-w-[160px]'}
+          placeholder="e.g. 4"
+        />
+      </Field>
+      <Field label="Do you sell products?">
+        <RadioRow
+          name="products_sold"
+          value={data.products_sold}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+          ]}
+          onChange={(v) =>
+            onChange({ ...data, products_sold: v as SalonData['products_sold'] })
+          }
+        />
+      </Field>
+      <Field label="Specializations" helper="Optional — e.g. curly hair, bridal, balayage.">
+        <input
+          value={data.specializations}
+          onChange={(e) => onChange({ ...data, specializations: e.target.value })}
+          className={inputClass(false)}
+          placeholder="e.g., Curly hair, balayage, bridal"
+        />
+      </Field>
+    </>
+  )
+}
+
+function AutoSection({
+  data,
+  errors,
+  onChange,
+  toggleArrayValue,
+}: {
+  data: AutoData
+  errors: Record<string, string>
+  onChange: (next: AutoData) => void
+  toggleArrayValue: (arr: string[], v: string) => string[]
+}) {
+  return (
+    <>
+      <SectionHeader
+        title="A few details about your shop"
+        subtitle="Helps customers know if you can service their vehicle."
+      />
+      <Field label="Services offered" required error={errors.auto_services}>
+        <CheckboxGrid
+          options={AUTO_SERVICE_OPTIONS}
+          values={data.auto_services}
+          onToggle={(v) =>
+            onChange({ ...data, auto_services: toggleArrayValue(data.auto_services, v) })
+          }
+        />
+      </Field>
+      <Field label="Makes / models you service">
+        <input
+          value={data.makes_models}
+          onChange={(e) => onChange({ ...data, makes_models: e.target.value })}
+          className={inputClass(false)}
+          placeholder="e.g., Toyota, Honda, Ford, BMW"
+        />
+      </Field>
+      <Field label="Certifications">
+        <input
+          value={data.certifications}
+          onChange={(e) => onChange({ ...data, certifications: e.target.value })}
+          className={inputClass(false)}
+          placeholder="e.g., ASE Certified, NAPA AutoCare"
+        />
+      </Field>
+      <Field label="Warranty offered">
+        <RadioRow
+          name="warranty"
+          value={data.warranty}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+            { value: 'details_below', label: 'Details below' },
+          ]}
+          onChange={(v) => onChange({ ...data, warranty: v as AutoData['warranty'] })}
+        />
+      </Field>
+      <Field label="Loaner vehicles available?">
+        <RadioRow
+          name="loaner_vehicles"
+          value={data.loaner_vehicles}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+          ]}
+          onChange={(v) =>
+            onChange({ ...data, loaner_vehicles: v as AutoData['loaner_vehicles'] })
+          }
+        />
+      </Field>
+    </>
+  )
+}
+
+function GeneralSection({
+  data,
+  onChange,
+}: {
+  data: GeneralData
+  onChange: (next: GeneralData) => void
+}) {
+  return (
+    <>
+      <SectionHeader
+        title="A few details about your work"
+        subtitle="Helps with location signals and trust copy."
+      />
+      <Field
+        label="Service area radius (miles)"
+        helper="How far do you travel from your address?"
+      >
+        <input
+          type="number"
+          min="0"
+          value={data.service_area_radius}
+          onChange={(e) => onChange({ ...data, service_area_radius: e.target.value })}
+          className={inputClass(false) + ' max-w-[160px]'}
+          placeholder="e.g. 25"
+        />
+      </Field>
+      <Field label="Certifications / licenses" helper="Optional. Used for trust badges.">
+        <input
+          value={data.certifications}
+          onChange={(e) => onChange({ ...data, certifications: e.target.value })}
+          className={inputClass(false)}
+          placeholder="e.g., Licensed MN contractor #BC012345"
+        />
+      </Field>
+    </>
+  )
+}
+
 // ─── Helpers ────────────────────────────────────────────
 
-function SectionHeader({
-  title,
-  subtitle,
+function ServiceCounter({ count, min }: { count: number; min: number }) {
+  const ok = count >= min
+  return (
+    <div
+      className={
+        'rounded-lg px-3 py-2 text-sm font-medium ' +
+        (ok ? 'bg-cimaa-green-light text-cimaa-green' : 'bg-cimaa-bg-amber text-cimaa-text')
+      }
+    >
+      Services: {count} of {min} minimum {ok && '✓'}
+    </div>
+  )
+}
+
+function CheckboxGrid({
+  options,
+  values,
+  onToggle,
 }: {
-  title: string
-  subtitle: string
+  options: readonly string[]
+  values: string[]
+  onToggle: (v: string) => void
 }) {
+  return (
+    <div className="grid sm:grid-cols-2 gap-2">
+      {options.map((opt) => {
+        const active = values.includes(opt)
+        return (
+          <label
+            key={opt}
+            className={
+              'flex items-center gap-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors ' +
+              (active
+                ? 'border-cimaa-yellow bg-cimaa-bg-tan'
+                : 'border-cimaa-border bg-white hover:border-cimaa-text')
+            }
+          >
+            <input
+              type="checkbox"
+              checked={active}
+              onChange={() => onToggle(opt)}
+              className="accent-cimaa-green"
+            />
+            <span className="text-sm text-cimaa-text">{opt}</span>
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
+function RadioRow({
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  name: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {options.map((opt) => {
+        const active = value === opt.value
+        return (
+          <label
+            key={opt.value}
+            className={
+              'flex items-center gap-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors ' +
+              (active
+                ? 'border-cimaa-yellow bg-cimaa-bg-tan'
+                : 'border-cimaa-border bg-white hover:border-cimaa-text')
+            }
+          >
+            <input
+              type="radio"
+              name={name}
+              value={opt.value}
+              checked={active}
+              onChange={() => onChange(opt.value)}
+              className="accent-cimaa-green"
+            />
+            <span className="text-sm text-cimaa-text">{opt.label}</span>
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
+function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="border-b border-cimaa-border pb-4">
       <h2 className="text-xl sm:text-2xl font-heading font-semibold text-cimaa-text">
@@ -741,6 +1396,11 @@ function inputClass(invalid: boolean) {
   )
 }
 
+function parseIntOrNull(v: string): number | null {
+  const n = parseInt(v, 10)
+  return Number.isFinite(n) && n >= 0 ? n : null
+}
+
 // ─── Validation ─────────────────────────────────────────
 
 interface ValidationResult {
@@ -748,8 +1408,13 @@ interface ValidationResult {
   errors: Record<string, string>
 }
 
-function validateSection(section: number, d: IntakeData): ValidationResult {
+function validateSection(
+  section: number,
+  d: IntakeData,
+  layout: LayoutKind
+): ValidationResult {
   const errors: Record<string, string> = {}
+
   if (section === 1) {
     if (d.tagline.trim().length < 5) errors.tagline = 'Add a tagline (5+ chars)'
     if (d.business_description.trim().length < 20)
@@ -758,16 +1423,46 @@ function validateSection(section: number, d: IntakeData): ValidationResult {
     if (d.business_type.trim().length < 2)
       errors.business_type = 'What type of business is this?'
   }
+
   if (section === 2) {
+    const story = d.business_story.trim()
+    if (story.length < 50)
+      errors.business_story = `Tell us a bit more (${story.length}/50 chars min) — this is what AI uses to write authentic copy`
+  }
+
+  if (section === 3) {
     if (d.address.trim().length < 5) errors.address = 'Address is required'
     if (d.city.trim().length < 2) errors.city = 'City is required'
     if (d.zip.length !== 5) errors.zip = '5-digit zip required'
   }
-  if (section === 3) {
+
+  if (section === 4) {
     const filled = d.services.filter((s) => s.name.trim().length > 0)
-    if (filled.length < 1)
-      errors.services = 'Add at least one service before continuing'
+    if (filled.length < MIN_SERVICES)
+      errors.services = `Add at least ${MIN_SERVICES} services (you have ${filled.length})`
   }
-  // Section 4 has no required fields beyond the theme (which has a default).
+
+  if (section === 5) {
+    if (layout === 'restaurant') {
+      if (!d.restaurant.cuisine_type)
+        errors.cuisine_type = 'Pick a cuisine type'
+      if (
+        d.restaurant.cuisine_type === 'Other' &&
+        d.restaurant.cuisine_type_other.trim().length < 2
+      )
+        errors.cuisine_type_other = 'Tell us your cuisine'
+    }
+    if (layout === 'salon') {
+      if (d.salon.salon_services.length < 1)
+        errors.salon_services = 'Pick at least one service category'
+    }
+    if (layout === 'auto') {
+      if (d.auto.auto_services.length < 1)
+        errors.auto_services = 'Pick at least one service type'
+    }
+    // general layout has no required fields
+  }
+
+  // Section 6 has no required fields beyond the theme (which has a default).
   return { ok: Object.keys(errors).length === 0, errors }
 }
