@@ -77,10 +77,13 @@ export async function seedClientDatabase(
     { key: 'state', value: submission.state || '' },
     { key: 'zip', value: submission.zip || '' },
     { key: 'hours', value: submission.hours || {} },
-    { key: 'selected_layout', value: layoutId },
+    // Canonical key names the starter-app reads. Submission columns stay
+    // `selected_*` (those are user-input fields on cimaasites.onboarding_submissions);
+    // only the written key in client_*.site_settings is `active_*`.
+    { key: 'active_layout', value: layoutId },
     {
-      key: 'selected_theme',
-      value: submission.selected_theme || 'warm',
+      key: 'active_theme',
+      value: submission.selected_theme || 'bistro',
     },
     { key: 'active_hero_variant', value: heroVariant },
     {
