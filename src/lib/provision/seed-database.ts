@@ -98,6 +98,13 @@ export async function seedClientDatabase(
     { key: 'about_text', value: content?.aboutText || '' },
     { key: 'meta_title', value: content?.metaTitle || '' },
     { key: 'meta_description', value: content?.metaDescription || '' },
+    // AI-curated stock photos (Unsplash). Empty string / [] when curation
+    // failed or UNSPLASH_ACCESS_KEY was missing — starter-app falls back
+    // to its layout default in that case.
+    { key: 'hero_image_url', value: submission.generated_hero_image || '' },
+    { key: 'about_image_url', value: submission.generated_about_image || '' },
+    { key: 'menu_images', value: submission.generated_menu_images || [] },
+    { key: 'gallery_images', value: submission.generated_gallery || [] },
   ]
 
   // Write both columns. `onConflict: 'key'` overwrites any prior partial
@@ -197,6 +204,71 @@ export async function seedClientDatabase(
         throw err
       }
     }
+  }
+
+  // ─── 2b. menu_items (restaurants only) ─────────────────
+  // Populated by generateMenuItems during provisioning. Empty array for
+  // non-restaurant layouts. Per-row try/catch so a column-name surprise
+  // logs the offending row but doesn't abort the whole seed.
+  const menuItems: Array<{
+    name?: string
+    description?: string
+    price?: string
+    category?: string
+    featured?: boolean
+  }> = Array.isArray(submission.generated_menu_items)
+    ? submission.generated_menu_items
+    : []
+
+  if (menuItems.length > 0) {
+    console.log('[seed] inserting menu_items', { count: menuItems.length })
+    for (let i = 0; i < menuItems.length; i++) {
+      const item = menuItems[i]
+      const itemName = (item.name || '').trim()
+      if (!itemName) continue
+
+      // Parse price to numeric ($12, $12-15, "Market price" → null)
+      let priceNumeric: number | null = null
+      if (item.price) {
+        const parsed = Number(String(item.price).replace(/[^0-9.]/g, ''))
+        priceNumeric =
+          Number.isFinite(parsed) && parsed > 0 ? parsed : null
+      }
+
+      try {
+        const { error } = await db.from('menu_items').insert({
+          name: itemName,
+          description: item.description || '',
+          price: priceNumeric,
+          category: item.category || 'main',
+          is_featured: item.featured === true,
+          is_active: true,
+        })
+        if (error) {
+          // Don't throw — menu_items column shape may differ from spec;
+          // log and continue so the rest of the site still seeds cleanly.
+          console.error('[seed] menu_item insert failed (non-fatal)', {
+            name: itemName,
+            err: error,
+          })
+        } else {
+          console.log('[seed] menu_item inserted', {
+            name: itemName,
+            priceNumeric,
+            featured: item.featured === true,
+          })
+        }
+      } catch (err) {
+        console.error('[seed] menu_item insert exception (non-fatal)', {
+          name: itemName,
+          err,
+        })
+      }
+    }
+  } else {
+    console.log('[seed] no menu items to seed', {
+      layout: submission.selected_layout,
+    })
   }
 
   // ─── 3. admin auth user ─────────────────────────────────

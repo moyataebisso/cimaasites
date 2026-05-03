@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { logStep } from '@/lib/provision/logger'
 import { generateContent } from '@/lib/provision/generate-content'
+import { generateMenuItems } from '@/lib/provision/generate-menu'
+import { generatePhotoSet } from '@/lib/provision/generate-photos'
 import { createVercelProject } from '@/lib/provision/deploy-vercel'
 import { seedClientDatabase } from '@/lib/provision/seed-database'
 import { createClientSchema } from '@/lib/provision/create-client-schema'
@@ -233,6 +235,66 @@ async function provisionSite(
     console.log('[provision] content generated', {
       submissionId,
       headlineLen: content.heroHeadline?.length ?? 0,
+    })
+  }
+
+  // ─── A2: Menu items (restaurants only, idempotent) ───
+  if (submission.generated_menu_items != null) {
+    console.log('[provision] menu items already generated — skipping', {
+      submissionId,
+      count: Array.isArray(submission.generated_menu_items)
+        ? submission.generated_menu_items.length
+        : 0,
+    })
+  } else {
+    console.log('[provision] step: menu generation', { submissionId })
+    const menuItems = await generateMenuItems(submission).catch((err) => {
+      console.error('[provision] menu generation failed (non-fatal)', { err })
+      return []
+    })
+    await supabaseAdmin
+      .schema('cimaasites')
+      .from('onboarding_submissions')
+      .update({ generated_menu_items: menuItems })
+      .eq('id', submissionId)
+    submission.generated_menu_items = menuItems
+    console.log('[provision] menu items generated', {
+      submissionId,
+      count: menuItems.length,
+    })
+  }
+
+  // ─── A3: Stock photos (Unsplash, idempotent) ───
+  if (submission.generated_hero_image) {
+    console.log('[provision] photos already curated — skipping', {
+      submissionId,
+    })
+  } else {
+    console.log('[provision] step: photo curation', { submissionId })
+    const photos = await generatePhotoSet(submission).catch((err) => {
+      console.error('[provision] photo curation failed (non-fatal)', { err })
+      return { hero: '', about: '', menu: [], gallery: [] }
+    })
+    await supabaseAdmin
+      .schema('cimaasites')
+      .from('onboarding_submissions')
+      .update({
+        generated_hero_image: photos.hero,
+        generated_about_image: photos.about,
+        generated_menu_images: photos.menu,
+        generated_gallery: photos.gallery,
+      })
+      .eq('id', submissionId)
+    submission.generated_hero_image = photos.hero
+    submission.generated_about_image = photos.about
+    submission.generated_menu_images = photos.menu
+    submission.generated_gallery = photos.gallery
+    console.log('[provision] photos curated', {
+      submissionId,
+      heroSet: !!photos.hero,
+      aboutSet: !!photos.about,
+      menuCount: photos.menu.length,
+      galleryCount: photos.gallery.length,
     })
   }
 
