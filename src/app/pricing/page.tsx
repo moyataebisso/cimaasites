@@ -36,7 +36,7 @@ const tiers: Tier[] = [
     ],
   },
   {
-    name: "Growth",
+    name: "Pro",
     bestFor: "Multi-location and growing teams",
     description:
       "Everything in Starter, plus tools to bring more customers back.",
@@ -55,7 +55,7 @@ const tiers: Tier[] = [
     description:
       "Built around your workflow — integrations, custom flows, and your own data.",
     features: [
-      "Everything in Growth",
+      "Everything in Pro",
       "Custom integrations (POS, CRM, etc.)",
       "Multi-page custom design",
       "Source code ownership available",

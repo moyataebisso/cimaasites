@@ -10,9 +10,9 @@ import { LayoutPicker } from "@/components/LayoutPicker";
 import type { LayoutId } from "@/lib/layouts";
 
 const PLAN_LABELS: Record<"basic" | "pro" | "developer", string> = {
-  basic: "Starter — solo owners and family-run shops",
-  pro: "Growth — multi-location and growing teams",
-  developer: "Custom — anyone with specific needs",
+  basic: "Basic — $599 setup + $299/mo",
+  pro: "Pro — $599 setup + $399/mo",
+  developer: "Developer — $49.99 one-time",
 };
 
 type PlanKey = keyof typeof PLAN_LABELS;
@@ -247,7 +247,7 @@ function ContactPageInner() {
                   <p className="mt-3 text-cimaa-text-muted leading-relaxed">
                     Thanks {submittedName}! We received your inquiry about{" "}
                     <strong className="text-cimaa-text">{submittedBusiness}</strong>.
-                    Moa will review and send you a custom proposal within 24
+                    We will review and send you a custom proposal within 24
                     hours — usually faster.
                   </p>
                   <Button

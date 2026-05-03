@@ -29,6 +29,19 @@ function fromAddress(): string {
 
 const ADMIN_INBOX = 'arsitechgroup@gmail.com'
 
+// Canonical pricing display string. Used in the admin "new client" alert
+// email and any other place we surface plan revenue. Keep in lockstep with
+// the actual Stripe prices.
+//   Basic     → $599 setup + $299/mo
+//   Pro       → $599 setup + $399/mo
+//   Developer → $49.99 one-time
+export function revenueLabel(plan: string): string {
+  if (plan === 'pro') return '$599 setup + $399/mo'
+  if (plan === 'basic') return '$599 setup + $299/mo'
+  if (plan === 'developer') return '$49.99 one-time'
+  return 'Custom'
+}
+
 // ─────────────────────────────────────────────
 // Common types
 // ─────────────────────────────────────────────

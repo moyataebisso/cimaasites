@@ -84,7 +84,7 @@ export default async function IntakePaidPage({ params }: PageProps) {
               href="mailto:arsitechgroup@gmail.com"
               className="text-cimaa-green underline"
             >
-              Email Moa
+              Email us
             </Link>{' '}
             — Stripe will also email you a receipt separately.
           </p>

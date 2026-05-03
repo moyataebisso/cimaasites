@@ -3,6 +3,7 @@ import {
   sendCheckoutLinkEmail,
   sendSiteLiveEmail,
   sendYouNewClientEmail,
+  revenueLabel,
 } from '@/lib/emails'
 import {
   createCheckoutSession,
@@ -204,8 +205,7 @@ async function handleGoLive(submission: {
       businessName: submission.business_name,
       email: submission.email,
       plan: submission.plan,
-      revenue:
-        submission.plan === 'basic' ? '$299' : submission.plan === 'pro' ? '$399' : '$49.99',
+      revenue: revenueLabel(submission.plan),
     })
   } catch (err) {
     console.error('Email send error:', err)

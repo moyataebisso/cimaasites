@@ -391,7 +391,7 @@ export function contactReceivedEmail({
   const html = buildEmail({
     preheader: `A real person will reply within 24 hours about ${businessName}.`,
     title: `Thanks, ${escapeHtml(safeName)} 👋`,
-    intro: `We received your inquiry about a website for <strong style="color:${COLORS.text};">${escapeHtml(businessName)}</strong>. A real person (Moa) will read every word and reply within 24 hours — usually faster.`,
+    intro: `We received your inquiry about a website for <strong style="color:${COLORS.text};">${escapeHtml(businessName)}</strong>. A real person from the Waji team will read every word and reply within 24 hours — usually faster.`,
     bodyHtml: `
 <p style="margin:0 0 14px 0;font-family:${FONT_STACK};font-size:13px;font-weight:600;color:${COLORS.textMuted};text-transform:uppercase;letter-spacing:0.08em;">What happens next</p>
 ${numberedList([
@@ -483,7 +483,7 @@ ${bulletList([
 ])}`,
     ctaText: 'Start the intake form',
     ctaUrl: intakeUrl,
-    footerNote: `Plan: ${escapeHtml(plan)}. Replies are read by Moa directly.`,
+    footerNote: `Plan: ${escapeHtml(plan)}. Replies are read by the Waji team.`,
   })
   return { subject, html }
 }
@@ -627,7 +627,7 @@ ${divider()}
 ${loginCard({ adminUrl, adminEmail, adminPassword })}`,
     ctaText: 'View your site',
     ctaUrl: previewUrl,
-    footerNote: 'Questions? Just reply to this email — Moa reads every one.',
+    footerNote: 'Questions? Just reply to this email — we read every one.',
   })
   return { subject, html }
 }

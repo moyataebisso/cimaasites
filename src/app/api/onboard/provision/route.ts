@@ -6,7 +6,11 @@ import { createVercelProject } from '@/lib/provision/deploy-vercel'
 import { seedClientDatabase } from '@/lib/provision/seed-database'
 import { createClientSchema } from '@/lib/provision/create-client-schema'
 import { generateSlug } from '@/lib/provision/slug'
-import { sendPreviewReadyEmail, sendYouNewClientEmail } from '@/lib/emails'
+import {
+  sendPreviewReadyEmail,
+  sendYouNewClientEmail,
+  revenueLabel,
+} from '@/lib/emails'
 
 // Vercel Pro: allow up to ~13 minutes for the full provisioning pipeline
 // (Anthropic content generation + Vercel API calls + deploy poll + seeding).
@@ -358,12 +362,7 @@ async function provisionSite(
       businessName: submission.business_name,
       email: submission.email,
       plan: submission.plan || 'basic',
-      revenue:
-        submission.plan === 'pro'
-          ? '$399/mo'
-          : submission.plan === 'developer'
-            ? '$49.99 one-time'
-            : '$299/mo',
+      revenue: revenueLabel(submission.plan || 'basic'),
     })
 
     await supabaseAdmin

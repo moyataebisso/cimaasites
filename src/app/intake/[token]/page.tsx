@@ -48,7 +48,7 @@ export default async function IntakePage({ params }: PageProps) {
               <strong className="text-cimaa-text">
                 {submission.business_name}
               </strong>
-              . Moa is reviewing now and will send your payment link shortly.
+              . The Waji team is reviewing now and will send your payment link shortly.
             </p>
             <div className="mt-8">
               <Button href="/" variant="outline" size="lg">
@@ -98,7 +98,7 @@ export default async function IntakePage({ params }: PageProps) {
           <p className="mt-6 text-center text-xs text-cimaa-text-subtle">
             Need a hand?{' '}
             <Link href="mailto:arsitechgroup@gmail.com" className="text-cimaa-green underline">
-              Email Moa directly
+              Email us directly
             </Link>{' '}
             and we&apos;ll fill the rest in for you.
           </p>
