@@ -131,11 +131,12 @@ export async function POST(request: Request) {
         )
       } else {
         const provisionUrl = `${baseUrl}/api/onboard/provision`
-        console.log('[webhook] triggering provision', {
+        console.log('[webhook] triggering_provision', {
           submissionId,
           checkoutType,
           provisionUrl,
           wasDuplicate,
+          timestamp: new Date().toISOString(),
         })
 
         // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
@@ -145,18 +146,26 @@ export async function POST(request: Request) {
           body: JSON.stringify({ submissionId }),
         })
           .then((res) => {
-            console.log('[webhook] provision trigger response', {
+            console.log('[webhook] provision_trigger_response', {
               submissionId,
               status: res.status,
             })
           })
-          .catch((err) => {
-            console.error('[webhook] failed to trigger provision', {
+          .catch((err: unknown) => {
+            const isErr = err instanceof Error
+            console.error('[webhook] provision_trigger_failed', {
               submissionId,
               provisionUrl,
-              error: err instanceof Error ? err.message : String(err),
+              error: isErr ? err.message : String(err),
+              stack: isErr ? err.stack : undefined,
             })
           })
+
+        // Sync log — proves the fetch was at least scheduled before this
+        // function returns. Vercel can terminate fire-and-forget promises
+        // once the response is sent; this lets us see in logs whether we
+        // even got to the dispatch.
+        console.log('[webhook] provision_fetch_dispatched', { submissionId })
       }
     }
   }
@@ -187,9 +196,12 @@ export async function POST(request: Request) {
             completed_at: new Date().toISOString(),
           })
       } else {
-        console.warn(
-          `invoice.paid: no submission found for stripe_customer_id=${customerId}; skipping log`
-        )
+        // Recurring invoice for a customer we don't have an onboarding row
+        // for (e.g., legacy clients pre-cimaasites). Informational, not a
+        // problem — keep visible but stop screaming as a warning.
+        console.log('[webhook] invoice.paid recurring (no provision needed)', {
+          stripe_customer_id: customerId,
+        })
       }
     }
   }
