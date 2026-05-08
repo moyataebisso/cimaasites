@@ -1,4 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { fetchMenuItemImage } from './generate-photos'
+import { logStep } from './logger'
 
 // Layout → default hero variant. Kept here so the AI/starter-app don't have
 // to know about layout-specific defaults — site_settings carries the resolved
@@ -222,6 +224,36 @@ export async function seedClientDatabase(
 
   if (menuItems.length > 0) {
     console.log('[seed] inserting menu_items', { count: menuItems.length })
+
+    // Fetch a per-dish Unsplash image for every menu item in parallel.
+    // Sequential lookup would add ~6s to provisioning. Each call returns
+    // string-or-null and never throws, so failures degrade gracefully to
+    // image_url=null and the starter-app falls back at render time.
+    const cuisine =
+      typeof submission.cuisine_type === 'string' &&
+      submission.cuisine_type.trim()
+        ? submission.cuisine_type.trim()
+        : null
+
+    await logStep(
+      submission.id,
+      'menu_images',
+      'running',
+      'Fetching dish photos from Unsplash'
+    ).catch(() => {})
+
+    const imageUrls = await Promise.all(
+      menuItems.map((item) =>
+        fetchMenuItemImage((item.name || '').trim(), cuisine)
+      )
+    )
+
+    const imagesFound = imageUrls.filter((u) => !!u).length
+    console.log('[seed] menu_items images resolved', {
+      requested: menuItems.length,
+      found: imagesFound,
+    })
+
     for (let i = 0; i < menuItems.length; i++) {
       const item = menuItems[i]
       const itemName = (item.name || '').trim()
@@ -243,6 +275,7 @@ export async function seedClientDatabase(
           category: item.category || 'main',
           is_featured: item.featured === true,
           is_active: true,
+          image_url: imageUrls[i] || null,
         })
         if (error) {
           // Don't throw — menu_items column shape may differ from spec;
@@ -256,6 +289,7 @@ export async function seedClientDatabase(
             name: itemName,
             priceNumeric,
             featured: item.featured === true,
+            hasImage: !!imageUrls[i],
           })
         }
       } catch (err) {
@@ -265,6 +299,13 @@ export async function seedClientDatabase(
         })
       }
     }
+
+    await logStep(
+      submission.id,
+      'menu_images',
+      'done',
+      `${imagesFound}/${menuItems.length} dishes got images`
+    ).catch(() => {})
   } else {
     console.log('[seed] no menu items to seed', {
       layout: submission.selected_layout,

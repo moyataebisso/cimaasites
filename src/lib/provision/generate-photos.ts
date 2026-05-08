@@ -123,6 +123,44 @@ function pickQueries(submission: PhotoSubmission): QueryBundle {
   }
 }
 
+/**
+ * Per-dish image lookup. Builds a cuisine-aware Unsplash query, retries
+ * with a broader cuisine-only query if the specific dish returns nothing,
+ * and gracefully returns null when both fail (or when UNSPLASH_ACCESS_KEY
+ * is missing). Never throws — caller can always insert with null image_url.
+ *
+ * Example queries for "Doro Wat" / cuisineType "Ethiopian":
+ *   1. "ethiopian doro wat dish food"
+ *   2. (fallback) "ethiopian food"
+ */
+export async function fetchMenuItemImage(
+  dishName: string,
+  cuisineType: string | null
+): Promise<string | null> {
+  try {
+    const cleanName = (dishName || '').trim()
+    if (!cleanName) return null
+
+    const cuisinePart = cuisineType?.trim() ? `${cuisineType.trim()} ` : ''
+    const primaryQuery = `${cuisinePart}${cleanName} dish food`.toLowerCase()
+
+    const primary = await searchUnsplash(primaryQuery, 1)
+    if (primary[0]) return primary[0]
+
+    // Broader fallback — better-than-nothing relevance based on cuisine.
+    const fallbackQuery = (cuisinePart ? `${cuisinePart}food` : 'restaurant food').toLowerCase()
+    const fallback = await searchUnsplash(fallbackQuery, 1)
+    return fallback[0] || null
+  } catch (err) {
+    console.error('[generate-photos] fetchMenuItemImage failed (returning null)', {
+      dishName,
+      cuisineType,
+      err,
+    })
+    return null
+  }
+}
+
 export async function generatePhotoSet(
   submission: PhotoSubmission
 ): Promise<PhotoSet> {
