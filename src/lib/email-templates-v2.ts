@@ -470,6 +470,14 @@ Stripe will email you a separate receipt for tax records.
 }
 
 // 6. Customer site-live email ───────────────────────────
+// Two flavors of admin handoff, picked at runtime:
+//   inviteLink    → new flow: customer clicks link, sets own password on
+//                   /admin/set-password. We never see or store their password.
+//   adminPassword → legacy flow: rendered for clients provisioned before the
+//                   Supabase invite-link cutover (kept so re-sends to existing
+//                   customers like Adama Test 5 don't show a broken email).
+// `inviteType` lets us soften the copy when the Auth API was down and we fell
+// back to "use Forgot password on the login page".
 
 export interface SiteLiveArgs {
   contactName: string
@@ -477,7 +485,9 @@ export interface SiteLiveArgs {
   previewUrl: string
   adminUrl: string
   adminEmail: string
-  adminPassword: string
+  inviteLink?: string
+  inviteType?: 'invite' | 'recovery' | 'fallback_manual_reset'
+  adminPassword?: string
 }
 
 export function siteLiveEmail({
@@ -486,21 +496,25 @@ export function siteLiveEmail({
   previewUrl,
   adminUrl,
   adminEmail,
+  inviteLink,
+  inviteType,
   adminPassword,
 }: SiteLiveArgs) {
   const subject = `🚀 Your Waji site is ready — preview ${businessName}`
+  const useInvite = !!inviteLink
+  const isFallback = inviteType === 'fallback_manual_reset'
+
+  const adminBlockHtml = useInvite
+    ? renderInviteBlock({ inviteLink: inviteLink!, adminEmail, adminUrl, isFallback })
+    : renderLegacyLoginBlock({ adminUrl, adminEmail, adminPassword: adminPassword || '' })
+
   const bodyHtml = `
 ${greeting(contactName)}
 ${paragraph(
-  `<strong>${escapeHtml(businessName)}</strong> is built and ready to view. Your preview link and admin login are below.`
+  `<strong>${escapeHtml(businessName)}</strong> is built and ready to view. Your preview link and admin setup details are below.`
 )}
 ${ctaButton('View your site', previewUrl)}
-<p style="margin:24px 0 8px;font-weight:600;font-size:15px">Your admin login</p>
-${loginBlock({ adminUrl, adminEmail, adminPassword })}
-${callout(
-  'Save this password',
-  "You'll use these credentials to log in and edit your site anytime. Save them somewhere safe — we can reset on request, but it's faster if you keep your own copy."
-)}
+${adminBlockHtml}
 ${bullets('What you can do from your admin:', [
   'Edit any page text or service',
   'Add or swap photos',
@@ -516,11 +530,131 @@ ${signoff()}
   return {
     subject,
     html: buildShell({
-      preheader: `${businessName} is live. Preview link and admin login inside.`,
+      preheader: `${businessName} is live. Preview link and admin setup inside.`,
       headerTitle: 'Your site is live ✨',
       bodyHtml,
     }),
-    text: `Hi ${contactName || 'there'},
+    text: useInvite
+      ? siteLiveTextInvite({
+          contactName,
+          businessName,
+          previewUrl,
+          adminUrl,
+          adminEmail,
+          inviteLink: inviteLink!,
+          isFallback,
+        })
+      : siteLiveTextLegacy({
+          contactName,
+          businessName,
+          previewUrl,
+          adminUrl,
+          adminEmail,
+          adminPassword: adminPassword || '',
+        }),
+  }
+}
+
+function renderInviteBlock(args: {
+  inviteLink: string
+  adminEmail: string
+  adminUrl: string
+  isFallback: boolean
+}): string {
+  const { inviteLink, adminEmail, adminUrl, isFallback } = args
+  if (isFallback) {
+    // Auth API was down when we generated the link. We still send the email but
+    // route the customer to the admin login page where they can use the
+    // built-in "Forgot password" flow to set their first password.
+    return `
+<p style="margin:24px 0 8px;font-weight:600;font-size:15px">Set up your admin password</p>
+${paragraph(
+  `Your admin email is <strong>${escapeHtml(adminEmail)}</strong>. Click below to open your login page, then click <strong>Forgot password</strong> to receive a setup link.`
+)}
+${ctaButton('Open admin login', adminUrl)}
+${callout(
+  'About this step',
+  "We had a brief hiccup generating your one-click setup link. The Forgot password flow on the login page does the same thing — you'll be in within a minute."
+)}`
+  }
+  return `
+<p style="margin:24px 0 8px;font-weight:600;font-size:15px">Set up your admin password</p>
+${paragraph(
+  `Your admin email is <strong>${escapeHtml(adminEmail)}</strong>. Click below to set your password and sign in. The link is single-use and good for 24 hours.`
+)}
+${ctaButton('Set up your password and log in', inviteLink)}
+<p style="margin:0 0 8px;font-size:13px;color:${COLORS.textMuted}">Or copy this link: <a href="${inviteLink}" style="color:${COLORS.text};word-break:break-all">${escapeHtml(inviteLink)}</a></p>
+${callout(
+  'About this link',
+  `It's a one-time invitation. After you set your password, log in any time at <strong>${escapeHtml(adminUrl)}</strong> with your email and password.`
+)}`
+}
+
+function renderLegacyLoginBlock(args: {
+  adminUrl: string
+  adminEmail: string
+  adminPassword: string
+}): string {
+  return `
+<p style="margin:24px 0 8px;font-weight:600;font-size:15px">Your admin login</p>
+${loginBlock(args)}
+${callout(
+  'Save this password',
+  "You'll use these credentials to log in and edit your site anytime. Save them somewhere safe — we can reset on request, but it's faster if you keep your own copy."
+)}`
+}
+
+function siteLiveTextInvite(args: {
+  contactName: string
+  businessName: string
+  previewUrl: string
+  adminUrl: string
+  adminEmail: string
+  inviteLink: string
+  isFallback: boolean
+}): string {
+  const { contactName, businessName, previewUrl, adminUrl, adminEmail, inviteLink, isFallback } = args
+  if (isFallback) {
+    return `Hi ${contactName || 'there'},
+
+${businessName} is built and ready to view.
+
+Preview your site: ${previewUrl}
+
+SET UP YOUR ADMIN PASSWORD:
+Admin email: ${adminEmail}
+Open: ${adminUrl}
+Then click "Forgot password" to receive a setup link.
+
+We had a brief hiccup generating your one-click setup link, but the Forgot password flow does the same thing.
+
+— The Waji team`
+  }
+  return `Hi ${contactName || 'there'},
+
+${businessName} is built and ready to view.
+
+Preview your site: ${previewUrl}
+
+SET UP YOUR ADMIN PASSWORD:
+Admin email: ${adminEmail}
+Set your password (single-use, expires in 24h): ${inviteLink}
+
+After you set your password, log in any time at ${adminUrl}.
+
+— The Waji team`
+}
+
+function siteLiveTextLegacy(args: {
+  contactName: string
+  businessName: string
+  previewUrl: string
+  adminUrl: string
+  adminEmail: string
+  adminPassword: string
+}): string {
+  const { contactName, businessName, previewUrl, adminUrl, adminEmail, adminPassword } = args
+  return `Hi ${contactName || 'there'},
 
 ${businessName} is built and ready to view.
 
@@ -533,16 +667,7 @@ Password:   ${adminPassword}
 
 Save this password somewhere safe — we can reset on request, but keeping your own copy is faster.
 
-What you can do from your admin:
-- Edit any page text or service
-- Add or swap photos
-- Change colors and theme
-- Manage hours, contact info, and bookings
-
-Questions? Just reply — we read every one.
-
-— The Waji team`,
-  }
+— The Waji team`
 }
 
 // 6b. Admin alert when intake completes ─────────────────

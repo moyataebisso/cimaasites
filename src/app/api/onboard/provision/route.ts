@@ -7,6 +7,7 @@ import { generatePhotoSet } from '@/lib/provision/generate-photos'
 import { createVercelProject } from '@/lib/provision/deploy-vercel'
 import { seedClientDatabase } from '@/lib/provision/seed-database'
 import { createClientSchema } from '@/lib/provision/create-client-schema'
+import { generateAdminInvite } from '@/lib/provision/admin-invite'
 import { generateSlug } from '@/lib/provision/slug'
 import {
   sendPreviewReadyEmail,
@@ -355,12 +356,15 @@ async function provisionSite(
     })
   }
 
-  // ─── C: Seed database (admin user + content) ───
+  // ─── C: Seed database (site_settings + services + menu_items) ───
+  // Auth user is no longer created here — moved to step D so it can be paired
+  // atomically with the invite-link generation. We gate this step on
+  // client_admin_email alone (column kept around for legacy rows; new rows
+  // never write client_admin_password — Supabase Auth owns the credential now).
   console.log('[provision] step: seed database', { submissionId })
   let adminEmail: string = submission.client_admin_email
-  let adminPassword: string = submission.client_admin_password
 
-  if (!adminEmail || !adminPassword) {
+  if (!adminEmail) {
     await logStep(
       submissionId,
       'setting_up_domain',
@@ -370,14 +374,13 @@ async function provisionSite(
 
     const seeded = await seedClientDatabase(submission, content, schemaName)
     adminEmail = seeded.adminEmail
-    adminPassword = seeded.adminPassword
 
     await supabaseAdmin
       .schema('cimaasites')
       .from('onboarding_submissions')
       .update({
         client_admin_email: adminEmail,
-        client_admin_password: adminPassword,
+        client_admin_password: null,
       })
       .eq('id', submissionId)
 
@@ -393,9 +396,9 @@ async function provisionSite(
       submissionId,
       'setting_up_domain',
       'done',
-      'Reusing existing admin credentials'
+      'Reusing existing seed'
     )
-    console.log('[provision] admin creds reused', { submissionId, adminEmail })
+    console.log('[provision] seed reused', { submissionId, adminEmail })
   }
 
   // ─── D: Welcome email (idempotent — guarded by welcome_email_sent_at) ───
@@ -411,12 +414,41 @@ async function provisionSite(
       'Sending your preview link...'
     )
 
+    // Vercel deploys return a bare hostname in client_preview_url for some flows
+    // (e.g. "foo-bar.vercel.app"), with `https://` for others. Normalize before
+    // building redirect/admin URLs so Supabase doesn't reject the redirectTo.
+    const customerSiteUrl = previewUrl.startsWith('http')
+      ? previewUrl
+      : `https://${previewUrl}`
+    const adminUrl = `${customerSiteUrl}/admin`
+
+    const invite = await generateAdminInvite({
+      email: adminEmail,
+      schemaName,
+      businessName: submission.business_name,
+      redirectTo: `${customerSiteUrl}/admin/set-password`,
+      adminUrl,
+    })
+
+    await logStep(
+      submissionId,
+      'invite_link_generated',
+      invite.type === 'fallback_manual_reset' ? 'failed' : 'done',
+      invite.type === 'fallback_manual_reset'
+        ? 'Auth API unavailable — customer will use Forgot password on login page'
+        : `Invite link generated (${invite.type})`,
+      invite.type === 'fallback_manual_reset'
+        ? 'Both invite and recovery generateLink calls failed'
+        : undefined
+    )
+
     await sendPreviewReadyEmail({
       email: submission.email,
       businessName: submission.business_name,
-      previewUrl,
+      previewUrl: customerSiteUrl,
       adminEmail,
-      adminPassword,
+      inviteLink: invite.actionLink,
+      inviteType: invite.type,
       submissionId,
     })
 

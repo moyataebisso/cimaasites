@@ -237,7 +237,12 @@ export async function sendPreviewReadyEmail(data: {
   businessName: string
   previewUrl: string
   adminEmail: string
-  adminPassword: string
+  // New flow: Supabase invite link the customer uses on /admin/set-password.
+  inviteLink?: string
+  inviteType?: 'invite' | 'recovery' | 'fallback_manual_reset'
+  // Legacy flow: kept so the standalone CLI script (scripts/provision.ts)
+  // and any pre-cutover retries keep rendering correctly.
+  adminPassword?: string
   submissionId: string
   contactName?: string
 }) {
@@ -247,6 +252,8 @@ export async function sendPreviewReadyEmail(data: {
     previewUrl: data.previewUrl,
     adminUrl: `${data.previewUrl}/admin`,
     adminEmail: data.adminEmail,
+    inviteLink: data.inviteLink,
+    inviteType: data.inviteType,
     adminPassword: data.adminPassword,
   })
   await getResend().emails.send({

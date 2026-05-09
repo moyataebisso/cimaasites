@@ -25,7 +25,8 @@ const mock = {
   previewUrl: 'https://adama-restaurant-xyz.vercel.app',
   adminUrl: 'https://adama-restaurant-xyz.vercel.app/admin',
   adminEmail: 'sarah@adamarestaurant.com',
-  adminPassword: 'Xk9mP3nQ7wRt',
+  inviteLink:
+    'https://abcxyz.supabase.co/auth/v1/verify?token=mock-invite-token&type=invite&redirect_to=https%3A%2F%2Fadama-restaurant-xyz.vercel.app%2Fadmin%2Fset-password',
   submissionId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   submittedAt: new Date().toISOString(),
 }
@@ -128,7 +129,8 @@ const TEMPLATES: TemplateMeta[] = [
         previewUrl: mock.previewUrl,
         adminUrl: mock.adminUrl,
         adminEmail: mock.adminEmail,
-        adminPassword: mock.adminPassword,
+        inviteLink: mock.inviteLink,
+        inviteType: 'invite',
       }),
   },
 ]

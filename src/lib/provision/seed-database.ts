@@ -28,16 +28,6 @@ function toText(v: unknown): string {
   }
 }
 
-// 12 chars, no ambiguous (0/O/1/l/I) so customers can re-type from email.
-function generatePassword(): string {
-  const chars =
-    'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
-  return Array.from(
-    { length: 12 },
-    () => chars[Math.floor(Math.random() * chars.length)]
-  ).join('')
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Submission = any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -312,46 +302,17 @@ export async function seedClientDatabase(
     })
   }
 
-  // ─── 3. admin auth user ─────────────────────────────────
-  console.log('[seed] creating admin user', { email: submission.email })
-  const adminPassword = generatePassword()
-
-  let adminUserId: string | undefined
-  try {
-    const { data: authData, error: authError } =
-      await supabaseAdmin.auth.admin.createUser({
-        email: submission.email,
-        password: adminPassword,
-        user_metadata: { role: 'admin', schema: schemaName },
-        email_confirm: true,
-      })
-
-    if (authError) {
-      // If the user already exists from a previous attempt, this isn't fatal —
-      // they'll need to reset their password but the site still works.
-      console.error('[seed] auth.admin.createUser error (non-fatal)', {
-        message: authError.message,
-        status: authError.status,
-      })
-    } else {
-      adminUserId = authData?.user?.id
-    }
-  } catch (err) {
-    console.error('[seed] createUser threw', { err })
-    // Don't throw — site is still usable; client can reset password via email.
-  }
-
+  // Auth user creation moved to the invite step (see admin-invite.ts) so we
+  // generate the user + invite link together right before the welcome email.
+  // Eliminates the plaintext-password-in-DB step entirely.
   console.log('[seed] complete', {
     schemaName,
     adminEmail: submission.email,
-    adminUserId,
     settingsWritten: settings.length,
     servicesWritten: services.length,
   })
 
   return {
     adminEmail: submission.email,
-    adminPassword,
-    adminUserId,
   }
 }
