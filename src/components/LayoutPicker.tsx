@@ -26,7 +26,7 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
             aria-checked={selected}
             onClick={() => onChange(layout.id)}
             className={cn(
-              "group relative flex flex-col text-left rounded-xl bg-slate-800 p-6 sm:p-7 min-h-[280px] sm:min-h-[300px] transition-all duration-200 cursor-pointer",
+              "group relative flex flex-col text-left rounded-xl bg-slate-800 p-5 min-h-[200px] transition-all duration-200 cursor-pointer",
               "hover:-translate-y-0.5 hover:shadow-xl",
               selected
                 ? "ring-2 ring-violet-500 bg-slate-800/90 shadow-lg shadow-violet-500/10"
@@ -43,16 +43,16 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
             )}
 
             <div className="flex-1">
-              <h3 className="font-heading font-semibold text-white text-3xl sm:text-4xl leading-[1.05] tracking-tight pr-8">
+              <h3 className="font-heading font-semibold text-white text-xl sm:text-2xl leading-snug tracking-tight pr-8 break-words">
                 {layout.name}
               </h3>
-              <p className="mt-3 text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-xs sm:text-sm text-slate-400 leading-relaxed">
                 {layout.industry}
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between gap-3">
-              <span className="text-[11px] uppercase tracking-wider text-slate-500 font-medium">
+            <div className="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-3">
+              <span className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-500 font-medium">
                 {layout.tagline}
               </span>
               <a
