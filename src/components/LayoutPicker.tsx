@@ -14,7 +14,7 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
     <div
       role="radiogroup"
       aria-label="Starting layout"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 gap-4"
     >
       {LAYOUTS.map((layout) => {
         const selected = value === layout.id;
@@ -26,7 +26,7 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
             aria-checked={selected}
             onClick={() => onChange(layout.id)}
             className={cn(
-              "group relative flex flex-col text-left rounded-xl bg-slate-800 p-5 min-h-[200px] transition-all duration-200 cursor-pointer",
+              "group relative flex flex-col text-left rounded-xl bg-slate-800 p-6 min-h-[180px] transition-all duration-200 cursor-pointer",
               "hover:-translate-y-0.5 hover:shadow-xl",
               selected
                 ? "ring-2 ring-violet-500 bg-slate-800/90 shadow-lg shadow-violet-500/10"
@@ -43,10 +43,10 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
             )}
 
             <div className="flex-1">
-              <h3 className="font-heading font-semibold text-white text-xl sm:text-2xl leading-snug tracking-tight pr-8 break-words">
+              <h3 className="font-heading font-semibold text-white text-2xl sm:text-3xl leading-snug tracking-tight pr-8">
                 {layout.name}
               </h3>
-              <p className="mt-2 text-xs sm:text-sm text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
                 {layout.industry}
               </p>
             </div>
