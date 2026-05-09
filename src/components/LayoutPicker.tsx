@@ -43,10 +43,10 @@ export function LayoutPicker({ value, onChange }: LayoutPickerProps) {
             )}
 
             <div className="flex-1">
-              <h3 className="font-heading font-semibold text-white text-2xl sm:text-3xl leading-snug tracking-tight pr-8">
+              <h3 className="font-heading font-semibold text-white text-2xl leading-snug tracking-tight pr-8">
                 {layout.name}
               </h3>
-              <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
+              <p className="mt-2 text-sm text-slate-400 leading-relaxed">
                 {layout.industry}
               </p>
             </div>
