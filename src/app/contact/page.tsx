@@ -7,6 +7,7 @@ import { Mail, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { LayoutPicker } from "@/components/LayoutPicker";
+import SiteGallery from "@/components/marketing/SiteGallery";
 import type { LayoutId } from "@/lib/layouts";
 
 const PLAN_LABELS: Record<"basic" | "pro" | "developer", string> = {
@@ -187,7 +188,8 @@ function ContactPageInner() {
 
   return (
     <main>
-      <section className="bg-cimaa-bg-tan pt-28 pb-16 md:pt-32 md:pb-20">
+      <SiteGallery />
+      <section className="bg-cimaa-bg-tan pb-16 md:pb-20">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 max-w-6xl mx-auto">
             <motion.div {...fadeUp}>
