@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendPaymentReceivedEmail } from '@/lib/emails'
@@ -134,44 +135,50 @@ export async function POST(request: Request) {
         timestamp: new Date().toISOString(),
       })
 
-      // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
-      // .then/.catch upgraded: log status+ok always, dump response body on
-      // non-2xx (truncated to 500 chars), and include the URL in failure
-      // logs so a future malformed URL surfaces in seconds, not hours.
-      fetch(provisionUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ submissionId }),
-      })
-        .then(async (res) => {
-          console.log('[webhook] provision_trigger_response', {
-            submissionId,
-            status: res.status,
-            ok: res.ok,
-            statusText: res.statusText,
-            provisionUrl,
-            timestamp: new Date().toISOString(),
-          })
-          if (!res.ok) {
-            const body = await res.text().catch(() => '<unreadable>')
-            console.error('[webhook] provision_trigger_non_ok_body', {
+      // Don't await — Stripe webhook must return 200 fast. But also don't let
+      // Vercel kill the serverless function the instant we return: wrap the
+      // promise in waitUntil() so the platform keeps the dispatch fetch alive
+      // until /api/onboard/provision has at least received the request and
+      // claimed the row (which is sub-second; the slow provisioning runs in
+      // that route's own function). Without waitUntil, Vercel tore down this
+      // function mid-fetch and the provision route never saw the request —
+      // confirmed for Adama Test 7.
+      waitUntil(
+        fetch(provisionUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionId }),
+        })
+          .then(async (res) => {
+            console.log('[webhook] provision_trigger_response', {
               submissionId,
               status: res.status,
+              ok: res.ok,
+              statusText: res.statusText,
               provisionUrl,
-              body: body.slice(0, 500),
+              timestamp: new Date().toISOString(),
             })
-          }
-        })
-        .catch((err: unknown) => {
-          const isErr = err instanceof Error
-          console.error('[webhook] provision_trigger_failed', {
-            submissionId,
-            provisionUrl,
-            error: isErr ? err.message : String(err),
-            stack: isErr ? err.stack : undefined,
-            timestamp: new Date().toISOString(),
+            if (!res.ok) {
+              const body = await res.text().catch(() => '<unreadable>')
+              console.error('[webhook] provision_trigger_non_ok_body', {
+                submissionId,
+                status: res.status,
+                provisionUrl,
+                body: body.slice(0, 500),
+              })
+            }
           })
-        })
+          .catch((err: unknown) => {
+            const isErr = err instanceof Error
+            console.error('[webhook] provision_trigger_failed', {
+              submissionId,
+              provisionUrl,
+              error: isErr ? err.message : String(err),
+              stack: isErr ? err.stack : undefined,
+              timestamp: new Date().toISOString(),
+            })
+          })
+      )
 
       // Sync log — proves the fetch was at least scheduled before this
       // function returns. Vercel can terminate fire-and-forget promises
