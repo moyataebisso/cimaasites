@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "provision": "tsx scripts/provision.ts"
+    "provision": "tsx scripts/provision.ts",
+    "test:redirect": "tsx scripts/test-redirect-fix.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
