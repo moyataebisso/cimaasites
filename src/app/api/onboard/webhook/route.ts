@@ -1,6 +1,7 @@
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendPaymentReceivedEmail } from '@/lib/emails'
+import { getAppBaseUrl } from '@/lib/urls'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -119,54 +120,64 @@ export async function POST(request: Request) {
         checkoutType,
       })
     } else {
-      const host = request.headers.get('host')
-      const baseUrl =
-        process.env.NEXT_PUBLIC_APP_URL ||
-        (host ? `https://${host}` : null)
+      // baseUrl is now always defined — getAppBaseUrl falls back through env →
+      // host header → hardcoded prod. The previous null-check is no longer
+      // needed but the URL value is still worth logging so a misconfigured env
+      // var (or unexpected host header) is visible in `triggering_provision`.
+      const baseUrl = getAppBaseUrl(request)
+      const provisionUrl = `${baseUrl}/api/onboard/provision`
+      console.log('[webhook] triggering_provision', {
+        submissionId,
+        checkoutType,
+        provisionUrl,
+        wasDuplicate,
+        timestamp: new Date().toISOString(),
+      })
 
-      if (!baseUrl) {
-        console.error(
-          '[webhook] cannot trigger provision — no NEXT_PUBLIC_APP_URL and no host header',
-          { submissionId }
-        )
-      } else {
-        const provisionUrl = `${baseUrl}/api/onboard/provision`
-        console.log('[webhook] triggering_provision', {
-          submissionId,
-          checkoutType,
-          provisionUrl,
-          wasDuplicate,
-          timestamp: new Date().toISOString(),
-        })
-
-        // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
-        fetch(provisionUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ submissionId }),
-        })
-          .then((res) => {
-            console.log('[webhook] provision_trigger_response', {
+      // Fire-and-forget. Do NOT await — Stripe webhook must respond fast.
+      // .then/.catch upgraded: log status+ok always, dump response body on
+      // non-2xx (truncated to 500 chars), and include the URL in failure
+      // logs so a future malformed URL surfaces in seconds, not hours.
+      fetch(provisionUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId }),
+      })
+        .then(async (res) => {
+          console.log('[webhook] provision_trigger_response', {
+            submissionId,
+            status: res.status,
+            ok: res.ok,
+            statusText: res.statusText,
+            provisionUrl,
+            timestamp: new Date().toISOString(),
+          })
+          if (!res.ok) {
+            const body = await res.text().catch(() => '<unreadable>')
+            console.error('[webhook] provision_trigger_non_ok_body', {
               submissionId,
               status: res.status,
-            })
-          })
-          .catch((err: unknown) => {
-            const isErr = err instanceof Error
-            console.error('[webhook] provision_trigger_failed', {
-              submissionId,
               provisionUrl,
-              error: isErr ? err.message : String(err),
-              stack: isErr ? err.stack : undefined,
+              body: body.slice(0, 500),
             })
+          }
+        })
+        .catch((err: unknown) => {
+          const isErr = err instanceof Error
+          console.error('[webhook] provision_trigger_failed', {
+            submissionId,
+            provisionUrl,
+            error: isErr ? err.message : String(err),
+            stack: isErr ? err.stack : undefined,
+            timestamp: new Date().toISOString(),
           })
+        })
 
-        // Sync log — proves the fetch was at least scheduled before this
-        // function returns. Vercel can terminate fire-and-forget promises
-        // once the response is sent; this lets us see in logs whether we
-        // even got to the dispatch.
-        console.log('[webhook] provision_fetch_dispatched', { submissionId })
-      }
+      // Sync log — proves the fetch was at least scheduled before this
+      // function returns. Vercel can terminate fire-and-forget promises
+      // once the response is sent; this lets us see in logs whether we
+      // even got to the dispatch.
+      console.log('[webhook] provision_fetch_dispatched', { submissionId })
     }
   }
 

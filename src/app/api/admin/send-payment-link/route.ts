@@ -4,6 +4,7 @@ import {
   createCheckoutSession,
   type CheckoutPlan,
 } from '@/lib/stripe-checkout'
+import { getAppBaseUrl } from '@/lib/urls'
 
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cimaasites.ai'
+  const appUrl = getAppBaseUrl(request)
 
   let session
   try {

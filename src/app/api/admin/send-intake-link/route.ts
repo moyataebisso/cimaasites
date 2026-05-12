@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
 import { sendIntakeLink } from '@/lib/emails'
+import { getAppBaseUrl } from '@/lib/urls'
 
 export const maxDuration = 30
 export const dynamic = 'force-dynamic'
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
     }
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cimaasites.ai'
+  const appUrl = getAppBaseUrl(request)
   const intakeUrl = `${appUrl}/intake/${intakeToken}`
 
   const emailResult = await sendIntakeLink(submission, intakeUrl)

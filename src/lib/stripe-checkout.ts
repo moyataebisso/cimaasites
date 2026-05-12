@@ -1,5 +1,6 @@
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase'
+import { getAppBaseUrl } from '@/lib/urls'
 
 export type CheckoutPlan = 'basic' | 'pro' | 'developer'
 
@@ -29,11 +30,12 @@ export async function createCheckoutSession(
 ): Promise<CreateCheckoutResult> {
   const { submissionId, plan, email, businessName } = input
 
+  const appUrl = getAppBaseUrl()
   const successUrl =
     input.successUrl ||
-    `${process.env.NEXT_PUBLIC_APP_URL}/building/${submissionId}?session_id={CHECKOUT_SESSION_ID}`
+    `${appUrl}/building/${submissionId}?session_id={CHECKOUT_SESSION_ID}`
   const cancelUrl =
-    input.cancelUrl || `${process.env.NEXT_PUBLIC_APP_URL}/get-started?cancelled=true`
+    input.cancelUrl || `${appUrl}/get-started?cancelled=true`
 
   let session
 
