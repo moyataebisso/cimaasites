@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { LAYOUTS } from "@/lib/layouts";
+
+const LOGO_BASE =
+  "https://abhpzepanwhuswhiuutu.supabase.co/storage/v1/object/public/logos";
 
 export const metadata: Metadata = {
   title: "Portfolio",
@@ -16,8 +20,10 @@ interface ProjectCard {
   industry: string;
   description: string;
   url: string | null;
-  /** Tailwind utility classes for the placeholder gradient. */
+  /** Tailwind utility classes for the gradient block behind the logo. */
   accent: string;
+  /** Public Supabase Storage URL for the project's logo. */
+  logo: string;
 }
 
 const projects: ProjectCard[] = [
@@ -28,6 +34,7 @@ const projects: ProjectCard[] = [
       "Provider matching platform with appointment booking and secure messaging.",
     url: "https://careconnectlive.org",
     accent: "from-emerald-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/careconnect-logo.png`,
   },
   {
     name: "SaveYours",
@@ -36,6 +43,7 @@ const projects: ProjectCard[] = [
       "CPR and first aid class registration with Stripe payments and automated emails.",
     url: "https://saveyours.net",
     accent: "from-rose-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/saveyours-logo.png`,
   },
   {
     name: "Entrusted Home Healthcare",
@@ -44,6 +52,7 @@ const projects: ProjectCard[] = [
       "Home healthcare agency website with HIPAA-aligned content and service listings.",
     url: "https://entrustedhomehealthcare.org",
     accent: "from-sky-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/entrusted-logo.png`,
   },
   {
     name: "Rift Valley Transportation",
@@ -52,6 +61,7 @@ const projects: ProjectCard[] = [
       "Transportation company website serving the Twin Cities metro area.",
     url: "https://rvtusinc.com",
     accent: "from-amber-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/riftvalley-logo.png`,
   },
   {
     name: "Oromo Platform",
@@ -60,6 +70,7 @@ const projects: ProjectCard[] = [
       "Community hub — academy, businesses, careers, news, events, all in one platform.",
     url: "https://oromo-platform.vercel.app",
     accent: "from-violet-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/odda-logo.png`,
   },
   {
     name: "Arsi Technology Group",
@@ -68,6 +79,7 @@ const projects: ProjectCard[] = [
       "The Minneapolis-based studio behind Waji and the rest of the platform.",
     url: "https://arsitechgroup.com",
     accent: "from-slate-100 to-cimaa-bg-tan",
+    logo: `${LOGO_BASE}/indsve-logo.png`,
   },
 ];
 
@@ -148,14 +160,22 @@ function ProjectTile({ project }: { project: ProjectCard }) {
   return (
     <div className="rounded-2xl border border-cimaa-border bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
       <div
-        className={`h-40 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
+        className={`relative h-48 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
       >
-        <span className="font-heading text-xl font-semibold text-cimaa-text text-center leading-tight">
-          {project.name}
-        </span>
+        <Image
+          src={project.logo}
+          alt={`${project.name} logo`}
+          width={240}
+          height={240}
+          sizes="(min-width: 1024px) 280px, (min-width: 640px) 40vw, 80vw"
+          className="object-contain max-h-32 w-auto"
+        />
       </div>
       <div className="p-6 flex-1 flex flex-col">
-        <span className="text-xs font-semibold uppercase tracking-wider text-cimaa-green">
+        <h3 className="font-heading text-lg font-semibold text-cimaa-text">
+          {project.name}
+        </h3>
+        <span className="mt-1 text-xs font-semibold uppercase tracking-wider text-cimaa-green">
           {project.industry}
         </span>
         <p className="mt-2 text-cimaa-text-muted leading-relaxed text-sm flex-1">
