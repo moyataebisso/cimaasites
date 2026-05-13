@@ -36,7 +36,7 @@ export function HomeHero() {
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-cimaa-text-muted leading-relaxed max-w-xl">
-              From restaurants to home services to nonprofits — Waji
+              From restaurants to home services to nonprofits — Wajii
               Professional Websites builds, launches, maintains, and protects
               your website. So you can focus on what you do best. All coded
               from scratch.

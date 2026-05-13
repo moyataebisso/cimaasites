@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "How It Works",
   description:
-    "What you get with Waji Professional Websites. Tell us about your business and we'll send a custom quote within 24 hours.",
+    "What you get with Wajii Professional Websites. Tell us about your business and we'll send a custom quote within 24 hours.",
 };
 
 interface Tier {
@@ -72,7 +72,7 @@ export default function PricingPage() {
           <SectionHeading
             eyebrow="What you get"
             headline="What you get with"
-            accent="Waji Professional Websites."
+            accent="Wajii Professional Websites."
             subtitle="Every business is different — so instead of one-size-fits-all pricing, we send you a custom quote within 24 hours."
           />
         </Container>

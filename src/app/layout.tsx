@@ -26,8 +26,8 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: {
     default:
-      "Waji Professional Websites — Custom Websites for Local Businesses",
-    template: "%s | Waji Professional Websites",
+      "Wajii Professional Websites — Custom Websites for Local Businesses",
+    template: "%s | Wajii Professional Websites",
   },
   description:
     "Custom websites for local and small businesses. Built, launched, secured, and supported — so you can focus on what you do best.",
@@ -35,17 +35,17 @@ export const metadata: Metadata = {
     "small business website, local business website, professional website, done for you website, website monitoring, restaurant website, salon website, healthcare website, fleet website, home services website",
   openGraph: {
     title:
-      "Waji Professional Websites — Custom Websites for Local Businesses",
+      "Wajii Professional Websites — Custom Websites for Local Businesses",
     description:
       "Custom websites for local businesses. Built, launched, secured, and supported. Get a quote in 24 hours.",
     url: "https://cimaasites.ai",
-    siteName: "Waji Professional Websites",
+    siteName: "Wajii Professional Websites",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title:
-      "Waji Professional Websites — Custom Websites for Local Businesses",
+      "Wajii Professional Websites — Custom Websites for Local Businesses",
     description:
       "Custom websites for local businesses. Get a quote in 24 hours.",
   },
@@ -65,7 +65,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "LocalBusiness",
-              name: "Waji Professional Websites",
+              name: "Wajii Professional Websites",
               description:
                 "Custom websites for local and small businesses. Built, launched, secured, and supported.",
               url: "https://cimaasites.ai",

@@ -12,7 +12,7 @@ const LOGO_BASE =
 export const metadata: Metadata = {
   title: "Portfolio",
   description:
-    "Real businesses on the Waji Professional Websites platform and the broader Arsi Technology Group ecosystem.",
+    "Real businesses on the Wajii Professional Websites platform and the broader Arsi Technology Group ecosystem.",
 };
 
 interface ProjectCard {
@@ -76,7 +76,7 @@ const projects: ProjectCard[] = [
     name: "Arsi Technology Group",
     industry: "Studio",
     description:
-      "The Minneapolis-based studio behind Waji and the rest of the platform.",
+      "The Minneapolis-based studio behind Wajii and the rest of the platform.",
     url: "https://arsitechgroup.com",
     accent: "from-slate-100 to-cimaa-bg-tan",
     logo: `${LOGO_BASE}/indsve-logo.png`,
@@ -93,7 +93,7 @@ export default function PortfolioPage() {
             eyebrow="Portfolio"
             headline="Real businesses,"
             accent="real sites"
-            subtitle="A look at sites built and run on the Waji Professional Websites platform — and the broader Arsi Technology Group ecosystem."
+            subtitle="A look at sites built and run on the Wajii Professional Websites platform — and the broader Arsi Technology Group ecosystem."
           />
         </Container>
       </section>

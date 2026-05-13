@@ -6,7 +6,7 @@ export default function PrivacyPage() {
       </h1>
       <p className="text-slate-400 mb-4">Last updated: April 2026</p>
       <p className="text-slate-400">
-        Waji Professional Websites collects only the information needed to build and manage your
+        Wajii Professional Websites collects only the information needed to build and manage your
         website. We never sell your data. Your business data is stored securely
         in your own database. Full privacy policy coming soon.
       </p>

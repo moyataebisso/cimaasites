@@ -1,5 +1,5 @@
 /**
- * Waji email design v2 — SaveYours-style: yellow header + footer bands,
+ * Wajii email design v2 — SaveYours-style: yellow header + footer bands,
  * clean white body, table-based info blocks, soft yellow callouts.
  *
  * Same 7 exports + arg shapes as v1 (email-templates.ts) so the swap in
@@ -52,7 +52,7 @@ function buildShell({ preheader, headerTitle, bodyHtml }: BuildArgs): string {
         <!-- HEADER -->
         <tr><td style="background:${COLORS.yellow};padding:32px 40px;text-align:center">
           <h1 style="margin:0;color:${COLORS.text};font-size:26px;font-weight:700;line-height:1.2">
-            💻 Waji ${escapeHtml(headerTitle)}
+            💻 Wajii ${escapeHtml(headerTitle)}
           </h1>
         </td></tr>
 
@@ -63,7 +63,7 @@ function buildShell({ preheader, headerTitle, bodyHtml }: BuildArgs): string {
 
         <!-- FOOTER -->
         <tr><td style="background:${COLORS.yellow};padding:24px 40px;text-align:center;color:${COLORS.text};font-size:14px;line-height:1.6">
-          <strong>Waji Professional Websites</strong><br>
+          <strong>Wajii Professional Websites</strong><br>
           Custom websites for local businesses<br>
           <span style="color:${COLORS.textMuted}">Designed in Minneapolis, MN</span><br>
           <a href="${SITE_URL}/contact" style="color:${COLORS.text};text-decoration:underline">Get a Quote</a>
@@ -126,7 +126,7 @@ function ctaButton(text: string, url: string): string {
   </table>`
 }
 
-function signoff(line = '— The Waji team'): string {
+function signoff(line = '— The Wajii team'): string {
   return `<p style="margin:24px 0 0;font-size:15px;color:${COLORS.textMuted}">${escapeHtml(line)}</p>`
 }
 
@@ -182,11 +182,11 @@ export function contactReceivedEmail({
   contactName,
   businessName,
 }: ContactReceivedArgs) {
-  const subject = 'We got your message — Waji Professional Websites'
+  const subject = 'We got your message — Wajii Professional Websites'
   const bodyHtml = `
 ${greeting(contactName)}
 ${paragraph(
-  `Thanks for reaching out about a website for <strong>${escapeHtml(businessName)}</strong>. A real person from the Waji team will read every word and reply within 24 hours — usually faster.`
+  `Thanks for reaching out about a website for <strong>${escapeHtml(businessName)}</strong>. A real person from the Wajii team will read every word and reply within 24 hours — usually faster.`
 )}
 ${bullets('What happens next:', [
   'We review your inquiry and check for fit (within 24 hours)',
@@ -216,7 +216,7 @@ function textForContactReceived({
 }: ContactReceivedArgs): string {
   return `Hi ${contactName || 'there'},
 
-Thanks for reaching out about a website for ${businessName}. A real person from the Waji team will read every word and reply within 24 hours — usually faster.
+Thanks for reaching out about a website for ${businessName}. A real person from the Wajii team will read every word and reply within 24 hours — usually faster.
 
 What happens next:
 - We review your inquiry and check for fit (within 24 hours)
@@ -225,8 +225,8 @@ What happens next:
 
 If you didn't submit this, just ignore this email.
 
-— The Waji team
-Waji Professional Websites · Designed in Minneapolis, MN
+— The Wajii team
+Wajii Professional Websites · Designed in Minneapolis, MN
 ${SITE_URL}`
 }
 
@@ -237,7 +237,7 @@ export function contactReceivedAdminAlert({
 }: {
   submission: AdminAlertSubmission
 }) {
-  const subject = `🔔 New Waji inquiry — ${submission.business_name} (${submission.plan})`
+  const subject = `🔔 New Wajii inquiry — ${submission.business_name} (${submission.plan})`
   const submittedAt = formatTimestamp(submission.submitted_at)
   const bodyHtml = `
 ${paragraph(`<strong>${escapeHtml(submission.business_name)}</strong> just submitted the contact form. Submitted ${escapeHtml(submittedAt)}.`)}
@@ -263,7 +263,7 @@ ${paragraph(`<span style="color:${COLORS.textMuted};font-size:13px">ID: ${escape
       headerTitle: 'New inquiry',
       bodyHtml,
     }),
-    text: `New Waji inquiry — ${submission.business_name}
+    text: `New Wajii inquiry — ${submission.business_name}
 
 Contact:        ${submission.contact_name || '—'}
 Email:          ${submission.email}
@@ -313,7 +313,7 @@ ${bullets("What we'll ask for:", [
 ${ctaButton('Start the intake form', intakeUrl)}
 ${callout(
   'Plan',
-  `<strong>${escapeHtml(plan)}</strong> — replies are read by the Waji team directly. Just reply if you have questions.`
+  `<strong>${escapeHtml(plan)}</strong> — replies are read by the Wajii team directly. Just reply if you have questions.`
 )}
 ${signoff()}
 `
@@ -336,9 +336,9 @@ What we'll ask for:
 
 Start the intake form: ${intakeUrl}
 
-Plan: ${plan}. Replies are read by the Waji team.
+Plan: ${plan}. Replies are read by the Wajii team.
 
-— The Waji team`,
+— The Wajii team`,
   }
 }
 
@@ -388,7 +388,7 @@ Pay setup fee: ${paymentUrl}
 
 Secure payment via Stripe. No card on file.
 
-— The Waji team`,
+— The Wajii team`,
   }
 }
 
@@ -465,7 +465,7 @@ What's happening now:
 
 Stripe will email you a separate receipt for tax records.
 
-— The Waji team`,
+— The Wajii team`,
   }
 }
 
@@ -500,7 +500,7 @@ export function siteLiveEmail({
   inviteType,
   adminPassword,
 }: SiteLiveArgs) {
-  const subject = `🚀 Your Waji site is ready — preview ${businessName}`
+  const subject = `🚀 Your Wajii site is ready — preview ${businessName}`
   const useInvite = !!inviteLink
   const isFallback = inviteType === 'fallback_manual_reset'
 
@@ -628,7 +628,7 @@ Then click "Forgot password" to receive a setup link.
 
 We had a brief hiccup generating your one-click setup link, but the Forgot password flow does the same thing.
 
-— The Waji team`
+— The Wajii team`
   }
   return `Hi ${contactName || 'there'},
 
@@ -642,7 +642,7 @@ Set your password (single-use, expires in 24h): ${inviteLink}
 
 After you set your password, log in any time at ${adminUrl}.
 
-— The Waji team`
+— The Wajii team`
 }
 
 function siteLiveTextLegacy(args: {
@@ -667,7 +667,7 @@ Password:   ${adminPassword}
 
 Save this password somewhere safe — we can reset on request, but keeping your own copy is faster.
 
-— The Waji team`
+— The Wajii team`
 }
 
 // 6b. Admin alert when intake completes ─────────────────

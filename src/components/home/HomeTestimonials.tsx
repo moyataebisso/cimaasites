@@ -16,7 +16,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "Waji got our healthcare agency online in under a week. The admin dashboard is so easy — even our staff can update it. Best investment we've made.",
+      "Wajii got our healthcare agency online in under a week. The admin dashboard is so easy — even our staff can update it. Best investment we've made.",
     name: "Fatima A.",
     business: "Entrusted Home Healthcare",
     initials: "FA",
@@ -24,7 +24,7 @@ const testimonials: Testimonial[] = [
   },
   {
     quote:
-      "I was paying thousands for a basic agency site. Waji rebuilt mine and now they handle everything. My site loads faster too.",
+      "I was paying thousands for a basic agency site. Wajii rebuilt mine and now they handle everything. My site loads faster too.",
     name: "Ahmed M.",
     business: "Rift Valley Transportation",
     initials: "AM",

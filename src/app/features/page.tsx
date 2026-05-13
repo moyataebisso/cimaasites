@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Features",
   description:
-    "Everything you need to launch, run, and grow a website for your local business — included with every Waji site.",
+    "Everything you need to launch, run, and grow a website for your local business — included with every Wajii site.",
 };
 
 interface CategoryDef {
@@ -62,7 +62,7 @@ const categories: CategoryDef[] = [
     eyebrow: "Trust",
     headline: "Yours, always",
     blurb:
-      "Your content, your customers, your brand. Waji runs on infrastructure that doesn't lock you in.",
+      "Your content, your customers, your brand. Wajii runs on infrastructure that doesn't lock you in.",
     features: [
       "Your content, your data — yours forever",
       "SSL secured and GDPR-friendly",
@@ -83,7 +83,7 @@ export default function FeaturesPage() {
             eyebrow="Features"
             headline="Everything you need to launch, run &"
             accent="grow"
-            subtitle="Every Waji site comes with the tools and care you'd expect from a high-end agency build — without the agency timeline or budget."
+            subtitle="Every Wajii site comes with the tools and care you'd expect from a high-end agency build — without the agency timeline or budget."
           />
         </Container>
       </section>

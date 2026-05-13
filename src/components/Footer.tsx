@@ -21,7 +21,7 @@ export function Footer() {
         <div className="py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <span className="font-heading text-lg font-semibold text-cimaa-text">
-              Waji Professional Websites
+              Wajii Professional Websites
             </span>
             <p className="mt-3 text-sm text-cimaa-text-muted leading-relaxed max-w-xs">
               Custom websites for local businesses.
@@ -67,7 +67,7 @@ export function Footer() {
         </div>
 
         <div className="py-6 border-t border-cimaa-border flex flex-col sm:flex-row gap-4 sm:items-center justify-between text-xs text-cimaa-text-muted">
-          <p>&copy; 2026 Waji Professional Websites by Arsi Technology Group</p>
+          <p>&copy; 2026 Wajii Professional Websites by Arsi Technology Group</p>
           <div className="flex items-center gap-5">
             <Link
               href="/privacy"

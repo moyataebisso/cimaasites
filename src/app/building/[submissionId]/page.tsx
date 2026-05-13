@@ -98,7 +98,7 @@ export default function BuildingPage({
           transition={{ duration: 0.5 }}
         >
           <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-            Waji
+            Wajii
           </span>
 
           {isComplete ? (

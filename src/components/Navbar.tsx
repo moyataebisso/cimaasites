@@ -43,7 +43,7 @@ export function Navbar() {
             </span>
             <span className="flex flex-col">
               <span className="font-heading text-xl font-semibold text-cimaa-text leading-tight">
-                Waji
+                Wajii
               </span>
               <span className="hidden md:block text-[10px] text-cimaa-text-muted leading-tight tracking-[0.15em] uppercase">
                 Professional Websites

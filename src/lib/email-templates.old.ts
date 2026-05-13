@@ -1,5 +1,5 @@
 /**
- * Email design system for Waji Professional Websites.
+ * Email design system for Wajii Professional Websites.
  *
  * Email-safe constraints (do not refactor away):
  *   - TABLE-based layouts only (Outlook chokes on flex/grid).
@@ -84,7 +84,7 @@ export function buildEmail({
                 <tr>
                   <td align="left" valign="middle">
                     <span style="font-size:28px;line-height:1;vertical-align:middle;">💻</span>
-                    <span style="font-family:${FONT_STACK};font-size:22px;font-weight:700;color:${COLORS.text};letter-spacing:-0.01em;margin-left:10px;vertical-align:middle;">Waji</span>
+                    <span style="font-family:${FONT_STACK};font-size:22px;font-weight:700;color:${COLORS.text};letter-spacing:-0.01em;margin-left:10px;vertical-align:middle;">Wajii</span>
                   </td>
                 </tr>
                 <tr>
@@ -130,7 +130,7 @@ export function buildEmail({
                 <tr>
                   <td align="left">
                     <p style="margin:0;font-family:${FONT_STACK};font-size:14px;font-weight:700;color:${COLORS.text};">
-                      Waji Professional Websites
+                      Wajii Professional Websites
                     </p>
                     <p style="margin:4px 0 0 0;font-family:${FONT_STACK};font-size:13px;color:${COLORS.textMuted};">
                       Custom websites for local businesses
@@ -149,7 +149,7 @@ export function buildEmail({
                 <tr>
                   <td align="left" style="padding-top:14px;">
                     <p style="margin:0;font-family:${FONT_STACK};font-size:11px;color:${COLORS.textMuted};line-height:1.5;">
-                      &copy; 2026 Waji Professional Websites by Arsi Technology Group LLC &middot; Designed in Minneapolis
+                      &copy; 2026 Wajii Professional Websites by Arsi Technology Group LLC &middot; Designed in Minneapolis
                     </p>
                   </td>
                 </tr>
@@ -387,11 +387,11 @@ export function contactReceivedEmail({
   businessName,
 }: ContactReceivedArgs) {
   const safeName = contactName || 'there'
-  const subject = 'We got your message — Waji Professional Websites'
+  const subject = 'We got your message — Wajii Professional Websites'
   const html = buildEmail({
     preheader: `A real person will reply within 24 hours about ${businessName}.`,
     title: `Thanks, ${escapeHtml(safeName)} 👋`,
-    intro: `We received your inquiry about a website for <strong style="color:${COLORS.text};">${escapeHtml(businessName)}</strong>. A real person from the Waji team will read every word and reply within 24 hours — usually faster.`,
+    intro: `We received your inquiry about a website for <strong style="color:${COLORS.text};">${escapeHtml(businessName)}</strong>. A real person from the Wajii team will read every word and reply within 24 hours — usually faster.`,
     bodyHtml: `
 <p style="margin:0 0 14px 0;font-family:${FONT_STACK};font-size:13px;font-weight:600;color:${COLORS.textMuted};text-transform:uppercase;letter-spacing:0.08em;">What happens next</p>
 ${numberedList([
@@ -426,7 +426,7 @@ export function contactReceivedAdminAlert({
   submission: AdminAlertSubmission
 }) {
   const submittedAt = formatTimestamp(submission.submitted_at)
-  const subject = `🔔 New Waji inquiry — ${submission.business_name} (${submission.plan})`
+  const subject = `🔔 New Wajii inquiry — ${submission.business_name} (${submission.plan})`
   const html = buildEmail({
     preheader: `${submission.business_name} · ${submission.plan} · ${submission.email}`,
     title: `New inquiry: ${escapeHtml(submission.business_name)}`,
@@ -483,7 +483,7 @@ ${bulletList([
 ])}`,
     ctaText: 'Start the intake form',
     ctaUrl: intakeUrl,
-    footerNote: `Plan: ${escapeHtml(plan)}. Replies are read by the Waji team.`,
+    footerNote: `Plan: ${escapeHtml(plan)}. Replies are read by the Wajii team.`,
   })
   return { subject, html }
 }
@@ -616,7 +616,7 @@ export function siteLiveEmail({
   adminPassword,
 }: SiteLiveArgs) {
   const safeName = contactName || 'there'
-  const subject = `🚀 Your Waji site is ready — preview ${businessName}`
+  const subject = `🚀 Your Wajii site is ready — preview ${businessName}`
   const html = buildEmail({
     preheader: `${businessName} is live. Preview link and admin login inside.`,
     title: `${escapeHtml(businessName)} is live ✨`,

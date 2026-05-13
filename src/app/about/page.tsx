@@ -5,9 +5,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 
 export const metadata: Metadata = {
-  title: "About — Waji Professional Websites",
+  title: "About — Wajii Professional Websites",
   description:
-    "Waji Professional Websites is part of Arsi Technology Group, a Minneapolis-based studio building tools that help local businesses look great online without the headache.",
+    "Wajii Professional Websites is part of Arsi Technology Group, a Minneapolis-based studio building tools that help local businesses look great online without the headache.",
 };
 
 const values = [
@@ -17,7 +17,7 @@ const values = [
   },
   {
     title: "Real care, every site",
-    body: "No template farms. Every Waji site is set up by people who pay attention to your industry, your customers, and your voice.",
+    body: "No template farms. Every Wajii site is set up by people who pay attention to your industry, your customers, and your voice.",
   },
   {
     title: "Yours forever, always",
@@ -32,10 +32,10 @@ export default function AboutPage() {
       <section className="bg-cimaa-bg-tan pt-28 pb-16 md:pt-32 md:pb-20">
         <Container>
           <SectionHeading
-            eyebrow="About Waji Professional Websites"
+            eyebrow="About Wajii Professional Websites"
             headline="Built by people who get"
             accent="small business"
-            subtitle="Waji Professional Websites is part of Arsi Technology Group, a Minneapolis-based studio building tools that help local businesses look great online without the headache."
+            subtitle="Wajii Professional Websites is part of Arsi Technology Group, a Minneapolis-based studio building tools that help local businesses look great online without the headache."
           />
         </Container>
       </section>
@@ -54,13 +54,13 @@ export default function AboutPage() {
             </div>
             <div className="space-y-5 text-lg text-cimaa-text-muted leading-relaxed">
               <p>
-                Most website platforms are built for developers. Waji is
+                Most website platforms are built for developers. Wajii is
                 built for the salon owner, the restaurant manager, the
                 trucking company that needs a website but doesn&apos;t have
                 time to figure out hosting, plugins, and SEO.
               </p>
               <p>
-                We built Waji because we kept watching small businesses pay
+                We built Wajii because we kept watching small businesses pay
                 agencies thousands for sites they couldn&apos;t update, on
                 platforms they didn&apos;t understand. There had to be a
                 better way.
@@ -116,7 +116,7 @@ export default function AboutPage() {
               run them.
             </p>
             <p className="mt-4 text-lg text-cimaa-text-muted leading-relaxed">
-              Beyond Waji, Arsi Technology Group builds platforms for
+              Beyond Wajii, Arsi Technology Group builds platforms for
               healthcare, transportation, community organizations, and
               education — all on the same trusted infrastructure.
             </p>

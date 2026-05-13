@@ -48,7 +48,7 @@ export default async function IntakePage({ params }: PageProps) {
               <strong className="text-cimaa-text">
                 {submission.business_name}
               </strong>
-              . The Waji team is reviewing now and will send your payment link shortly.
+              . The Wajii team is reviewing now and will send your payment link shortly.
             </p>
             <div className="mt-8">
               <Button href="/" variant="outline" size="lg">
