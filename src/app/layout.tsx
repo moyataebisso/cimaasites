@@ -38,7 +38,7 @@ export const metadata: Metadata = {
       "Wajii Professional Websites — Custom Websites for Local Businesses",
     description:
       "Custom websites for local businesses. Built, launched, secured, and supported. Get a quote in 24 hours.",
-    url: "https://cimaasites.ai",
+    url: "https://wajiiwebsites.com",
     siteName: "Wajii Professional Websites",
     type: "website",
   },
@@ -68,7 +68,7 @@ export default function RootLayout({
               name: "Wajii Professional Websites",
               description:
                 "Custom websites for local and small businesses. Built, launched, secured, and supported.",
-              url: "https://cimaasites.ai",
+              url: "https://wajiiwebsites.com",
               email: "arsitechgroup@gmail.com",
               address: {
                 "@type": "PostalAddress",

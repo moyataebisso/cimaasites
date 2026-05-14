@@ -32,7 +32,7 @@ All variables needed in `.env.local` (and Vercel project settings).
 | Variable | Description |
 |----------|-------------|
 | `RESEND_API_KEY` | Resend API key (resend.com > API Keys) |
-| `RESEND_FROM_EMAIL` | Verified sender email (e.g. `noreply@cimaasites.ai`) |
+| `RESEND_FROM_EMAIL` | Verified sender email (e.g. `noreply@wajiiwebsites.com`) |
 
 ## Vercel (Auto-provisioning)
 
@@ -45,7 +45,7 @@ All variables needed in `.env.local` (and Vercel project settings).
 
 | Variable | Description |
 |----------|-------------|
-| `NEXT_PUBLIC_APP_URL` | Full app URL (e.g. `https://cimaasites.ai` or `http://localhost:3000`) |
+| `NEXT_PUBLIC_APP_URL` | Full app URL (e.g. `https://wajiiwebsites.com` or `http://localhost:3000`) |
 | `ADMIN_PASSWORD` | Password for the /admin dashboard |
 
 ## Optional

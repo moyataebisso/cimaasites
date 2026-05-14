@@ -19,7 +19,7 @@ const mock = {
   selected_layout: 'restaurant',
   message: 'We need a website with online ordering and reservations',
   layout_notes: 'Warm earthy colors, lots of food photos',
-  intakeUrl: 'https://cimaasites.vercel.app/intake/abc123',
+  intakeUrl: 'https://wajiiwebsites.com/intake/abc123',
   paymentUrl: 'https://buy.stripe.com/test_xxx',
   amountUsd: 599,
   previewUrl: 'https://adama-restaurant-xyz.vercel.app',

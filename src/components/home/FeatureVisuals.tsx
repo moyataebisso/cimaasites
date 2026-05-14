@@ -208,7 +208,7 @@ export function CraftDeviceVisual() {
             <span className="h-2 w-2 rounded-full bg-amber-300" />
             <span className="h-2 w-2 rounded-full bg-emerald-300" />
             <span className="ml-3 text-xs text-cimaa-text-subtle">
-              your-business.cimaasites.ai
+              your-business.wajiiwebsites.com
             </span>
           </div>
           <div className="p-6 sm:p-8">

@@ -24,7 +24,7 @@ function getResend(): Resend {
 
 // Hardcoded per spec — Resend must have arsitechgroup.com domain verified
 // or every send will bounce. Keep the env override available as a kill
-// switch if we ever need to roll back to cimaasites.ai in a hurry.
+// switch if we ever need to roll back the From-address in a hurry.
 const FROM_DEFAULT = 'Wajii Sites <noreply@arsitechgroup.com>'
 const REPLY_TO = 'support@arsitechgroup.com'
 function fromAddress(): string {

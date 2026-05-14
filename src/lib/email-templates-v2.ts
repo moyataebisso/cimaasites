@@ -25,7 +25,7 @@ const COLORS = {
   textCode: '#fde68a',
 } as const
 
-const SITE_URL = 'https://cimaasites.ai'
+const SITE_URL = 'https://wajiiwebsites.com'
 
 // ─── Shared shell ───────────────────────────────────────
 

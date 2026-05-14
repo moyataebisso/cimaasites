@@ -34,7 +34,7 @@ function MockupCard({ side }: { side: "left" | "right" }) {
           <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
           <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
           <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
-          <div className="ml-2 text-xs text-slate-400">cimaasites.ai</div>
+          <div className="ml-2 text-xs text-slate-400">wajiiwebsites.com</div>
         </div>
         <div className="relative h-48">
           <div className="absolute inset-0 animate-theme-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-white p-6">

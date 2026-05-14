@@ -35,5 +35,5 @@ export function getAppBaseUrl(
     return `${protocol}://${host}`
   }
 
-  return 'https://cimaasites.vercel.app'
+  return 'https://wajiiwebsites.com'
 }
