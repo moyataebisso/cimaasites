@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { logStep } from '@/lib/provision/logger'
@@ -441,6 +442,57 @@ async function provisionSite(
         ? 'Both invite and recovery generateLink calls failed'
         : undefined
     )
+
+    // Seed the tenant-schema users row so arsi-platform's requireAdmin()
+    // resolves this admin. requireAdmin queries <schema>.users by auth_id
+    // (NOT by id): id is the tenant table's own PK (fresh uuid), auth_id
+    // is the foreign reference to auth.users.id. Keep them distinct.
+    //
+    // Fails loudly (throws) when we don't have an auth userId, or when the
+    // insert errors with anything other than a unique-violation. Silent
+    // partial provisioning — a site that comes up but whose admin can't
+    // upload — is exactly the bug class this commit fixes; a rare Auth-API
+    // outage that landed us in fallback_manual_reset warrants a retry, not
+    // a silently broken site. 23505 (unique_violation) is treated as
+    // success so a retry of a partially-completed run is idempotent.
+    if (!invite.userId) {
+      throw new Error(
+        `Cannot seed admin profile in ${schemaName}.users: invite returned no userId (type=${invite.type}). ` +
+          `Retry provisioning after the Supabase Auth API is healthy.`
+      )
+    }
+    const { error: usersErr } = await supabaseAdmin
+      .schema(schemaName)
+      .from('users')
+      .insert({
+        id: randomUUID(),
+        auth_id: invite.userId,
+        email: adminEmail,
+        role: 'admin',
+        is_active: true,
+        ...(submission.contact_name
+          ? { name: submission.contact_name }
+          : {}),
+      })
+    if (usersErr && usersErr.code !== '23505') {
+      throw new Error(
+        `Could not seed admin profile in ${schemaName}.users: ${usersErr.message}`
+      )
+    }
+    await logStep(
+      submissionId,
+      'tenant_admin_seeded',
+      'done',
+      usersErr?.code === '23505'
+        ? 'Admin profile already present (idempotent retry)'
+        : 'Admin profile created in tenant schema'
+    )
+    console.log('[provision] tenant users seeded', {
+      submissionId,
+      schema: schemaName,
+      authId: invite.userId,
+      idempotent: usersErr?.code === '23505',
+    })
 
     await sendPreviewReadyEmail({
       email: submission.email,

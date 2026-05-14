@@ -49,6 +49,7 @@ export async function logStep(
     deploying: 65,
     waiting_for_deploy: 80,
     setting_up_domain: 90,
+    tenant_admin_seeded: 93,
     sending_preview: 95,
     complete: 100,
   }
