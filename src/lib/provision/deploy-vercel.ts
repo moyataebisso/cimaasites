@@ -98,7 +98,7 @@ export async function createVercelProject(
   schemaName: string
 ) {
   const slug = generateSlug(submission.business_name)
-  const projectName = `cimaa-${slug}-${Date.now()}`
+  const projectName = `waji-${slug}-${Date.now()}`
 
   // 1. Create project from same GitHub repo
   const project = await vercelFetch('/v9/projects', {

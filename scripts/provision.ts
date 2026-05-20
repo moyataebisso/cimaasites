@@ -165,7 +165,7 @@ async function main() {
 
   // ── PROVISION ──────────────────────────────────
   const schemaName = generateSchemaName(businessName)
-  const projectName = `cimaa-${schemaName.replace('client_', '')}-${Date.now()}`
+  const projectName = `waji-${schemaName.replace('client_', '')}-${Date.now()}`
 
   let adminPassword = ''
   let previewUrl = ''
