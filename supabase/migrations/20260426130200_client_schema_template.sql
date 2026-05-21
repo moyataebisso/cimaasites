@@ -20,6 +20,11 @@ CREATE SCHEMA IF NOT EXISTS __SCHEMA__;
 
 CREATE TABLE IF NOT EXISTS __SCHEMA__.site_settings (
   key text PRIMARY KEY,
+  -- DEPRECATED: this column will be dropped in a follow-up migration.
+  -- Code no longer writes to it. Kept here for historical accuracy
+  -- of what was applied on 2026-04-26. New tenants get site_settings
+  -- via cimaasites.clone_public_to_schema() (added 2026-05-01) which
+  -- mirrors public.site_settings directly.
   value text,
   value_json jsonb,
   updated_at timestamptz DEFAULT now()

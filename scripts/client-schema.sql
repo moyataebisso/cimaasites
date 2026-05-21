@@ -3,7 +3,6 @@ SET search_path TO {{SCHEMA}};
 CREATE TABLE IF NOT EXISTS site_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   key text NOT NULL,
-  value text,
   value_json jsonb,
   updated_by uuid,
   updated_at timestamptz DEFAULT now(),

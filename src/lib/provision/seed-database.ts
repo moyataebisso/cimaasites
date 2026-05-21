@@ -14,20 +14,6 @@ const LAYOUT_DEFAULT_HERO: Record<string, string> = {
   home_services: 'image_overlay',
 }
 
-// Coerce arbitrary value into a text representation for the `value` column
-// of site_settings. The starter-app reads from value_json; `value` is a text
-// mirror kept for legacy tools that don't speak jsonb.
-function toText(v: unknown): string {
-  if (v === null || v === undefined) return ''
-  if (typeof v === 'string') return v
-  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
-  try {
-    return JSON.stringify(v)
-  } catch {
-    return ''
-  }
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Submission = any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,10 +33,10 @@ export async function seedClientDatabase(
     LAYOUT_DEFAULT_HERO[layoutId] || LAYOUT_DEFAULT_HERO.fleet
 
   // ─── 1. site_settings ───────────────────────────────────
-  // public.site_settings has BOTH `value` (text) and `value_json` (jsonb).
-  // The starter-app reads from value_json — but we mirror to value (text)
-  // so legacy queries / older tooling don't see NULL. Native JS values
-  // (objects, arrays) only round-trip correctly through value_json.
+  // public.site_settings still has a legacy `value` (text) column alongside
+  // `value_json` (jsonb). The starter-app reads only value_json — we stopped
+  // writing the text mirror. The column will be dropped in a follow-up
+  // migration; until then new rows leave it NULL.
   const settings: { key: string; value: unknown }[] = [
     { key: 'business_name', value: submission.business_name || '' },
     {
@@ -99,12 +85,11 @@ export async function seedClientDatabase(
     { key: 'gallery_images', value: submission.generated_gallery || [] },
   ]
 
-  // Write both columns. `onConflict: 'key'` overwrites any prior partial
-  // garbage from earlier failed runs.
+  // `onConflict: 'key'` overwrites any prior partial garbage from earlier
+  // failed runs.
   const upsertPayload = settings.map((s) => ({
     key: s.key,
-    value: toText(s.value), // text mirror
-    value_json: s.value, // primary — what the starter-app reads
+    value_json: s.value,
   }))
 
   console.log('[seed] inserting site_settings', { count: upsertPayload.length })
