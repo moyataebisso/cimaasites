@@ -17,9 +17,11 @@ All variables needed in `.env.local` (and Vercel project settings).
 | `STRIPE_SECRET_KEY` | Stripe secret key (Developers > API keys) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (Developers > API keys) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (Developers > Webhooks > signing secret) |
-| `STRIPE_BASIC_PRICE_ID` | Stripe Price ID for Basic plan ($19/mo subscription) |
-| `STRIPE_PRO_PRICE_ID` | Stripe Price ID for Pro plan ($35/mo subscription) |
-| `STRIPE_DEV_PRICE_ID` | Stripe Price ID for Developer plan ($49.99 one-time payment) |
+| `STRIPE_BASIC_SETUP_PRICE_ID` | Stripe Price ID for Basic plan setup fee ($599 one-time) |
+| `STRIPE_BASIC_MONTHLY_PRICE_ID` | Stripe Price ID for Basic plan ($299/mo subscription) |
+| `STRIPE_PRO_SETUP_PRICE_ID` | Stripe Price ID for Pro plan setup fee ($599 one-time) |
+| `STRIPE_PRO_MONTHLY_PRICE_ID` | Stripe Price ID for Pro plan ($399/mo subscription) |
+| `STRIPE_DEVELOPER_PRICE_ID` | Stripe Price ID for Developer plan ($49.99 one-time payment) |
 
 ## Anthropic (Claude AI)
 
