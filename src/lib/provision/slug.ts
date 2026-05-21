@@ -2,7 +2,7 @@
  * Lower-cases the business name and replaces any non-alphanumeric run with a
  * single hyphen, then trims leading/trailing hyphens and caps at 25 chars.
  *
- * Used to derive both the Vercel project name (`waji-<slug>-<ts>`) and the
+ * Used to derive both the Vercel project name (`wajii-<slug>-<ts>`) and the
  * per-customer Postgres schema name (`client_<slug>`). Keep these in sync —
  * if you change the rules here, every downstream identifier shifts.
  */
