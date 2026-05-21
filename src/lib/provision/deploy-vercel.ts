@@ -91,12 +91,30 @@ async function vercelFetch(path: string, options: RequestInit = {}) {
   return data
 }
 
+// Vars that get injected into every tenant Vercel project. Missing any
+// one of these silently produces a tenant deployment that boots but
+// can't talk to Supabase — exactly the failure mode that gave Adama
+// Restaurant a broken /admin/users (no apikey header on browser
+// requests). Fail loudly before we create the Vercel project so a
+// half-provisioned tenant never reaches the customer.
+const REQUIRED_ENVS = [
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
+] as const
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createVercelProject(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   submission: any,
   schemaName: string
 ) {
+  for (const key of REQUIRED_ENVS) {
+    if (!process.env[key]) {
+      throw new Error(`${key} env var is required for tenant provisioning`)
+    }
+  }
+
   const slug = generateSlug(submission.business_name)
   const projectName = `wajii-${slug}-${Date.now()}`
 
@@ -118,9 +136,9 @@ export async function createVercelProject(
 
   // 2. Set all environment variables
   const envVars = [
-    { key: 'NEXT_PUBLIC_SUPABASE_URL', value: process.env.NEXT_PUBLIC_SUPABASE_URL!, target: ['production', 'preview'], type: 'plain' },
-    { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, target: ['production', 'preview'], type: 'plain' },
-    { key: 'SUPABASE_SERVICE_ROLE_KEY', value: process.env.SUPABASE_SERVICE_ROLE_KEY!, target: ['production', 'preview'], type: 'encrypted' },
+    { key: 'NEXT_PUBLIC_SUPABASE_URL', value: process.env.NEXT_PUBLIC_SUPABASE_URL, target: ['production', 'preview'], type: 'plain' },
+    { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, target: ['production', 'preview'], type: 'plain' },
+    { key: 'SUPABASE_SERVICE_ROLE_KEY', value: process.env.SUPABASE_SERVICE_ROLE_KEY, target: ['production', 'preview'], type: 'encrypted' },
     { key: 'NEXT_PUBLIC_APP_URL', value: `https://${projectName}.vercel.app`, target: ['production'], type: 'plain' },
     { key: 'RESEND_API_KEY', value: process.env.RESEND_API_KEY!, target: ['production'], type: 'encrypted' },
     { key: 'RESEND_FROM_EMAIL', value: process.env.RESEND_FROM_EMAIL!, target: ['production'], type: 'plain' },
@@ -138,6 +156,11 @@ export async function createVercelProject(
     // deployments (no schemaName) silently fall back to 'public' on the
     // starter side, so we keep them working by setting a sensible default.
     { key: 'SUPABASE_SCHEMA', value: schemaName, target: ['production', 'preview'], type: 'plain' },
+    // NEXT_PUBLIC_ counterpart for browser-side supabase clients. Without
+    // this, src/lib/supabase/client.ts falls back to 'public' and any
+    // tenant admin page that queries the browser client reads from the
+    // shared public.* tables instead of this tenant's schema.
+    { key: 'NEXT_PUBLIC_SUPABASE_SCHEMA', value: schemaName, target: ['production', 'preview'], type: 'plain' },
     { key: 'CRON_SECRET', value: 'cimaa2026secret', target: ['production'], type: 'plain' },
     { key: 'DISCORD_WEBHOOK_DAILY_REPORTS', value: 'placeholder', target: ['production'], type: 'plain' },
     { key: 'UNSPLASH_ACCESS_KEY', value: process.env.UNSPLASH_ACCESS_KEY || 'placeholder', target: ['production'], type: 'plain' },
