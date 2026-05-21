@@ -31,7 +31,7 @@ export function CommunitySection() {
 
             <div className="mt-6 space-y-4 text-slate-600 leading-relaxed">
               <p>
-                Cimaa Sites was born from the community. We watched local
+                Wajii Sites was born from the community. We watched local
                 businesses and community entrepreneurs struggle to get online —
                 either paying thousands to agencies, or getting lost trying to
                 figure out Wix or Squarespace alone.

@@ -37,10 +37,13 @@ export async function POST(request: Request) {
   }
 
   if (status === 'done') {
+    if (!process.env.RESEND_FROM_EMAIL) {
+      throw new Error('RESEND_FROM_EMAIL env var is required')
+    }
     try {
       const resend = new Resend(process.env.RESEND_API_KEY)
       await resend.emails.send({
-        from: `Cimaa Sites <${process.env.RESEND_FROM_EMAIL || 'noreply@cimaasites.ai'}>`,
+        from: `Wajii Sites <${process.env.RESEND_FROM_EMAIL}>`,
         to: existing.client_email,
         subject: `Your change is done — ${existing.business_name}`,
         html: `
@@ -61,7 +64,7 @@ export async function POST(request: Request) {
                 : ''
             }
             <p>Visit your website to see the update. If anything looks off, just submit another change request.</p>
-            <p style="color:#888;font-size:12px">Cimaa Sites — We are always here to help</p>
+            <p style="color:#888;font-size:12px">Wajii Sites — We are always here to help</p>
           </div>
         `,
       })

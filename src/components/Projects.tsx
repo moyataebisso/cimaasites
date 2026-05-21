@@ -82,7 +82,7 @@ export function Projects() {
           </h2>
           <p className="mt-4 text-lg text-slate-400">
             Every platform we&apos;ve built runs on the same stack powering
-            Cimaa Sites.
+            Wajii Sites.
           </p>
         </motion.div>
 

@@ -170,7 +170,7 @@ const PROJECT_FILTER_OPTIONS = [
   { value: 'SaveYours', label: 'SaveYours' },
   { value: 'CareConnect Live', label: 'CareConnect' },
   { value: 'Oromo Platform', label: 'Oromo Platform' },
-  { value: 'cimaa', label: 'Cimaa Clients' },
+  { value: 'cimaa', label: 'Wajii Clients' },
 ]
 
 // ─── Main Component ─────────────────────────────────────
@@ -320,7 +320,7 @@ export default function AdminPage() {
     <main className="min-h-screen bg-slate-50 pt-24 pb-16">
       <Container>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-slate-900">Cimaa Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Wajii Admin Dashboard</h1>
           <a
             href="https://arsi-platform-dashboard.vercel.app"
             target="_blank"
@@ -364,7 +364,7 @@ export default function AdminPage() {
           <>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <StatCard label="Total Projects" value="7" sub="All monitored 24/7" icon={<Globe size={16} className="text-blue-500" />} />
-              <StatCard label="Cimaa Clients" value={String(clients.length)} sub="New Cimaa Sites clients" />
+              <StatCard label="Wajii Clients" value={String(clients.length)} sub="New Wajii Sites clients" />
               <StatCard label="Monthly Revenue" value={`$${(totalRevenue / 100).toFixed(2)}`} />
               <StatCard label="Recent Signups" value={String(submissions.length)} />
             </div>

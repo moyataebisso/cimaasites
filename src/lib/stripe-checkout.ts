@@ -19,7 +19,7 @@ export interface CreateCheckoutResult {
 }
 
 /**
- * Creates a Stripe Checkout session for a Cimaa Sites onboarding submission and
+ * Creates a Stripe Checkout session for a Wajii Sites onboarding submission and
  * persists the resulting session id + url back onto onboarding_submissions.
  *
  * - developer plan: one-time payment

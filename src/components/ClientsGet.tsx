@@ -41,7 +41,7 @@ export function ClientsGet() {
             Everything your clients need to get found online
           </h2>
           <p className="text-xl font-semibold text-center text-violet-300 mb-12">
-            Every Cimaa Site comes with a full marketing toolkit &mdash; built
+            Every Wajii Site comes with a full marketing toolkit &mdash; built
             in, no add-ons needed.
           </p>
         </motion.div>

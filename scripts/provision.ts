@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // ─────────────────────────────────────────
-// CIMAA SITES PRICING — April 2026
+// WAJII SITES PRICING — April 2026
 // ─────────────────────────────────────────
 // Setup fee:      $599 one-time
 //                 Includes first month
@@ -64,7 +64,7 @@ for (const env of requiredEnvs) {
 
 async function main() {
   console.log('\n' + chalk.bold.blue('═══════════════════════════════'))
-  console.log(chalk.bold.blue('  CIMAA SITES — PROVISIONING'))
+  console.log(chalk.bold.blue('  WAJII SITES — PROVISIONING'))
   console.log(chalk.bold.blue('═══════════════════════════════') + '\n')
 
   // ── COLLECT INFO ──────────────────────────────
@@ -293,7 +293,7 @@ async function main() {
       admin_url: `${previewUrl}/admin`,
       domain: `${projectName}.vercel.app`,
     })
-    spinnerF.succeed(chalk.green('Registered in Cimaa Sites admin'))
+    spinnerF.succeed(chalk.green('Registered in Wajii Sites admin'))
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e)
     spinnerF.warn(chalk.yellow(`Registration warning: ${msg}`))
