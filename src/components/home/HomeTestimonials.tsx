@@ -8,7 +8,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 interface Testimonial {
   quote: string;
   name: string;
-  business: string;
+  title: string;
+  location: string;
   initials: string;
   accent: string;
 }
@@ -16,27 +17,21 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "Wajii got our healthcare agency online in under a week. The admin dashboard is so easy — even our staff can update it. Best investment we've made.",
-    name: "Fatima A.",
-    business: "Entrusted Home Healthcare",
+      "Wajii got our health services agency online in under a week. The site looks completely professional, it shows up on Google, and I can actually update it myself. Best investment for our agency.",
+    name: "Furtu Anota, DNP, APRN",
+    title: "Founder, El Roi Health Services LLC",
+    location: "Minneapolis, MN",
     initials: "FA",
     accent: "bg-emerald-100 text-emerald-700",
   },
   {
     quote:
-      "I was paying thousands for a basic agency site. Wajii rebuilt mine and now they handle everything. My site loads faster too.",
-    name: "Ahmed M.",
-    business: "Rift Valley Transportation",
-    initials: "AM",
-    accent: "bg-amber-100 text-amber-700",
-  },
-  {
-    quote:
-      "They understood exactly what we needed — a professional site that serves our community. Setup was painless and support has been amazing.",
-    name: "Hana T.",
-    business: "CareConnect Live",
-    initials: "HT",
-    accent: "bg-violet-100 text-violet-700",
+      "We needed a website that actually represented what we do. Wajii understood our mission from day one. The site is clean, professional, and our families can find us on Google now.",
+    name: "Korme Koji",
+    title: "CEO, Entrusted Care Residence",
+    location: "Saint Paul, MN",
+    initials: "KK",
+    accent: "bg-rose-100 text-rose-700",
   },
 ];
 
@@ -51,7 +46,7 @@ export function HomeTestimonials() {
           subtitle="A few words from local owners who let us run their site so they don't have to."
         />
 
-        <div className="mt-14 grid md:grid-cols-3 gap-6 md:gap-8">
+        <div className="mt-14 grid md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
           {testimonials.map((t, i) => (
             <motion.figure
               key={t.name}
@@ -66,7 +61,7 @@ export function HomeTestimonials() {
                   <Star key={j} size={16} fill="currentColor" />
                 ))}
               </div>
-              <blockquote className="text-cimaa-text leading-relaxed flex-1">
+              <blockquote className="text-cimaa-text leading-relaxed flex-1 italic">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-6 pt-5 border-t border-cimaa-border flex items-center gap-3">
@@ -79,7 +74,8 @@ export function HomeTestimonials() {
                   <p className="text-sm font-semibold text-cimaa-text">
                     {t.name}
                   </p>
-                  <p className="text-xs text-cimaa-text-muted">{t.business}</p>
+                  <p className="text-xs text-cimaa-text-muted">{t.title}</p>
+                  <p className="text-xs text-cimaa-text-subtle">{t.location}</p>
                 </div>
               </figcaption>
             </motion.figure>

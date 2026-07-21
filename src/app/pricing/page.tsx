@@ -7,9 +7,9 @@ import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "How It Works",
+  title: "Pricing — Wajii Websites | Custom Websites Starting at $99/mo",
   description:
-    "What you get with Wajii Professional Websites. Tell us about your business and we'll send a custom quote within 24 hours.",
+    "Transparent website pricing for small businesses. One-time setup fee plus flat monthly rate. No contracts. No hidden fees. Cancel anytime.",
 };
 
 interface Tier {

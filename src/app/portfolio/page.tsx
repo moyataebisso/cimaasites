@@ -1,85 +1,59 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { HomeFinalCTA } from "@/components/home/HomeFinalCTA";
 import { LAYOUTS } from "@/lib/layouts";
 
-const LOGO_BASE =
-  "https://abhpzepanwhuswhiuutu.supabase.co/storage/v1/object/public/logos";
-
 export const metadata: Metadata = {
-  title: "Portfolio",
+  title: "Our Work — Wajii Websites | Client Portfolio",
   description:
-    "Real businesses on the Wajii Professional Websites platform and the broader Arsi Technology Group ecosystem.",
+    "See the restaurants, home care agencies, and small businesses we have built websites for in Minneapolis and Minnesota.",
 };
 
 interface ProjectCard {
   name: string;
   industry: string;
+  location: string;
   description: string;
-  url: string | null;
-  /** Tailwind utility classes for the gradient block behind the logo. */
+  url?: string;
+  tags: string[];
+  status: "live" | "demo";
   accent: string;
-  /** Public Supabase Storage URL for the project's logo. */
-  logo: string;
 }
 
 const projects: ProjectCard[] = [
   {
-    name: "CareConnect Live",
-    industry: "Healthcare",
+    name: "El Roi Health Services",
+    industry: "Home Care Agency",
+    location: "Minneapolis, MN",
+    url: "https://elroihealthservices.com",
     description:
-      "Provider matching platform with appointment booking and secure messaging.",
-    url: "https://careconnectlive.org",
+      "Full 7-page site with JSON-LD structured data, Google Business Profile, Google Search Console, SEO-optimized copy, referrals page, jobs page, and contact form routing.",
+    tags: ["Healthcare", "Home Care", "SEO"],
+    status: "live",
     accent: "from-emerald-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/careconnect-logo.png`,
   },
   {
-    name: "SaveYours",
-    industry: "Training",
-    description:
-      "CPR and first aid class registration with Stripe payments and automated emails.",
-    url: "https://saveyours.net",
-    accent: "from-rose-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/saveyours-logo.png`,
-  },
-  {
-    name: "Entrusted Home Healthcare",
-    industry: "Healthcare",
-    description:
-      "Home healthcare agency website with HIPAA-aligned content and service listings.",
+    name: "Entrusted Care Residence",
+    industry: "Assisted Living",
+    location: "Saint Paul, MN",
     url: "https://entrustedhomehealthcare.org",
-    accent: "from-sky-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/entrusted-logo.png`,
+    description:
+      "Full website rebuild from GoDaddy to custom Next.js platform. Mission/Values/Philosophy structure, OurHomes gallery, Referrals page, Resources page, newsletter subscribe, maroon/cream palette.",
+    tags: ["Healthcare", "Assisted Living"],
+    status: "live",
+    accent: "from-rose-100 to-cimaa-bg-tan",
   },
   {
-    name: "Rift Valley Transportation",
-    industry: "Logistics",
+    name: "Adama Restaurant",
+    industry: "Ethiopian Restaurant",
+    location: "Columbia Heights, MN",
     description:
-      "Transportation company website serving the Twin Cities metro area.",
-    url: "https://rvtusinc.com",
+      "Demo site built to replace SpotHopper. Custom adamaGold theme with Playfair Display headings. Full restaurant page set: Menu, Drinks, Order, Reserve, Parties, Catering, Jobs.",
+    tags: ["Restaurant", "Food & Beverage"],
+    status: "demo",
     accent: "from-amber-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/riftvalley-logo.png`,
-  },
-  {
-    name: "Oromo Platform",
-    industry: "Community",
-    description:
-      "Community hub — academy, businesses, careers, news, events, all in one platform.",
-    url: "https://oromo-platform.vercel.app",
-    accent: "from-violet-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/odda-logo.png`,
-  },
-  {
-    name: "Arsi Technology Group",
-    industry: "Studio",
-    description:
-      "The Minneapolis-based studio behind Wajii and the rest of the platform.",
-    url: "https://arsitechgroup.com",
-    accent: "from-slate-100 to-cimaa-bg-tan",
-    logo: `${LOGO_BASE}/indsve-logo.png`,
   },
 ];
 
@@ -93,7 +67,7 @@ export default function PortfolioPage() {
             eyebrow="Portfolio"
             headline="Real businesses,"
             accent="real sites"
-            subtitle="A look at sites built and run on the Wajii Professional Websites platform — and the broader Arsi Technology Group ecosystem."
+            subtitle="A look at sites built and run on the Wajii Websites platform — restaurants, home care agencies, and small businesses in Minneapolis and Minnesota."
           />
         </Container>
       </section>
@@ -160,40 +134,48 @@ function ProjectTile({ project }: { project: ProjectCard }) {
   return (
     <div className="rounded-2xl border border-cimaa-border bg-white shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
       <div
-        className={`relative h-48 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
+        className={`relative h-40 bg-gradient-to-br ${project.accent} flex items-center justify-center px-6`}
       >
-        <Image
-          src={project.logo}
-          alt={`${project.name} logo`}
-          width={240}
-          height={240}
-          sizes="(min-width: 1024px) 280px, (min-width: 640px) 40vw, 80vw"
-          className="object-contain max-h-32 w-auto"
-        />
+        <span className="font-heading text-xl font-semibold text-cimaa-text text-center leading-tight">
+          {project.name}
+        </span>
+        {project.status === "demo" && (
+          <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-white/90 text-cimaa-text text-[10px] font-semibold uppercase tracking-wider">
+            Demo
+          </span>
+        )}
       </div>
       <div className="p-6 flex-1 flex flex-col">
-        <h3 className="font-heading text-lg font-semibold text-cimaa-text">
-          {project.name}
-        </h3>
-        <span className="mt-1 text-xs font-semibold uppercase tracking-wider text-cimaa-green">
+        <span className="text-xs font-semibold uppercase tracking-wider text-cimaa-green">
           {project.industry}
         </span>
-        <p className="mt-2 text-cimaa-text-muted leading-relaxed text-sm flex-1">
+        <p className="mt-1 text-xs text-cimaa-text-muted">{project.location}</p>
+        <p className="mt-3 text-cimaa-text-muted leading-relaxed text-sm flex-1">
           {project.description}
         </p>
-        {project.url ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-0.5 rounded-full bg-cimaa-bg-tan text-cimaa-text text-[11px] font-medium"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        {project.status === "live" && project.url ? (
           <a
             href={project.url}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-cimaa-green hover:text-emerald-800 transition-colors"
           >
-            Visit site
+            View site
             <ExternalLink size={14} />
           </a>
         ) : (
           <span className="mt-4 text-sm text-cimaa-text-subtle">
-            Coming soon
+            Demo — request a walkthrough
           </span>
         )}
       </div>

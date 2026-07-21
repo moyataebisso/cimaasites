@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Manrope, Outfit } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { WajiiJsonLd } from "@/components/WajiiJsonLd";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,31 +25,39 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://wajiiwebsites.com"),
   title: {
     default:
-      "Wajii Professional Websites — Custom Websites for Local Businesses",
-    template: "%s | Wajii Professional Websites",
+      "Wajii Websites — Done-For-You Custom Websites for Small Businesses",
+    template: "%s | Wajii Websites",
   },
   description:
-    "Custom websites for local and small businesses. Built, launched, secured, and supported — so you can focus on what you do best.",
-  keywords:
-    "small business website, local business website, professional website, done for you website, website monitoring, restaurant website, salon website, healthcare website, fleet website, home services website",
+    "Done-for-you custom websites for small businesses in Minneapolis and Minnesota. We build, host, and manage everything. Starting at $99/mo. No tech skills needed.",
+  keywords: [
+    "custom website Minneapolis",
+    "managed website service Minnesota",
+    "done for you website small business",
+    "SpotHopper alternative",
+    "restaurant website Minneapolis",
+    "home care agency website MN",
+    "Wajii Websites",
+  ],
   openGraph: {
-    title:
-      "Wajii Professional Websites — Custom Websites for Local Businesses",
+    title: "Wajii Websites — Custom Websites for Small Businesses",
     description:
-      "Custom websites for local businesses. Built, launched, secured, and supported. Get a quote in 24 hours.",
+      "We build and manage professional websites for small businesses. Starting at $99/mo.",
     url: "https://wajiiwebsites.com",
-    siteName: "Wajii Professional Websites",
+    siteName: "Wajii Websites",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Wajii Professional Websites — Custom Websites for Local Businesses",
+    title: "Wajii Websites — Custom Websites for Small Businesses",
     description:
-      "Custom websites for local businesses. Get a quote in 24 hours.",
+      "We build and manage professional websites for small businesses. Starting at $99/mo.",
   },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -58,34 +67,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: "Wajii Professional Websites",
-              description:
-                "Custom websites for local and small businesses. Built, launched, secured, and supported.",
-              url: "https://wajiiwebsites.com",
-              email: "arsitechgroup@gmail.com",
-              address: {
-                "@type": "PostalAddress",
-                addressCountry: "US",
-              },
-              priceRange: "$$",
-              parentOrganization: {
-                "@type": "Organization",
-                name: "Arsi Technology Group",
-              },
-            }),
-          }}
-        />
-      </head>
       <body
         className={`${inter.variable} ${manrope.variable} ${outfit.variable} font-sans antialiased`}
       >
+        <WajiiJsonLd />
         {/* Animated page border — top */}
         <div className="fixed top-0 left-0 w-full h-[3px] z-[9999] pointer-events-none overflow-hidden">
           <div className="border-travel-top absolute top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-cimaa-yellow to-transparent" />

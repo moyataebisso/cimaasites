@@ -12,6 +12,7 @@ const supportLinks = [
   { href: "/contact", label: "Contact" },
   { href: "/pricing", label: "How It Works" },
   { href: "/features", label: "Features" },
+  { href: "/compare/spothopper", label: "vs. SpotHopper" },
 ];
 
 export function Footer() {
