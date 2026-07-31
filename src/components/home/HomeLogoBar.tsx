@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/Container";
 const clients = [
   "CareConnect Live",
   "SaveYours",
-  "Entrusted Home Healthcare",
+  "Entrusted Care Residence",
   "Rift Valley Transportation",
   "Oromo Platform",
   "Arsi Tech Group",

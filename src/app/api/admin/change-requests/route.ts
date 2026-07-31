@@ -6,7 +6,7 @@ const EXISTING_PROJECT_NAMES = [
   'CareConnect Live',
   'Oromo Platform',
   'Arsi Command Center',
-  'Entrusted Home Healthcare',
+  'Entrusted Care Residence',
   'Rift Valley Transportation',
 ]
 

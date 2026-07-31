@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/Container";
 const clients = [
   { name: "CareConnect Live", type: "Healthcare" },
   { name: "SaveYours", type: "Training & Education" },
-  { name: "Entrusted Home Healthcare", type: "Healthcare" },
+  { name: "Entrusted Care Residence", type: "Healthcare" },
   { name: "Rift Valley Transportation", type: "Transportation" },
   { name: "Your business", type: "Coming soon \u2192" },
 ];

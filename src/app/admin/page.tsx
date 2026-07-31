@@ -123,13 +123,13 @@ const EXISTING_PROJECTS = [
     github: 'moyataebisso/arsi-platform',
   },
   {
-    name: 'Entrusted Home Healthcare',
-    url: 'https://entrustedhomehealthcare.org',
+    name: 'Entrusted Care Residence',
+    url: 'https://www.entrustedcareresidence.org',
     adminUrl: null,
     type: 'Healthcare Website',
     description: 'Home healthcare company website with HIPAA compliance pages',
     status: 'live',
-    businessName: 'Entrusted Home Healthcare',
+    businessName: 'Entrusted Care Residence',
     github: null,
   },
   {
@@ -160,7 +160,7 @@ const PROJECT_BADGE_COLORS: Record<string, string> = {
   'Oromo Platform': 'bg-violet-100 text-violet-700',
   'Arsi Tech Group Website': 'bg-slate-100 text-slate-600',
   'Arsi Command Center': 'bg-orange-100 text-orange-700',
-  'Entrusted Home Healthcare': 'bg-teal-100 text-teal-700',
+  'Entrusted Care Residence': 'bg-teal-100 text-teal-700',
   'Rift Valley Transportation': 'bg-amber-100 text-amber-700',
 }
 

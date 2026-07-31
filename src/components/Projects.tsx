@@ -37,10 +37,10 @@ const projects: Project[] = [
     logo: `${SUPABASE_LOGOS}/odda-logo.png`,
   },
   {
-    name: "Entrusted Home Healthcare",
+    name: "Entrusted Care Residence",
     category: "Healthcare",
     description: "Healthcare Agency Website",
-    url: "https://entrustedhomehealthcare.org",
+    url: "https://www.entrustedcareresidence.org",
     logo: `${SUPABASE_LOGOS}/entrusted-logo.png`,
   },
   {

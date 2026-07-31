@@ -38,7 +38,7 @@ const projects: ProjectCard[] = [
     name: "Entrusted Care Residence",
     industry: "Assisted Living",
     location: "Saint Paul, MN",
-    url: "https://entrustedhomehealthcare.org",
+    url: "https://www.entrustedcareresidence.org",
     description:
       "Full website rebuild from GoDaddy to custom Next.js platform. Mission/Values/Philosophy structure, OurHomes gallery, Referrals page, Resources page, newsletter subscribe, maroon/cream palette.",
     tags: ["Healthcare", "Assisted Living"],
