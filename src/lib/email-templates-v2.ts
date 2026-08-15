@@ -755,7 +755,7 @@ ${note}
 
 // ─── Helpers ────────────────────────────────────────────
 
-function escapeHtml(s: string): string {
+export function escapeHtml(s: string): string {
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -764,7 +764,7 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;')
 }
 
-function nl2br(s: string): string {
+export function nl2br(s: string): string {
   return escapeHtml(s).replace(/\r?\n/g, '<br />')
 }
 

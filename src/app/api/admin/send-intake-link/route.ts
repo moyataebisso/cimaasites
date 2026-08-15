@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto'
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminPassword } from '@/lib/admin-auth'
 import { sendIntakeLink } from '@/lib/emails'
 import { getAppBaseUrl } from '@/lib/urls'
 
@@ -7,10 +8,8 @@ export const maxDuration = 30
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  const password = request.headers.get('x-admin-password')
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAdminPassword(request)
+  if (denied) return denied
 
   const body = await request.json().catch(() => ({}))
   const submissionId: string | undefined =

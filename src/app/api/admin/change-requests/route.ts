@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminPassword } from '@/lib/admin-auth'
 
 const EXISTING_PROJECT_NAMES = [
   'Arsi Tech Group Website',
@@ -11,10 +12,8 @@ const EXISTING_PROJECT_NAMES = [
 ]
 
 export async function GET(request: Request) {
-  const adminPassword = request.headers.get('x-admin-password')
-  if (adminPassword !== process.env.ADMIN_PASSWORD) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAdminPassword(request)
+  if (denied) return denied
 
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')

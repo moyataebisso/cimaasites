@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminPassword } from '@/lib/admin-auth'
 import {
   sendCheckoutLinkEmail,
   sendSiteLiveEmail,
@@ -18,6 +19,9 @@ type Mode = 'go_live' | 'approve_for_payment'
 const VALID_PLANS: CheckoutPlan[] = ['basic', 'pro', 'developer']
 
 export async function POST(request: Request) {
+  const denied = requireAdminPassword(request)
+  if (denied) return denied
+
   const body = await request.json()
   const submissionId: string | undefined = body.submissionId
   const mode: Mode = body.mode === 'approve_for_payment' ? 'approve_for_payment' : 'go_live'
@@ -25,13 +29,6 @@ export async function POST(request: Request) {
 
   if (!submissionId) {
     return Response.json({ error: 'submissionId is required' }, { status: 400 })
-  }
-
-  if (mode === 'approve_for_payment') {
-    const password = request.headers.get('x-admin-password')
-    if (password !== process.env.ADMIN_PASSWORD) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
   }
 
   const { data: submission } = await supabaseAdmin
@@ -161,7 +158,6 @@ async function handleGoLive(submission: {
   plan: string
   client_preview_url: string
   client_admin_email: string
-  client_admin_password: string
   client_vercel_project_id: string
   assigned_subdomain: string
 }) {
@@ -211,11 +207,12 @@ async function handleGoLive(submission: {
     console.error('Email send error:', err)
   }
 
+  // Credentials never travel through this response — customers get them
+  // from the welcome email only (Supabase invite link → self-set password).
   return Response.json({
     success: true,
     liveUrl: submission.client_preview_url,
     adminUrl: `${submission.client_preview_url}/admin`,
     adminEmail: submission.client_admin_email,
-    adminPassword: submission.client_admin_password,
   })
 }

@@ -69,6 +69,9 @@ function ContactPageInner() {
   const [plan, setPlan] = useState<PlanKey>("pro");
   const [message, setMessage] = useState("");
   const [selectedLayout, setSelectedLayout] = useState<LayoutId>("restaurant");
+  // Honeypot: hidden off-screen field. Bots that auto-fill every input
+  // will populate this; humans can't see or tab into it.
+  const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -80,6 +83,8 @@ function ContactPageInner() {
   const emailRef = useRef<HTMLInputElement>(null);
   const businessRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  // Timestamp of first mount. Server rejects submits under 3s as bots.
+  const mountedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
     const p = searchParams.get("plan");
@@ -166,6 +171,8 @@ function ContactPageInner() {
           plan,
           message,
           selected_layout: selectedLayout,
+          website,
+          mountedAt: mountedAtRef.current,
         }),
       });
       const result = await res.json();
@@ -267,6 +274,22 @@ function ContactPageInner() {
                 </div>
               ) : (
                 <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+                  {/*
+                    Honeypot: off-screen, tab-blocked, not autocompleted.
+                    Server treats any non-empty value as spam and drops
+                    silently. Do NOT change to type="hidden" or
+                    display:none — both are easy for bots to detect.
+                  */}
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    style={{ position: "absolute", left: "-9999px" }}
+                  />
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-cimaa-text mb-2">

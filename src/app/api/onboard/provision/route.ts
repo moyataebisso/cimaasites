@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { randomUUID, timingSafeEqual } from 'node:crypto'
 import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { logStep } from '@/lib/provision/logger'
@@ -24,7 +24,30 @@ export const dynamic = 'force-dynamic'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SubmissionRow = any
 
+// Header auth: this route creates a Postgres schema + Vercel project +
+// Auth user and burns Anthropic/Unsplash quota. The Stripe webhook is
+// the only legitimate caller. Missing env and wrong header return the
+// exact same response + log shape so external probes can't distinguish
+// misconfiguration from an attack.
+const MIN_SECRET_LEN = 32
+
+function verifyProvisionSecret(request: NextRequest): boolean {
+  const expected = process.env.PROVISION_SECRET
+  const provided = request.headers.get('x-provision-secret')
+  if (!expected || expected.length < MIN_SECRET_LEN) return false
+  if (!provided || provided.length !== expected.length) return false
+  const a = Buffer.from(expected)
+  const b = Buffer.from(provided)
+  if (a.length !== b.length) return false
+  return timingSafeEqual(a, b)
+}
+
 export async function POST(request: NextRequest) {
+  if (!verifyProvisionSecret(request)) {
+    console.warn('[provision] auth denied')
+    return Response.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   const { submissionId } = await request.json()
 
   console.log('[provision] entry', { submissionId })
@@ -38,10 +61,12 @@ export async function POST(request: NextRequest) {
   // Only one concurrent caller wins. Postgres handles the race in a single
   // statement: we update + filter on the lock columns, and PostgREST returns
   // the row only if the WHERE clause matches.
+  //   - paid_at IS NOT NULL              → payment confirmed by Stripe
   //   - provisioning_started_at IS NULL  → no in-progress run
   //   - provisioned_at IS NULL           → not already done
   // Once a run fails, the catch handler clears provisioning_started_at so
-  // manual retries can re-claim.
+  // manual retries can re-claim. paid_at is a belt-and-suspenders gate on
+  // top of the header auth: an unpaid row must never be provisionable.
   const { data: claim, error: claimErr } = await supabaseAdmin
     .schema('cimaasites')
     .from('onboarding_submissions')
@@ -50,6 +75,7 @@ export async function POST(request: NextRequest) {
       provisioning_started_at: new Date().toISOString(),
     })
     .eq('id', submissionId)
+    .not('paid_at', 'is', null)
     .is('provisioning_started_at', null)
     .is('provisioned_at', null)
     .select('*')

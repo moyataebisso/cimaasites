@@ -14,14 +14,7 @@ interface StatusData {
     progress: number
     business_name: string
     client_preview_url: string
-    error_message?: string
   }
-  logs: Array<{
-    step: string
-    status: string
-    message: string
-    completed_at: string
-  }>
 }
 
 const buildSteps = [
@@ -77,12 +70,14 @@ export default function BuildingPage({
   const isComplete = statusData?.submission?.status === 'preview'
   const isFailed = statusData?.submission?.status === 'failed'
   const progress = statusData?.submission?.progress || 0
-  const completedSteps = new Set(
-    statusData?.logs?.filter((l) => l.status === 'done').map((l) => l.step) || []
-  )
-  const runningSteps = new Set(
-    statusData?.logs?.filter((l) => l.status === 'running').map((l) => l.step) || []
-  )
+  // Derive step state from current_step so we no longer need per-log
+  // detail (which leaks the internal pipeline structure). Steps before
+  // the current one show as done, the current one as running, the rest
+  // as pending.
+  const currentStep = statusData?.submission?.current_step
+  const currentIndex = currentStep
+    ? buildSteps.findIndex((s) => s.key === currentStep)
+    : -1
 
   return (
     <main className="min-h-screen pt-24 pb-16 relative overflow-hidden">
@@ -135,8 +130,8 @@ export default function BuildingPage({
                 Something went wrong
               </h1>
               <p className="mt-2 text-slate-500">
-                {statusData?.submission?.error_message ||
-                  "We hit a snag. Don't worry — we've been notified and will fix this."}
+                We hit a snag. Don&apos;t worry — we&apos;ve been notified
+                and will fix this.
               </p>
               <p className="mt-4 text-sm text-slate-600">
                 Something went wrong. Email us at{' '}
@@ -167,9 +162,9 @@ export default function BuildingPage({
               </p>
 
               <div className="mt-8 text-left space-y-3">
-                {buildSteps.map((step) => {
-                  const done = completedSteps.has(step.key)
-                  const running = runningSteps.has(step.key)
+                {buildSteps.map((step, i) => {
+                  const done = currentIndex >= 0 && i < currentIndex
+                  const running = currentIndex >= 0 && i === currentIndex
                   return (
                     <div key={step.key} className="flex items-center gap-3">
                       {done ? (

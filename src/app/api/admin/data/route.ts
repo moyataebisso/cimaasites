@@ -1,11 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase'
+import { requireAdminPassword } from '@/lib/admin-auth'
 
 export async function GET(request: Request) {
-  const password = request.headers.get('x-admin-password')
-
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = requireAdminPassword(request)
+  if (denied) return denied
 
   const { data: clients } = await supabaseAdmin
     .schema('cimaasites')

@@ -7,6 +7,7 @@ import {
   intakeCompleteAdminAlertEmail,
   paymentReceiptEmail,
   siteLiveEmail,
+  escapeHtml,
   type AdminAlertSubmission,
 } from './email-templates-v2'
 
@@ -319,17 +320,30 @@ export async function sendYouNewClientEmail(data: {
   revenue: string
 }) {
   // Internal operational alert. Branded with the same shell.
+  //
+  // businessName + email are customer-controlled (they land here from the
+  // intake form). buildEmail's `intro` and `bodyHtml` are inserted as raw
+  // HTML — escape user-supplied values before interpolation so an inbound
+  // "Bobby<script>" business name can't inject markup into the admin
+  // inbox. plan/revenue are internal (plan is enum-validated upstream,
+  // revenue comes from revenueLabel), but we escape defensively so the
+  // policy is uniform.
+  const businessNameSafe = escapeHtml(data.businessName)
+  const emailSafe = escapeHtml(data.email)
+  const planSafe = escapeHtml(data.plan)
+  const revenueSafe = escapeHtml(data.revenue)
+
   const { buildEmail } = await import('./email-templates-v2')
   const html = buildEmail({
     preheader: `${data.businessName} · ${data.plan} · ${data.revenue}/mo`,
     title: `New client: ${data.businessName}`,
-    intro: `${data.businessName} just signed up on the <strong>${data.plan}</strong> plan.`,
+    intro: `${businessNameSafe} just signed up on the <strong>${planSafe}</strong> plan.`,
     bodyHtml: `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fafaf7;border:1px solid #e7e5e4;border-radius:10px;">
   <tr><td style="padding:14px 18px;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;color:#18181b;line-height:1.7;">
-    <strong>Email:</strong> ${data.email}<br/>
-    <strong>Plan:</strong> ${data.plan}<br/>
-    <strong>Revenue:</strong> ${data.revenue}/mo
+    <strong>Email:</strong> ${emailSafe}<br/>
+    <strong>Plan:</strong> ${planSafe}<br/>
+    <strong>Revenue:</strong> ${revenueSafe}/mo
   </td></tr>
 </table>`,
   })

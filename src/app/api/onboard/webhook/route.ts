@@ -143,10 +143,14 @@ export async function POST(request: Request) {
       // that route's own function). Without waitUntil, Vercel tore down this
       // function mid-fetch and the provision route never saw the request —
       // confirmed for Adama Test 7.
+      const provisionSecret = process.env.PROVISION_SECRET ?? ''
       waitUntil(
         fetch(provisionUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-provision-secret': provisionSecret,
+          },
           body: JSON.stringify({ submissionId }),
         })
           .then(async (res) => {
@@ -166,17 +170,63 @@ export async function POST(request: Request) {
                 provisionUrl,
                 body: body.slice(0, 500),
               })
+              // Surface into provisioning_logs so the admin view shows
+              // the failure. A 401 here means PROVISION_SECRET is
+              // missing or mismatched between the webhook and the
+              // provision route — the webhook still returned 200 to
+              // Stripe so operators would otherwise see nothing.
+              await supabaseAdmin
+                .schema('cimaasites')
+                .from('provisioning_logs')
+                .insert({
+                  submission_id: submissionId,
+                  step: 'provision_trigger',
+                  status: 'failed',
+                  message: `Provision route returned ${res.status}`,
+                  error: body.slice(0, 500),
+                  started_at: new Date().toISOString(),
+                  completed_at: new Date().toISOString(),
+                })
+                .then(({ error }) => {
+                  if (error) {
+                    console.error('[webhook] provision_trigger_log_insert_failed', {
+                      submissionId,
+                      error: error.message,
+                    })
+                  }
+                })
             }
           })
-          .catch((err: unknown) => {
+          .catch(async (err: unknown) => {
             const isErr = err instanceof Error
+            const message = isErr ? err.message : String(err)
             console.error('[webhook] provision_trigger_failed', {
               submissionId,
               provisionUrl,
-              error: isErr ? err.message : String(err),
+              error: message,
               stack: isErr ? err.stack : undefined,
               timestamp: new Date().toISOString(),
             })
+            await supabaseAdmin
+              .schema('cimaasites')
+              .from('provisioning_logs')
+              .insert({
+                submission_id: submissionId,
+                step: 'provision_trigger',
+                status: 'failed',
+                message: 'Provision trigger fetch failed',
+                error: message.slice(0, 500),
+                started_at: new Date().toISOString(),
+                completed_at: new Date().toISOString(),
+              })
+              .then(({ error }) => {
+                if (error) {
+                  console.error('[webhook] provision_trigger_log_insert_failed', {
+                    submissionId,
+                    error: error.message,
+                  })
+                }
+              })
           })
       )
 
