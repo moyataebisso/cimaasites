@@ -53,6 +53,7 @@ const requiredEnvs = [
   'VERCEL_API_TOKEN',
   'VERCEL_ACCOUNT_ID',
   'RESEND_API_KEY',
+  'CRON_SECRET',
 ]
 
 for (const env of requiredEnvs) {

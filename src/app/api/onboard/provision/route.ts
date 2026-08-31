@@ -48,6 +48,18 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'unauthorized' }, { status: 401 })
   }
 
+  // Fail-loud on missing CRON_SECRET before we touch any infrastructure.
+  // deploy-vercel.ts also gates on this via REQUIRED_ENVS, but that check
+  // fires AFTER createClientSchema() has already run — a mid-pipeline
+  // failure leaves an orphaned Postgres schema with no rollback path.
+  if (!process.env.CRON_SECRET) {
+    console.error('[provision] CRON_SECRET missing — refusing to provision')
+    throw new Error(
+      'CRON_SECRET env var is required — refusing to provision. ' +
+        'Aborting before any schema, Vercel project, or user is created.'
+    )
+  }
+
   const { submissionId } = await request.json()
 
   console.log('[provision] entry', { submissionId })

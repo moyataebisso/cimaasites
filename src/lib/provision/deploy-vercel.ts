@@ -101,6 +101,7 @@ const REQUIRED_ENVS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
+  'CRON_SECRET',
 ] as const
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,6 +141,7 @@ export async function createVercelProject(
     { key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, target: ['production', 'preview'], type: 'plain' },
     { key: 'SUPABASE_SERVICE_ROLE_KEY', value: process.env.SUPABASE_SERVICE_ROLE_KEY, target: ['production', 'preview'], type: 'encrypted' },
     { key: 'NEXT_PUBLIC_APP_URL', value: `https://${projectName}.vercel.app`, target: ['production'], type: 'plain' },
+    { key: 'NEXT_PUBLIC_SITE_URL', value: `https://${projectName}.vercel.app`, target: ['production'], type: 'plain' },
     { key: 'RESEND_API_KEY', value: process.env.RESEND_API_KEY!, target: ['production'], type: 'encrypted' },
     { key: 'RESEND_FROM_EMAIL', value: process.env.RESEND_FROM_EMAIL!, target: ['production'], type: 'plain' },
     { key: 'RESEND_FROM_NAME', value: submission.business_name, target: ['production'], type: 'plain' },
@@ -161,7 +163,7 @@ export async function createVercelProject(
     // tenant admin page that queries the browser client reads from the
     // shared public.* tables instead of this tenant's schema.
     { key: 'NEXT_PUBLIC_SUPABASE_SCHEMA', value: schemaName, target: ['production', 'preview'], type: 'plain' },
-    { key: 'CRON_SECRET', value: 'cimaa2026secret', target: ['production'], type: 'plain' },
+    { key: 'CRON_SECRET', value: process.env.CRON_SECRET!, target: ['production'], type: 'plain' },
     { key: 'DISCORD_WEBHOOK_DAILY_REPORTS', value: 'placeholder', target: ['production'], type: 'plain' },
     { key: 'UNSPLASH_ACCESS_KEY', value: process.env.UNSPLASH_ACCESS_KEY || 'placeholder', target: ['production'], type: 'plain' },
   ]
