@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Outfit } from "next/font/google";
+import Script from "next/script";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { WajiiJsonLd } from "@/components/WajiiJsonLd";
@@ -93,6 +94,11 @@ export default function RootLayout({
         {children}
         <Footer />
         <Analytics />
+        <Script
+          src="https://arsi-command-center.vercel.app/t.js"
+          data-key="5bfe6a0c6a6446eeb55a730b"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
